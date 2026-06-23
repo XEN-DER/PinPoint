@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+# IDE configurations
+.vscode/
+
+# OS generated files
+.DS_Store
