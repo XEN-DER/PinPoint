@@ -1,0 +1,90 @@
+---
+// Footer component matching the {component.footer} spec in clay/DESIGN.md
+---
+
+<footer class="bg-surface-soft text-body py-20 px-6 sm:px-12 border-t border-hairline mt-auto select-none relative overflow-hidden">
+  <div class="max-w-[1280px] mx-auto relative z-10">
+    <!-- Grid Columns -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+      <!-- Col 1 -->
+      <div>
+        <h3 class="text-caption-uppercase text-ink font-bold mb-4 tracking-wider">Civic Action</h3>
+        <ul class="flex flex-col gap-3 text-sm">
+          <li><a href="#feed-section" class="hover:text-primary transition-colors duration-150">Active Issues Feed</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150" id="footer-report-trigger">Report an Issue</a></li>
+          <li><a href="#hotspots-section" class="hover:text-primary transition-colors duration-150">Predictive Hotspots</a></li>
+          <li><a href="#analytics-section" class="hover:text-primary transition-colors duration-150">Locality Impact</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 2 -->
+      <div>
+        <h3 class="text-caption-uppercase text-ink font-bold mb-4 tracking-wider">Community</h3>
+        <ul class="flex flex-col gap-3 text-sm">
+          <li><a href="#gamification-section" class="hover:text-primary transition-colors duration-150">Leaderboard</a></li>
+          <li><a href="#gamification-section" class="hover:text-primary transition-colors duration-150">Badges & Levels</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Citizen Guilds</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Monthly Impact Report</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3 -->
+      <div>
+        <h3 class="text-caption-uppercase text-ink font-bold mb-4 tracking-wider">For Authorities</h3>
+        <ul class="flex flex-col gap-3 text-sm">
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Local Govt Portal</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Municipal API Access</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">SLA Dashboard</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Resource Allocation</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4 -->
+      <div>
+        <h3 class="text-caption-uppercase text-ink font-bold mb-4 tracking-wider">Pinpoint Platform</h3>
+        <ul class="flex flex-col gap-3 text-sm">
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">About Pinpoint</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Developer Resources</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-primary transition-colors duration-150">Terms & Conditions</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Legal Row -->
+    <div class="border-t border-hairline pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-muted">
+      <div class="flex flex-col gap-2 max-w-xl">
+        <p>
+          Pinpoint is an open platform designed to foster citizen accountability. Reported issues undergo crowd-verification before escalation.
+          AI auto-tagging, severity index, and map geocoding are simulated client-side using advanced rule heuristics for demonstrative purposes.
+        </p>
+        <p>© 2026 Pinpoint Inc. All rights reserved.</p>
+      </div>
+      
+      <div class="flex gap-4 font-semibold text-ink">
+        <a href="#" class="hover:underline">Legal Information</a>
+        <span class="text-hairline">|</span>
+        <a href="#" class="hover:underline">Feedback</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clay's Signature Footer Mountain SVG (Minimalist skyline placed at bottom right background) -->
+  <div class="absolute bottom-0 right-0 left-0 h-28 pointer-events-none opacity-20 flex justify-end">
+    <svg class="w-full max-w-3xl h-full translate-y-3" viewBox="0 0 500 100" fill="none" preserveAspectRatio="none">
+      <!-- Layered warm-clay colored vector mountains -->
+      <path d="M 0 100 L 100 40 L 180 80 L 290 20 L 370 70 L 450 30 L 500 100 Z" fill="#ebe6d6" />
+      <path d="M 40 100 L 140 60 L 220 90 L 330 30 L 420 80 L 500 100 Z" fill="#f5f0e0" opacity="0.7" />
+    </svg>
+  </div>
+</footer>
+
+<script>
+  const footerReportTrigger = document.getElementById('footer-report-trigger');
+  if (footerReportTrigger) {
+    footerReportTrigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.dispatchEvent(new CustomEvent('pinpoint_open_report_modal'));
+    });
+  }
+</script>

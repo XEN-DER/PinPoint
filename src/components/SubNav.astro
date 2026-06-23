@@ -1,0 +1,57 @@
+---
+// Sub Nav component matching the {component.category-tab} and top CTA specs in clay/DESIGN.md
+---
+
+<div class="sticky top-0 z-40 bg-canvas/85 backdrop-blur-md border-b border-hairline h-[52px] flex items-center justify-between px-6 select-none">
+  <!-- Left Side: Category Name -->
+  <div class="flex items-center gap-4">
+    <h1 class="text-tagline font-bold text-ink leading-none font-display tracking-tight">
+      Pinpoint
+    </h1>
+    <!-- Small divider -->
+    <span class="hidden sm:inline w-[1px] h-4 bg-hairline"></span>
+    <!-- Subtitle / Local area -->
+    <span class="hidden sm:inline text-xs text-muted font-medium">Hyperlocal Hub</span>
+  </div>
+
+  <!-- Right Side: Navigation Tabs and Primary CTA -->
+  <div class="flex items-center gap-6">
+    <!-- Inline Navigation Tabs in Clay's category-tab pill grammar -->
+    <div class="hidden lg:flex items-center gap-2" id="subnav-tabs-container">
+      <a href="#feed-section" class="active-tab bg-surface-card text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Active Issues</a>
+      <a href="#analytics-section" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Impact</a>
+      <a href="#hotspots-section" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Hotspots</a>
+      <a href="#gamification-section" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Leaderboard</a>
+    </div>
+
+    <!-- Report Issue CTA - Clay B2B near-black primary rounded button (rounded: 12px, height: 44px) -->
+    <button 
+      id="subnav-report-btn" 
+      class="bg-primary hover:bg-primary-active text-on-primary font-sans text-button-utility font-semibold rounded-md px-5 h-11 flex items-center justify-center active-scale focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors cursor-pointer"
+    >
+      Report Issue
+    </button>
+  </div>
+</div>
+
+<script>
+  // Setup click handler to open the Report Modal
+  const reportBtn = document.getElementById('subnav-report-btn');
+  if (reportBtn) {
+    reportBtn.addEventListener('click', () => {
+      // Dispatch a custom event to open the report modal in index.astro
+      window.dispatchEvent(new CustomEvent('pinpoint_open_report_modal'));
+    });
+  }
+
+  // Handle active subnav pill tab highlights on scroll or click
+  const tabLinks = document.querySelectorAll('#subnav-tabs-container a');
+  tabLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      tabLinks.forEach(t => {
+        t.className = "text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150";
+      });
+      link.className = "active-tab bg-surface-card text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150";
+    });
+  });
+</script>

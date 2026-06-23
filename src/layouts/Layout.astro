@@ -1,23 +1,39 @@
+---
+import '../styles/app.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { 
+	title = 'Pinpoint — Hyperlocal Civic Issue Reporting & Resolution',
+	description = 'Empower your community. Report, track, and resolve hyperlocal community issues like potholes, water leaks, waste management, and streetlights.'
+} = Astro.props;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-full scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		
+		<!-- SEO -->
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		
+		<!-- Icons -->
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		
+		<!-- Google Fonts Inter substitute for SF Pro -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+		
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
 	</head>
-	<body>
+	<body class="h-full bg-canvas text-body text-[16px] leading-[1.55] font-sans antialiased flex flex-col">
 		<slot />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
