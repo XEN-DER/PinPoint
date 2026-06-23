@@ -24,6 +24,3 @@ pnpm-debug.log*
 .idea/
 # IDE configurations
 .vscode/
-
-# OS generated files
-.DS_Store
