@@ -18,6 +18,35 @@ const {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
+		<!-- Theme Initialization Script (Prevents flash) -->
+		<script is:inline>
+			(function() {
+				const theme = localStorage.getItem('pinpoint_theme') || 
+											(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+				if (theme === 'dark') {
+					document.documentElement.classList.add('dark');
+				} else {
+					document.documentElement.classList.remove('dark');
+				}
+			})();
+		</script>
+
+		<!-- Cross-tab theme synchronization listener -->
+		<script>
+			window.addEventListener('storage', (e) => {
+				if (e.key === 'pinpoint_theme' && e.newValue) {
+					const newTheme = e.newValue;
+					if (newTheme === 'dark') {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+					// Dispatch local event for components to sync icons
+					window.dispatchEvent(new CustomEvent('pinpoint_theme_changed', { detail: { theme: newTheme } }));
+				}
+			});
+		</script>
+		
 		<!-- SEO -->
 		<title>{title}</title>
 		<meta name="description" content={description} />

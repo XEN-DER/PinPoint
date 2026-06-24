@@ -17,6 +17,23 @@
 
   <!-- Right Side: User Profile Indicator (Gamification Quick Stats in Clay style) -->
   <div class="flex items-center gap-3 sm:gap-4">
+    <!-- Theme Toggle Button -->
+    <button 
+      class="theme-toggle-btn w-10 h-10 rounded-md border border-hairline flex items-center justify-center cursor-pointer hover:bg-surface-card active-scale transition-colors text-ink focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      title="Toggle Color Theme"
+      aria-label="Toggle Color Theme"
+    >
+      <!-- Sun icon (visible in dark mode) -->
+      <svg class="theme-toggle-sun-icon w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="5"></circle>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 18.36l1.42-1.42M18.36 4.22l1.42-1.42"></path>
+      </svg>
+      <!-- Moon icon (visible in light mode) -->
+      <svg class="theme-toggle-moon-icon w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+
     <!-- Points Tracker (Mint Filled Pill) -->
     <div class="flex items-center gap-1 bg-brand-mint text-primary-active px-3 py-1 rounded-pill text-[12px] font-semibold font-sans tracking-wide">
       <span id="user-points-display" class="font-bold">350</span> pts
@@ -45,6 +62,55 @@
       console.error(e);
     }
   }
+
+  // Theme Toggle Logic
+  function updateThemeIcons(theme: string) {
+    const sunIcons = document.querySelectorAll('.theme-toggle-sun-icon');
+    const moonIcons = document.querySelectorAll('.theme-toggle-moon-icon');
+    
+    if (theme === 'dark') {
+      sunIcons.forEach(i => i.classList.remove('hidden'));
+      moonIcons.forEach(i => i.classList.add('hidden'));
+    } else {
+      sunIcons.forEach(i => i.classList.add('hidden'));
+      moonIcons.forEach(i => i.classList.remove('hidden'));
+    }
+  }
+
+  // Bind listener only to buttons inside GlobalNav
+  const globalThemeBtns = document.querySelectorAll('nav .theme-toggle-btn');
+  globalThemeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      const newTheme = isDark ? 'light' : 'dark';
+      
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      
+      localStorage.setItem('pinpoint_theme', newTheme);
+      updateThemeIcons(newTheme);
+      
+      // Notify other tabs and components
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'pinpoint_theme',
+        newValue: newTheme
+      }));
+    });
+  });
+
+  // Sync state on load
+  const initialTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  updateThemeIcons(initialTheme);
+
+  // Listen to external theme updates (local storage cross-tab, or custom event)
+  window.addEventListener('pinpoint_theme_changed', (e: any) => {
+    if (e.detail && e.detail.theme) {
+      updateThemeIcons(e.detail.theme);
+    }
+  });
 
   // Update on mount
   updateNavStats();

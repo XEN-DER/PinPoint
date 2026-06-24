@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Brand & Accent Colors */
   --color-primary: #0a0a0a;
@@ -21,6 +23,7 @@
   --color-surface-pearl: #faf5e8;
   --color-surface-card: #f5f0e0; /* Cream Card Surface */
   --color-surface-strong: #ebe6d6;
+  --color-surface-soft: #faf5e8;
   --color-surface-tile-1: #faf5e8;
   --color-surface-tile-2: #f5f0e0;
   --color-surface-tile-3: #ebe6d6;
@@ -207,4 +210,82 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Premium dark theme variable overrides */
+.dark {
+  /* Brand & Accent Colors */
+  --color-primary: #ffffff;
+  --color-primary-active: #e5e5e5;
+  --color-primary-disabled: #333333;
+  --color-on-primary: #0a0e14;
+
+  /* Saturated Feature Card Accent Colors in Dark Mode */
+  --color-brand-pink: #ff6b9d;
+  --color-brand-teal: #235252;
+  --color-brand-lavender: #cbbdf2;
+  --color-brand-peach: #ffc4a3;
+  --color-brand-ochre: #edd078;
+  --color-brand-mint: #bce0d5;
+  --color-brand-coral: #ff8577;
+
+  /* Surface Colors */
+  --color-canvas: #0a0e14; /* Deep premium dark canvas */
+  --color-canvas-parchment: #121820; /* Dark parchment background */
+  --color-surface-pearl: #1a2330;
+  --color-surface-card: #151c26; /* Dark Card Surface */
+  --color-surface-strong: #1e2936;
+  --color-surface-soft: #121820;
+  --color-surface-tile-1: #151c26;
+  --color-surface-tile-2: #1a2330;
+  --color-surface-tile-3: #1e2936;
+  --color-surface-black: #05070a;
+  --color-surface-dark: #05070a;
+  --color-surface-dark-elevated: #10151f;
+  --color-surface-chip-translucent: rgba(255, 255, 255, 0.08);
+
+  /* Text Colors */
+  --color-ink: #ffffff;
+  --color-body: #d1d5db; /* Softer text color */
+  --color-body-strong: #ffffff;
+  --color-muted: #9ca3af;
+  --color-muted-soft: #6b7280;
+
+  /* Border & Dividers */
+  --color-divider-soft: rgba(255, 255, 255, 0.06);
+  --color-hairline: #223040;
+  --color-hairline-soft: #1a2533;
+}
+
+/* Premium dark Leaflet map custom overrides */
+.dark .leaflet-container {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) !important;
+}
+
+.dark .leaflet-control-attribution a {
+  color: #3b82f6 !important;
+}
+
+.dark .leaflet-bar a {
+  background-color: var(--color-surface-card) !important;
+  color: var(--color-ink) !important;
+  border-bottom: 1px solid var(--color-hairline) !important;
+}
+
+.dark .leaflet-bar a:hover {
+  background-color: var(--color-surface-strong) !important;
+}
+
+/* Force dark styling on Leaflet popups globally */
+.dark .leaflet-popup-content-wrapper {
+  background-color: var(--color-surface-card) !important;
+  color: var(--color-ink) !important;
+  border: 1px solid var(--color-hairline) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .leaflet-popup-tip {
+  background-color: var(--color-surface-card) !important;
+  border-left: 1px solid var(--color-hairline) !important;
+  border-bottom: 1px solid var(--color-hairline) !important;
 }
