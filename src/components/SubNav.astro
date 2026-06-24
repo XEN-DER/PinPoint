@@ -4,7 +4,7 @@
 
 <div class="sticky top-0 z-40 bg-canvas/85 backdrop-blur-md border-b border-hairline h-[52px] flex items-center justify-between px-6 select-none">
   <!-- Left Side: Category Name -->
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-3 sm:gap-4">
     <h1 class="text-tagline font-bold text-ink leading-none font-display tracking-tight">
       Pinpoint
     </h1>
@@ -12,6 +12,11 @@
     <span class="hidden sm:inline w-[1px] h-4 bg-hairline"></span>
     <!-- Subtitle / Local area -->
     <span class="hidden sm:inline text-xs text-muted font-medium">Hyperlocal Hub</span>
+    
+    <!-- Points Tracker (Mint Filled Pill) -->
+    <div class="flex items-center gap-1 bg-brand-mint text-primary-active px-3 py-1 rounded-pill text-[12px] font-semibold font-sans tracking-wide">
+      <span id="user-points-display" class="font-bold">350</span> pts
+    </div>
   </div>
 
   <!-- Right Side: Navigation Tabs and Primary CTA -->
@@ -31,6 +36,11 @@
     >
       Report Issue
     </button>
+
+    <!-- User Profile Avatar/Button (Clay Styled) -->
+    <div id="subnav-auth-container" class="flex items-center gap-3">
+      <!-- Dynamic Sign In button or Avatar circle will be rendered here -->
+    </div>
   </div>
 </div>
 
@@ -53,5 +63,77 @@
       });
       link.className = "active-tab bg-surface-card text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150";
     });
+  });
+
+  // Hook into localStorage stats updates
+  function updateNavStats() {
+    try {
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      const ptsDisp = document.getElementById('user-points-display');
+      if (ptsDisp) ptsDisp.textContent = userStats.points;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Dynamic Authentication state rendering
+  function renderAuthState() {
+    const container = document.getElementById('subnav-auth-container');
+    if (!container) return;
+    
+    const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    
+    let initials = 'RV';
+    let name = 'Ritvik Vedangi';
+    
+    if (loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        name = u.name;
+        // Compute initials
+        initials = u.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    // Check if user is logged in
+    const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+    
+    if (isLoggedIn) {
+      container.innerHTML = `
+        <div id="subnav-avatar-btn" class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold font-display cursor-pointer hover:opacity-90 active-scale border border-hairline" title="${name}">
+          ${initials}
+        </div>
+      `;
+      
+      const avatarBtn = document.getElementById('subnav-avatar-btn');
+      avatarBtn?.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('pinpoint_open_profile_modal'));
+      });
+    } else {
+      container.innerHTML = `
+        <button id="subnav-signin-btn" class="bg-surface-card hover:bg-hairline text-ink border border-hairline text-caption font-bold rounded-md px-4 h-11 flex items-center justify-center active-scale transition-colors cursor-pointer">
+          Sign In
+        </button>
+      `;
+      
+      const signInBtn = document.getElementById('subnav-signin-btn');
+      signInBtn?.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('pinpoint_open_auth_modal'));
+      });
+    }
+  }
+
+  // Update on mount
+  updateNavStats();
+  renderAuthState();
+
+  // Listen for stats and auth updates
+  window.addEventListener('pinpoint_stats_changed', updateNavStats);
+  window.addEventListener('pinpoint_auth_changed', () => {
+    updateNavStats();
+    renderAuthState();
   });
 </script>

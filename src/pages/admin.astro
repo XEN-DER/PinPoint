@@ -1,0 +1,1209 @@
+---
+import Layout from '../layouts/Layout.astro';
+import GlobalNav from '../components/GlobalNav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="VMC Authority Portal — Pinpoint">
+  <GlobalNav />
+
+  <main class="flex-grow bg-canvas flex flex-col">
+    <!-- LOGIN GATE: MINIMALIST & BORDERLESS -->
+    <div id="admin-login-gate" class="flex-grow flex items-center justify-center py-24 px-6 relative z-30">
+      <div class="w-full max-w-sm flex flex-col gap-8">
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-10 h-10 bg-ink text-white rounded-full font-bold text-sm mb-3">
+            VMC
+          </div>
+          <h2 class="text-display-sm text-ink font-medium tracking-tight">Authority Portal</h2>
+          <p class="text-xs text-muted mt-1">
+            Secure ward management for Vadodara Municipal Corporation.
+          </p>
+        </div>
+
+        <form id="admin-login-form" class="flex flex-col gap-6">
+          <div class="flex flex-col gap-1">
+            <label for="admin-email" class="text-[10px] font-bold text-ink uppercase tracking-wider">Email Address</label>
+            <input 
+              type="email" 
+              id="admin-email" 
+              placeholder="admin@vmc.gov.in" 
+              required
+              class="w-full h-10 border-b border-hairline bg-transparent text-ink font-sans focus:outline-none focus:border-ink transition-colors text-sm rounded-none px-0"
+            />
+          </div>
+          
+          <div class="flex flex-col gap-1">
+            <label for="admin-password" class="text-[10px] font-bold text-ink uppercase tracking-wider">Password</label>
+            <input 
+              type="password" 
+              id="admin-password" 
+              placeholder="••••••••" 
+              required
+              class="w-full h-10 border-b border-hairline bg-transparent text-ink font-sans focus:outline-none focus:border-ink transition-colors text-sm rounded-none px-0"
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full h-11 bg-ink hover:bg-primary-active text-white text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer mt-4"
+          >
+            Sign In to Portal
+          </button>
+        </form>
+
+        <div class="relative flex items-center py-1">
+          <div class="flex-grow border-t border-hairline"></div>
+          <span class="flex-shrink mx-4 text-[9px] text-muted-soft font-bold uppercase tracking-wider">Or</span>
+          <div class="flex-grow border-t border-hairline"></div>
+        </div>
+
+        <button 
+          id="admin-bypass-btn" 
+          class="w-full h-11 bg-transparent hover:bg-surface-card text-ink border border-hairline text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer"
+        >
+          Quick Bypass / Demo Access
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT: CLEAN & SPACIOUS -->
+    <div id="admin-dashboard-content" class="hidden flex-grow flex flex-col px-6 sm:px-12 py-10 max-w-[1440px] mx-auto w-full gap-10">
+      <!-- Title Block -->
+      <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-hairline pb-6">
+        <div>
+          <h1 class="text-display-sm text-ink font-semibold tracking-tight">VMC Municipal Portal</h1>
+          <p class="text-xs text-muted mt-1">
+            Official Ward Service Delivery & SLA Resolution Hub.
+          </p>
+        </div>
+        <div class="flex items-center gap-6">
+          <div class="flex flex-col items-end">
+            <span class="text-xs font-bold text-ink" id="admin-user-display">VMC Admin</span>
+            <span class="text-[10px] text-muted-soft tracking-wide">Vadodara Municipal Corp</span>
+          </div>
+          <button 
+            id="admin-sign-out" 
+            class="text-xs text-muted hover:text-ink font-bold transition-colors cursor-pointer active-scale"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Minimalist Metrics Strip (Dividers instead of boxes) -->
+      <div class="border-y border-hairline py-8 grid grid-cols-2 md:grid-cols-4 gap-6 bg-transparent">
+        <div class="flex flex-col justify-center px-4 md:border-r border-hairline">
+          <span id="kpi-total" class="text-display-md text-ink font-light leading-none">0</span>
+          <span class="text-[10px] font-bold text-muted uppercase tracking-wider mt-2.5">Total Cases Logged</span>
+        </div>
+
+        <div class="flex flex-col justify-center px-4 md:border-r border-hairline">
+          <span id="kpi-open" class="text-display-md text-error font-light leading-none font-display">0</span>
+          <span class="text-[10px] font-bold text-muted uppercase tracking-wider mt-2.5 font-sans">Open Review Case</span>
+        </div>
+
+        <div class="flex flex-col justify-center px-4 md:border-r border-hairline">
+          <span id="kpi-progress" class="text-display-md text-warning font-light leading-none font-display">0</span>
+          <span class="text-[10px] font-bold text-muted uppercase tracking-wider mt-2.5 font-sans">Crews Dispatched</span>
+        </div>
+
+        <div class="flex flex-col justify-center px-4">
+          <span id="kpi-sla" class="text-display-md text-success font-light leading-none font-display">0%</span>
+          <span class="text-[10px] font-bold text-muted uppercase tracking-wider mt-2.5 font-sans">SLA Compliance</span>
+        </div>
+      </div>
+
+      <!-- Main Columns Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <!-- LEFT: Map (5-cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              SLA Heatmap
+            </h3>
+          </div>
+          
+          <div class="relative w-full h-[420px] border border-hairline rounded-lg overflow-hidden z-10 bg-surface-card">
+            <!-- Map Legend (Top Left) -->
+            <div class="absolute top-3 left-3 bg-canvas/90 backdrop-blur-sm border border-hairline px-3 py-2 rounded z-20 flex flex-col gap-1 text-[9px] text-ink pointer-events-none shadow-sm">
+              <div class="font-bold uppercase tracking-wider text-muted-soft mb-0.5">SLA Target</div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                <span>Open Target</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                <span>In Progress</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                <span>Resolved</span>
+              </div>
+            </div>
+
+            <!-- Map ward label -->
+            <div class="absolute top-3 right-3 bg-canvas/90 backdrop-blur-sm border border-hairline px-2 py-1 rounded z-20 text-[9px] text-ink pointer-events-none shadow-sm">
+              <span id="active-ward-label" class="font-bold text-ink">All Localities</span>
+            </div>
+
+            <div id="admin-map" class="w-full h-full"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Queue Queue List (7-cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-4 w-full">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h3 class="text-xs font-bold text-ink uppercase tracking-wider">
+              Issue Queue
+            </h3>
+            
+            <!-- Minimal search bar -->
+            <div class="flex items-center gap-3">
+              <input 
+                type="text" 
+                id="queue-search" 
+                placeholder="Search case title..." 
+                class="h-8 px-0 border-b border-hairline bg-transparent text-ink font-sans text-xs focus:outline-none focus:border-ink w-44 rounded-none transition-colors"
+              />
+              <button 
+                id="btn-clear-filters" 
+                class="hidden text-xs text-muted hover:text-ink font-semibold transition-colors cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Minimalist Filters (borderless-style select rows) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-2 border-b border-hairline select-none">
+            <div class="flex flex-col gap-1">
+              <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Status</span>
+              <select id="filter-status" class="bg-transparent border-0 text-ink font-sans text-xs focus:outline-none cursor-pointer py-1">
+                <option value="All">All Statuses</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Severity</span>
+              <select id="filter-severity" class="bg-transparent border-0 text-ink font-sans text-xs focus:outline-none cursor-pointer py-1">
+                <option value="All">All Severities</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Category</span>
+              <select id="filter-category" class="bg-transparent border-0 text-ink font-sans text-xs focus:outline-none cursor-pointer py-1">
+                <option value="All">All Categories</option>
+                <option value="Infrastructure">Infrastructure</option>
+                <option value="Streetlight">Streetlight</option>
+                <option value="Water Leakage">Water Leakage</option>
+                <option value="Waste Management">Waste Management</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Locality</span>
+              <select id="filter-locality" class="bg-transparent border-0 text-ink font-sans text-xs focus:outline-none cursor-pointer py-1">
+                <option value="All">All Localities</option>
+                <option value="Bapod">Bapod</option>
+                <option value="Ajwa Road">Ajwa Road</option>
+                <option value="Waghodia Road">Waghodia Road</option>
+                <option value="Kishanwadi">Kishanwadi</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Queue Table Layout -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse font-sans text-xs">
+              <thead>
+                <tr class="border-b border-hairline text-muted font-bold select-none uppercase tracking-wider text-[9px] opacity-70">
+                  <th class="py-3 px-1">Case Details</th>
+                  <th class="py-3 px-1 hidden sm:table-cell">Locality / Category</th>
+                  <th class="py-3 px-1">Severity</th>
+                  <th class="py-3 px-1">Status</th>
+                  <th class="py-3 px-1 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="queue-table-body" class="divide-y divide-hairline/40">
+                <!-- Dynamic rows -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Empty state -->
+          <div id="queue-empty" class="hidden py-16 text-center flex flex-col items-center justify-center gap-1.5 opacity-60">
+            <span class="text-2xl">🔍</span>
+            <h4 class="text-xs font-bold text-ink uppercase tracking-wider">No Matches</h4>
+            <p class="text-caption text-muted">Try removing your keywords or filters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT-SIDE SLIDE-OVER DRAWER (MODAL ALTERNATIVE) -->
+    <!-- Drawer backdrop overlay -->
+    <div id="drawer-backdrop" class="hidden fixed inset-0 bg-ink/10 backdrop-blur-xs z-40 transition-opacity duration-300 opacity-0"></div>
+
+    <!-- Drawer Container -->
+    <div 
+      id="admin-detail-drawer" 
+      class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-canvas border-l border-hairline shadow-lg flex flex-col transition-transform duration-300 transform translate-x-full select-none"
+    >
+      <!-- Drawer Header -->
+      <div class="px-6 py-5 border-b border-hairline flex items-center justify-between bg-transparent">
+        <div>
+          <span id="modal-issue-id" class="text-[9px] font-bold text-muted uppercase tracking-wider">Case ID</span>
+          <h3 id="modal-issue-title" class="text-body-strong font-bold text-ink tracking-tight mt-0.5">Title Details</h3>
+        </div>
+        <button id="modal-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-card text-muted hover:text-ink transition-colors cursor-pointer text-lg font-light">
+          &times;
+        </button>
+      </div>
+
+      <!-- Drawer Content (Scrollable) -->
+      <div class="flex-grow overflow-y-auto p-6 flex flex-col gap-6">
+        <!-- Metadata blocks -->
+        <div class="grid grid-cols-2 gap-4 text-xs border-b border-hairline pb-5">
+          <div>
+            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider">Reported By</span>
+            <span id="modal-reporter" class="text-ink font-semibold">Name</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider">Date Logged</span>
+            <span id="modal-date" class="text-ink">YYYY-MM-DD</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider">Locality Sector</span>
+            <span id="modal-locality" class="text-ink font-semibold">Locality</span>
+          </div>
+          <div>
+            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider">Coordinates</span>
+            <span id="modal-gps" class="text-ink">0.0, 0.0</span>
+          </div>
+          <div class="col-span-2">
+            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider">SLA Status</span>
+            <div id="modal-sla-badge" class="mt-1.5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold">SLA Remaining</div>
+          </div>
+        </div>
+
+        <!-- Citizen Description -->
+        <div class="flex flex-col gap-1 border-b border-hairline pb-5">
+          <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Citizen Statement</span>
+          <p id="modal-desc" class="text-xs text-body leading-relaxed whitespace-pre-wrap mt-1">
+            Description...
+          </p>
+        </div>
+
+        <!-- Citizen Attachment -->
+        <div class="flex flex-col gap-1.5 border-b border-hairline pb-5">
+          <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Report Attachment</span>
+          <div class="relative w-full h-[180px] rounded border border-hairline overflow-hidden bg-surface-card flex items-center justify-center mt-1">
+            <img id="modal-image" class="w-full h-full object-cover" src="" alt="Citizen attachment" />
+          </div>
+        </div>
+
+        <!-- Dispute Notes Warning Box (hidden by default) -->
+        <div id="modal-dispute-container" class="hidden bg-red-50 border border-red-200 rounded-md p-3.5 flex flex-col gap-1">
+          <div class="flex items-center gap-1.5 text-red-700 font-bold text-xs">
+            <span>⚠️</span>
+            <span>Citizen Disputed Fix</span>
+          </div>
+          <p id="modal-dispute-notes" class="text-xs text-red-700 leading-relaxed font-normal whitespace-pre-wrap">
+            "Dispute notes details..."
+          </p>
+        </div>
+
+        <!-- SLA Actions form -->
+        <form id="modal-action-form" class="flex flex-col gap-5 pb-16">
+          <h4 class="text-[9px] font-bold text-ink uppercase tracking-wider">
+            SLA Closeout Actions
+          </h4>
+
+          <div class="flex flex-col gap-1">
+            <label for="action-status" class="text-[9px] font-bold text-muted uppercase tracking-wider">Status Transition</label>
+            <select id="action-status" class="h-9 px-2 rounded-md border border-hairline bg-canvas text-ink font-sans text-xs focus:outline-none focus:ring-1 focus:ring-primary font-semibold cursor-pointer">
+              <option value="Open">Open (Pending)</option>
+              <option value="In Progress">In Progress (Dispatched)</option>
+              <option value="Resolved">Resolved (Closed)</option>
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label for="action-dept" class="text-[9px] font-bold text-muted uppercase tracking-wider">Assigned Department</label>
+            <select id="action-dept" class="h-9 px-2 rounded-md border border-hairline bg-canvas text-ink font-sans text-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer">
+              <option value="Roads & Highways">Roads & Highways Department</option>
+              <option value="Water Supply & Sewerage">Water Supply & Sewerage Board</option>
+              <option value="Electricity & Streetlights">Electricity & Public Lighting</option>
+              <option value="Sanitation & Waste Management">Sanitation & Waste Management</option>
+            </select>
+          </div>
+
+          <!-- Resolution inputs (Resolved status only) -->
+          <div id="resolution-fields-container" class="hidden flex flex-col gap-4 border-t border-hairline pt-4 bg-transparent">
+            <div class="flex justify-between items-center">
+              <span class="text-[9px] font-bold text-success uppercase tracking-wider">Closeout Specifications</span>
+              <button 
+                type="button" 
+                id="btn-autofill-resolution"
+                class="text-[9px] font-semibold text-primary hover:underline transition-all cursor-pointer bg-transparent border-0"
+              >
+                ⚡ Autofill Demo Fix
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="resolve-notes" class="text-[9px] font-bold text-muted uppercase tracking-wider">Official Closeout Notes</label>
+              <textarea 
+                id="resolve-notes" 
+                rows="3" 
+                placeholder="Describe actions taken by VMC crews..." 
+                class="w-full p-2.5 rounded-md border border-hairline bg-canvas text-ink font-sans text-xs focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+              ></textarea>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="resolve-by" class="text-[9px] font-bold text-muted uppercase tracking-wider">Closeout Crew Name</label>
+              <input 
+                type="text" 
+                id="resolve-by" 
+                placeholder="e.g. VMC Ward 10 Repair Crew"
+                class="w-full h-8 px-3 rounded-md border border-hairline bg-canvas text-ink font-sans text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="resolve-image" class="text-[9px] font-bold text-muted uppercase tracking-wider">Proof Photo URL</label>
+              <input 
+                type="text" 
+                id="resolve-image" 
+                placeholder="/images/pothole_fixed_vadodara.png"
+                class="w-full h-8 px-3 rounded-md border border-hairline bg-canvas text-ink font-sans text-xs focus:outline-none"
+              />
+              <div class="w-full h-24 rounded border border-hairline overflow-hidden mt-1.5 bg-surface-card flex items-center justify-center">
+                <img id="resolve-image-preview" src="" alt="Proof Preview" class="w-full h-full object-cover hidden" />
+                <span id="resolve-image-placeholder" class="text-[9px] text-muted-soft">No proof image loaded</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Drawer Submit actions -->
+          <div class="flex flex-col gap-2 mt-4 pt-4 border-t border-hairline">
+            <button 
+              type="submit" 
+              class="w-full h-11 bg-ink hover:bg-primary-active text-white text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer"
+            >
+              Update & Dispatch SLA
+            </button>
+            <button 
+              type="button" 
+              id="modal-cancel-btn" 
+              class="w-full h-11 bg-transparent hover:bg-surface-card text-ink text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-notification" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink text-white border border-white/10 rounded-md py-3 px-6 shadow-md flex items-center gap-3 animate-slide-up-fade">
+      <span class="text-sm">🔔</span>
+      <span id="toast-message" class="text-xs font-semibold font-sans">Notification text</span>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  // Auth flags
+  let adminAuthorized = localStorage.getItem('pinpoint_admin_authorized') === 'true';
+  const loginGate = document.getElementById('admin-login-gate');
+  const dashboardContent = document.getElementById('admin-dashboard-content');
+  const loginForm = document.getElementById('admin-login-form');
+  const bypassBtn = document.getElementById('admin-bypass-btn');
+  const signOutBtn = document.getElementById('admin-sign-out');
+
+  // State values
+  let activeIssues: any[] = [];
+  let selectedIssueId: string | null = null;
+  let adminMap: any = null;
+  let mapMarkers: Record<string, any> = {};
+  let mapPolygons: Record<string, any> = {};
+
+  // Filters and table
+  const tableBody = document.getElementById('queue-table-body');
+  const emptyState = document.getElementById('queue-empty');
+  const searchInput = document.getElementById('queue-search') as HTMLInputElement;
+  const filterStatus = document.getElementById('filter-status') as HTMLSelectElement;
+  const filterSeverity = document.getElementById('filter-severity') as HTMLSelectElement;
+  const filterCategory = document.getElementById('filter-category') as HTMLSelectElement;
+  const filterLocality = document.getElementById('filter-locality') as HTMLSelectElement;
+  const btnClearFilters = document.getElementById('btn-clear-filters');
+
+  // Drawer Elements
+  const detailDrawer = document.getElementById('admin-detail-drawer');
+  const drawerBackdrop = document.getElementById('drawer-backdrop');
+  const modalCloseBtn = document.getElementById('modal-close-btn');
+  const modalCancelBtn = document.getElementById('modal-cancel-btn');
+  const actionForm = document.getElementById('modal-action-form');
+  const actionStatus = document.getElementById('action-status') as HTMLSelectElement;
+  const actionDept = document.getElementById('action-dept') as HTMLSelectElement;
+  const resolutionContainer = document.getElementById('resolution-fields-container');
+  const resolveNotes = document.getElementById('resolve-notes') as HTMLTextAreaElement;
+  const resolveBy = document.getElementById('resolve-by') as HTMLInputElement;
+  const resolveImage = document.getElementById('resolve-image') as HTMLInputElement;
+  const resolveImagePreview = document.getElementById('resolve-image-preview') as HTMLImageElement;
+  const resolveImagePlaceholder = document.getElementById('resolve-image-placeholder');
+  const btnAutofill = document.getElementById('btn-autofill-resolution');
+
+  // Constants
+  const regionPolygons: Record<string, [number, number][]> = {
+    'Bapod': [[22.3060, 73.2180], [22.3180, 73.2180], [22.3180, 73.2320], [22.3060, 73.2320]],
+    'Ajwa Road': [[22.3120, 73.1980], [22.3180, 73.1980], [22.3180, 73.2180], [22.3120, 73.2180]],
+    'Waghodia Road': [[22.2900, 73.2100], [22.3060, 73.2100], [22.3060, 73.2320], [22.2900, 73.2320]],
+    'Kishanwadi': [[22.3060, 73.1980], [22.3120, 73.1980], [22.3120, 73.2180], [22.3060, 73.2180]]
+  };
+
+  const regionStyles: Record<string, any> = {
+    'Bapod': { color: '#ffb084', fillColor: '#ffb084', fillOpacity: 0.01, weight: 1.2, dashArray: '4, 4' },
+    'Ajwa Road': { color: '#a4d4c5', fillColor: '#a4d4c5', fillOpacity: 0.01, weight: 1.2, dashArray: '4, 4' },
+    'Waghodia Road': { color: '#b8a4ed', fillColor: '#b8a4ed', fillOpacity: 0.01, weight: 1.2, dashArray: '4, 4' },
+    'Kishanwadi': { color: '#ff6b5a', fillColor: '#ff6b5a', fillOpacity: 0.01, weight: 1.2, dashArray: '4, 4' }
+  };
+
+  const statusColors: Record<string, string> = {
+    'Open': '#ef4444',
+    'In Progress': '#f59e0b',
+    'Resolved': '#22c55e',
+  };
+
+  const statusDots: Record<string, string> = {
+    'Open': 'bg-error',
+    'In Progress': 'bg-warning',
+    'Resolved': 'bg-success',
+  };
+
+  const severityTextColors: Record<string, string> = {
+    'High': 'text-red-500 font-bold',
+    'Medium': 'text-amber-500 font-semibold',
+    'Low': 'text-blue-500 font-medium',
+  };
+
+  // Toast Helper
+  function showToast(message: string) {
+    const toast = document.getElementById('toast-notification');
+    const toastMsg = document.getElementById('toast-message');
+    if (toast && toastMsg) {
+      toastMsg.textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+  }
+
+  // Auth UI logic
+  function updateAuthUI() {
+    if (adminAuthorized) {
+      loginGate?.classList.add('hidden');
+      dashboardContent?.classList.remove('hidden');
+      loadDashboardData();
+      // Ensure Leaflet recalculates size after transition
+      setTimeout(() => {
+        if (adminMap) adminMap.invalidateSize();
+      }, 150);
+    } else {
+      loginGate?.classList.remove('hidden');
+      dashboardContent?.classList.add('hidden');
+    }
+  }
+
+  // Handle Login
+  loginForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const emailInput = (document.getElementById('admin-email') as HTMLInputElement).value;
+    const passInput = (document.getElementById('admin-password') as HTMLInputElement).value;
+
+    if (emailInput === 'admin@vmc.gov.in' && passInput === 'admin123') {
+      adminAuthorized = true;
+      localStorage.setItem('pinpoint_admin_authorized', 'true');
+      showToast("Access Granted. Signed in as VMC Admin.");
+      updateAuthUI();
+    } else {
+      showToast("Invalid credentials. Try admin@vmc.gov.in / admin123");
+    }
+  });
+
+  bypassBtn?.addEventListener('click', () => {
+    adminAuthorized = true;
+    localStorage.setItem('pinpoint_admin_authorized', 'true');
+    showToast("Access Granted. Signed in as VMC Admin.");
+    updateAuthUI();
+  });
+
+  signOutBtn?.addEventListener('click', () => {
+    adminAuthorized = false;
+    localStorage.setItem('pinpoint_admin_authorized', 'false');
+    showToast("Signed out from Authority Portal.");
+    updateAuthUI();
+  });
+
+  // Map Setup
+  function initAdminMap() {
+    if (typeof L === 'undefined') {
+      setTimeout(initAdminMap, 100);
+      return;
+    }
+
+    if (adminMap) {
+      setTimeout(() => {
+        adminMap.invalidateSize();
+      }, 100);
+      return;
+    }
+
+    adminMap = L.map('admin-map', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView([22.3090, 73.2200], 14);
+
+    L.control.zoom({ position: 'bottomright' }).addTo(adminMap);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(adminMap);
+
+    const mapEl = document.getElementById('admin-map');
+    if (mapEl) {
+      mapEl.style.filter = 'sepia(0.08) saturate(0.95) hue-rotate(5deg)';
+    }
+
+    Object.keys(regionPolygons).forEach(name => {
+      const coords = regionPolygons[name];
+      const style = regionStyles[name];
+      
+      const poly = L.polygon(coords, style).addTo(adminMap);
+      mapPolygons[name] = poly;
+
+      poly.on('mouseover', () => {
+        const label = document.getElementById('active-ward-label');
+        if (label) label.textContent = name;
+        poly.setStyle({ fillOpacity: 0.08, weight: 1.5 });
+      });
+
+      poly.on('mouseout', () => {
+        const label = document.getElementById('active-ward-label');
+        if (label) label.textContent = 'All Localities';
+        poly.setStyle(regionStyles[name]);
+      });
+    });
+
+    renderMapMarkers();
+    
+    // Call invalidateSize after map is fully initialized
+    setTimeout(() => {
+      if (adminMap) adminMap.invalidateSize();
+    }, 200);
+  }
+
+  function renderMapMarkers(issuesToRender = activeIssues) {
+    if (!adminMap) return;
+
+    Object.keys(mapMarkers).forEach(key => {
+      adminMap.removeLayer(mapMarkers[key]);
+    });
+    mapMarkers = {};
+
+    issuesToRender.forEach(issue => {
+      if (!issue.lat || !issue.lng) return;
+
+      const color = statusColors[issue.status] || '#ef4444';
+      const isResolved = issue.status === 'Resolved';
+      
+      const pulseHtml = !isResolved 
+        ? `<span class="absolute inline-flex w-4.5 h-4.5 rounded-full animate-pin-ping" style="background-color: ${color};"></span>` 
+        : '';
+
+      const markerIcon = L.divIcon({
+        html: `
+          <div class="relative flex items-center justify-center w-5 h-5">
+            ${pulseHtml}
+            <div class="relative w-2.5 h-2.5 rounded-full border border-white shadow-sm flex items-center justify-center" style="background-color: ${color};">
+              <div class="w-0.5 h-0.5 rounded-full bg-white"></div>
+            </div>
+          </div>
+        `,
+        className: 'custom-map-marker',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+
+      const marker = L.marker([issue.lat, issue.lng], { icon: markerIcon }).addTo(adminMap);
+      mapMarkers[issue.id] = marker;
+
+      marker.bindPopup(`<b>${issue.title}</b><br><span class="text-[9px] text-muted">${issue.locality} (${issue.status})</span>`, {
+        closeButton: false,
+        offset: L.point(0, -3)
+      });
+
+      marker.on('mouseover', () => {
+        marker.openPopup();
+      });
+
+      marker.on('mouseout', () => {
+        marker.closePopup();
+      });
+
+      marker.on('click', () => {
+        openIssueDetail(issue.id);
+      });
+    });
+  }
+
+  function loadDashboardData() {
+    const raw = localStorage.getItem('pinpoint_issues');
+    if (raw) {
+      try {
+        activeIssues = JSON.parse(raw);
+      } catch (e) {
+        console.error(e);
+        activeIssues = [];
+      }
+    } else {
+      activeIssues = [];
+    }
+
+    calculateMetrics();
+    renderQueueTable();
+    
+    setTimeout(() => {
+      initAdminMap();
+      
+      // Render markers with current filtered state
+      const searchVal = searchInput.value.toLowerCase().trim();
+      const statusVal = filterStatus.value;
+      const severityVal = filterSeverity.value;
+      const categoryVal = filterCategory.value;
+      const localityVal = filterLocality.value;
+      const filtered = activeIssues.filter(issue => {
+        const matchSearch = issue.title.toLowerCase().includes(searchVal) || issue.id.toLowerCase().includes(searchVal);
+        const matchStatus = statusVal === 'All' || issue.status === statusVal;
+        const matchSeverity = severityVal === 'All' || issue.severity === severityVal;
+        const matchCategory = categoryVal === 'All' || issue.category === categoryVal;
+        const matchLocality = localityVal === 'All' || issue.locality === localityVal;
+        return matchSearch && matchStatus && matchSeverity && matchCategory && matchLocality;
+      });
+      renderMapMarkers(filtered);
+    }, 100);
+  }
+
+  // Helper to compute SLA properties
+  function getSLAInfo(issue: any) {
+    const reportDateStr = issue.date;
+    const currentSimulatedDateStr = '2026-06-24';
+    
+    let targetDays = 5; // Low severity
+    if (issue.severity === 'High') targetDays = 2;
+    else if (issue.severity === 'Medium') targetDays = 3;
+    
+    const d1 = new Date(reportDateStr);
+    let d2 = new Date(currentSimulatedDateStr);
+    
+    if (issue.status === 'Resolved' && issue.resolvedDate) {
+      d2 = new Date(issue.resolvedDate);
+    }
+    
+    d1.setHours(12, 0, 0, 0);
+    d2.setHours(12, 0, 0, 0);
+    
+    const diffTime = d2.getTime() - d1.getTime();
+    const elapsedDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    
+    const isDisputed = issue.disputed === true;
+    const isSlaComplied = elapsedDays <= targetDays;
+    
+    let text = '';
+    let isBreached = false;
+    let badgeClass = '';
+    
+    if (issue.status === 'Resolved') {
+      if (isDisputed) {
+        text = 'SLA Breached (Disputed)';
+        isBreached = true;
+        badgeClass = 'text-red-700 bg-red-100/50 border-red-300 border';
+      } else if (isSlaComplied) {
+        text = 'Resolved within SLA';
+        isBreached = false;
+        badgeClass = 'text-emerald-700 bg-emerald-100/50 border-emerald-300 border';
+      } else {
+        text = 'Resolved late (SLA breached)';
+        isBreached = true;
+        badgeClass = 'text-red-700 bg-red-100/50 border-red-300 border';
+      }
+    } else {
+      if (isDisputed) {
+        text = '⚠️ Disputed · SLA BREACHED';
+        isBreached = true;
+        badgeClass = 'text-red-700 bg-red-100/50 border-red-300 border animate-pulse';
+      } else if (elapsedDays > targetDays) {
+        const overDays = elapsedDays - targetDays;
+        text = `⚠️ SLA BREACHED by ${overDays} day${overDays > 1 ? 's' : ''}`;
+        isBreached = true;
+        badgeClass = 'text-red-700 bg-red-100/50 border-red-300 border animate-pulse';
+      } else {
+        const remainingDays = targetDays - elapsedDays;
+        isBreached = false;
+        badgeClass = 'text-ink bg-canvas border-hairline border';
+        if (remainingDays === 0) {
+          text = `SLA expires today`;
+        } else {
+          text = `${remainingDays} day${remainingDays > 1 ? 's' : ''} remaining`;
+        }
+      }
+    }
+    
+    return {
+      text,
+      isBreached,
+      badgeClass,
+      elapsedDays,
+      targetDays,
+      isSlaComplied
+    };
+  }
+
+  // SLA Calculation
+  function calculateMetrics() {
+    const total = activeIssues.length;
+    const open = activeIssues.filter(i => i.status === 'Open').length;
+    const progress = activeIssues.filter(i => i.status === 'In Progress').length;
+
+    let slaCompliedCount = 0;
+    
+    activeIssues.forEach(issue => {
+      const slaInfo = getSLAInfo(issue);
+      if (!slaInfo.isBreached) {
+        slaCompliedCount++;
+      }
+    });
+
+    const slaCompliance = total > 0 ? Math.round((slaCompliedCount / total) * 100) : 100;
+
+    const totalEl = document.getElementById('kpi-total');
+    const openEl = document.getElementById('kpi-open');
+    const progressEl = document.getElementById('kpi-progress');
+    const slaEl = document.getElementById('kpi-sla');
+
+    if (totalEl) totalEl.textContent = total.toString();
+    if (openEl) openEl.textContent = open.toString();
+    if (progressEl) progressEl.textContent = progress.toString();
+    if (slaEl) slaEl.textContent = `${slaCompliance}%`;
+  }
+
+  // Queue table rendering with minimalist status dots
+  function renderQueueTable() {
+    if (!tableBody || !emptyState) return;
+
+    const searchVal = searchInput.value.toLowerCase().trim();
+    const statusVal = filterStatus.value;
+    const severityVal = filterSeverity.value;
+    const categoryVal = filterCategory.value;
+    const localityVal = filterLocality.value;
+
+    const hasFilters = searchVal !== '' || statusVal !== 'All' || severityVal !== 'All' || categoryVal !== 'All' || localityVal !== 'All';
+    if (btnClearFilters) {
+      if (hasFilters) btnClearFilters.classList.remove('hidden');
+      else btnClearFilters.classList.add('hidden');
+    }
+
+    const filtered = activeIssues.filter(issue => {
+      const matchSearch = issue.title.toLowerCase().includes(searchVal) || issue.id.toLowerCase().includes(searchVal);
+      const matchStatus = statusVal === 'All' || issue.status === statusVal;
+      const matchSeverity = severityVal === 'All' || issue.severity === severityVal;
+      const matchCategory = categoryVal === 'All' || issue.category === categoryVal;
+      const matchLocality = localityVal === 'All' || issue.locality === localityVal;
+
+      return matchSearch && matchStatus && matchSeverity && matchCategory && matchLocality;
+    });
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      renderMapMarkers([]); // Clear markers on empty filter results
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    tableBody.innerHTML = filtered.map(issue => {
+      const slaInfo = getSLAInfo(issue);
+      const isDisputed = issue.disputed === true;
+      
+      let statusDot = statusDots[issue.status] || 'bg-muted-soft';
+      let statusLabel = issue.status;
+      
+      if (isDisputed) {
+        statusDot = 'bg-red-500 animate-pulse';
+        statusLabel = '⚠️ Disputed';
+      }
+      
+      const severityColor = severityTextColors[issue.severity] || 'text-ink';
+      
+      const rowHighlightClass = slaInfo.isBreached 
+        ? 'bg-red-500/5 border-l-2 border-red-500' 
+        : '';
+      
+      return `
+        <tr class="hover:bg-surface-card transition-colors select-none ${rowHighlightClass}">
+          <td class="py-4 px-1 flex flex-col gap-0.5">
+            <span class="text-[9px] font-bold text-muted-soft uppercase tracking-wider">${issue.id}</span>
+            <span class="text-body-strong text-ink font-semibold select-text leading-tight">${issue.title}</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-[9px] text-muted-soft">${issue.date}</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold ${slaInfo.badgeClass}">${slaInfo.text}</span>
+            </div>
+          </td>
+          <td class="py-4 px-1 hidden sm:table-cell">
+            <div class="font-bold text-ink">${issue.locality}</div>
+            <div class="text-[9px] text-muted-soft">${issue.category}</div>
+          </td>
+          <td class="py-4 px-1">
+            <span class="text-[10px] uppercase font-bold tracking-wider ${severityColor}">
+              ${issue.severity}
+            </span>
+          </td>
+          <td class="py-4 px-1">
+            <div class="flex items-center gap-2 text-ink font-medium">
+              <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+              <span>${statusLabel}</span>
+            </div>
+          </td>
+          <td class="py-4 px-1 text-right">
+            <button 
+              data-id="${issue.id}" 
+              class="btn-manage-issue text-primary hover:underline text-xs font-bold bg-transparent border-0 cursor-pointer active-scale"
+            >
+              Manage
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    document.querySelectorAll('.btn-manage-issue').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.target as HTMLButtonElement).getAttribute('data-id');
+        if (id) openIssueDetail(id);
+      });
+    });
+
+    renderMapMarkers(filtered); // Re-render markers synced with filters
+  }
+
+  // Slide-over drawer actions
+  function openIssueDetail(id: string) {
+    selectedIssueId = id;
+    const issue = activeIssues.find(i => i.id === id);
+    if (!issue) return;
+
+    const modalId = document.getElementById('modal-issue-id');
+    const modalTitle = document.getElementById('modal-issue-title');
+    const modalReporter = document.getElementById('modal-reporter');
+    const modalDate = document.getElementById('modal-date');
+    const modalLocality = document.getElementById('modal-locality');
+    const modalGps = document.getElementById('modal-gps');
+    const modalDesc = document.getElementById('modal-desc');
+    const modalImage = document.getElementById('modal-image') as HTMLImageElement;
+
+    if (modalId) modalId.textContent = issue.id.toUpperCase();
+    if (modalTitle) modalTitle.textContent = issue.title;
+    if (modalReporter) modalReporter.textContent = issue.reportedBy || 'Anonymous Citizen';
+    if (modalDate) modalDate.textContent = issue.date;
+    if (modalLocality) modalLocality.textContent = issue.locality;
+    if (modalGps) modalGps.textContent = `${issue.lat.toFixed(4)}, ${issue.lng.toFixed(4)}`;
+    if (modalDesc) modalDesc.textContent = issue.description || 'No description provided.';
+    if (modalImage) modalImage.src = issue.imageUrl || '/images/pothole.png';
+
+    // Set SLA details
+    const slaEl = document.getElementById('modal-sla-badge');
+    if (slaEl) {
+      const slaInfo = getSLAInfo(issue);
+      slaEl.textContent = slaInfo.text;
+      slaEl.className = `mt-1.5 inline-block text-[10px] px-2.5 py-0.5 rounded-full font-bold ${slaInfo.badgeClass}`;
+    }
+
+    // Set dispute warning container
+    const disputeContainer = document.getElementById('modal-dispute-container');
+    const disputeNotes = document.getElementById('modal-dispute-notes');
+    if (issue.disputed) {
+      if (disputeNotes) disputeNotes.textContent = `"${issue.disputeNotes || 'No notes provided.'}"`;
+      disputeContainer?.classList.remove('hidden');
+    } else {
+      disputeContainer?.classList.add('hidden');
+    }
+
+    actionStatus.value = issue.status;
+    actionDept.value = issue.assignedDepartment || 'Roads & Highways';
+
+    if (issue.status === 'Resolved') {
+      resolutionContainer?.classList.remove('hidden');
+      resolveNotes.value = issue.resolvedNotes || '';
+      resolveBy.value = issue.resolvedBy || '';
+      resolveImage.value = issue.resolvedImageUrl || '';
+      
+      if (issue.resolvedImageUrl) {
+        resolveImagePreview.src = issue.resolvedImageUrl;
+        resolveImagePreview.classList.remove('hidden');
+        resolveImagePlaceholder?.classList.add('hidden');
+      } else {
+        resolveImagePreview.classList.add('hidden');
+        resolveImagePlaceholder?.classList.remove('hidden');
+      }
+    } else {
+      resolutionContainer?.classList.add('hidden');
+      resolveNotes.value = '';
+      resolveBy.value = '';
+      resolveImage.value = '';
+      resolveImagePreview.classList.add('hidden');
+      resolveImagePlaceholder?.classList.remove('hidden');
+    }
+
+    // Pan map to coordinates of issue
+    if (adminMap && issue.lat && issue.lng) {
+      adminMap.setView([issue.lat, issue.lng], 16);
+    }
+
+    // Toggle drawer slide animation
+    drawerBackdrop?.classList.remove('hidden');
+    // Allow thread cycle for hidden class removal before opacity change
+    setTimeout(() => {
+      drawerBackdrop?.classList.add('opacity-100');
+      detailDrawer?.classList.remove('translate-x-full');
+      detailDrawer?.classList.add('translate-x-0');
+    }, 10);
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeIssueModal() {
+    detailDrawer?.classList.remove('translate-x-0');
+    detailDrawer?.classList.add('translate-x-full');
+    drawerBackdrop?.classList.remove('opacity-100');
+    setTimeout(() => {
+      drawerBackdrop?.classList.add('hidden');
+      document.body.style.overflow = '';
+      selectedIssueId = null;
+    }, 300);
+  }
+
+  modalCloseBtn?.addEventListener('click', closeIssueModal);
+  modalCancelBtn?.addEventListener('click', closeIssueModal);
+  drawerBackdrop?.addEventListener('click', closeIssueModal);
+
+  actionStatus.addEventListener('change', () => {
+    if (actionStatus.value === 'Resolved') {
+      resolutionContainer?.classList.remove('hidden');
+      if (!resolveNotes.value && !resolveBy.value) {
+        autofillResolutionData();
+      }
+    } else {
+      resolutionContainer?.classList.add('hidden');
+    }
+  });
+
+  resolveImage?.addEventListener('input', () => {
+    const val = resolveImage.value.trim();
+    if (val) {
+      resolveImagePreview.src = val;
+      resolveImagePreview.classList.remove('hidden');
+      resolveImagePlaceholder?.classList.add('hidden');
+    } else {
+      resolveImagePreview.classList.add('hidden');
+      resolveImagePlaceholder?.classList.remove('hidden');
+    }
+  });
+
+  function autofillResolutionData() {
+    if (!selectedIssueId) return;
+    const issue = activeIssues.find(i => i.id === selectedIssueId);
+    if (!issue) return;
+
+    let crew = 'VMC Ward 10 Repair Crew';
+    let notes = 'SLA resolved. Sweep completed.';
+    let img = '/images/pothole_fixed_vadodara.png';
+
+    if (issue.category === 'Infrastructure') {
+      crew = 'VMC Roads & Bridges Repair Crew';
+      notes = 'Municipal asphalt roller dispatched. Pothole filled and sealed with concrete asphalt mix. Road levelled to standard.';
+      img = '/images/pothole_fixed_vadodara.png';
+    } else if (issue.category === 'Streetlight') {
+      crew = 'VMC Electrical Utility Squad';
+      notes = 'Streetlight post inspected. Damaged wiring replaced and upgraded to energy-efficient LED lamp bulb. Light is fully operational.';
+      img = '/images/streetlight_fixed_vadodara.png';
+    } else if (issue.category === 'Water Leakage') {
+      crew = 'VMC Water Supply Engineers';
+      notes = 'Excavation completed at Sayaji Park Road to locate burst main. Faulty section of pipe cut and replaced. Footpath re-concreted.';
+      img = '/images/water_fixed_vadodara.png';
+    } else if (issue.category === 'Waste Management') {
+      crew = 'VMC Ward 10 Sanitation Crew';
+      notes = 'Solid waste management vehicles dispatched. Overflowing trash bins cleared, swept, and surrounding area disinfected.';
+      img = '/images/garbage_fixed_vadodara.png';
+    }
+
+    resolveNotes.value = notes;
+    resolveBy.value = crew;
+    resolveImage.value = img;
+    
+    resolveImagePreview.src = img;
+    resolveImagePreview.classList.remove('hidden');
+    resolveImagePlaceholder?.classList.add('hidden');
+  }
+
+  btnAutofill?.addEventListener('click', autofillResolutionData);
+
+  // Submit edits
+  actionForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!selectedIssueId) return;
+
+    const issueIndex = activeIssues.findIndex(i => i.id === selectedIssueId);
+    if (issueIndex === -1) return;
+
+    const currentStatus = actionStatus.value;
+    const dept = actionDept.value;
+
+    activeIssues[issueIndex].status = currentStatus;
+    activeIssues[issueIndex].assignedDepartment = dept;
+
+    if (currentStatus === 'In Progress' || currentStatus === 'Resolved') {
+      delete activeIssues[issueIndex].disputed;
+      delete activeIssues[issueIndex].disputeNotes;
+    }
+
+    if (currentStatus === 'Resolved') {
+      activeIssues[issueIndex].resolvedNotes = resolveNotes.value || 'Issue resolved and closed.';
+      activeIssues[issueIndex].resolvedBy = resolveBy.value || 'VMC Authority';
+      activeIssues[issueIndex].resolvedImageUrl = resolveImage.value || '/images/pothole_fixed_vadodara.png';
+      
+      if (!activeIssues[issueIndex].resolvedDate) {
+        activeIssues[issueIndex].resolvedDate = '2026-06-24';
+      }
+    } else {
+      delete activeIssues[issueIndex].resolvedNotes;
+      delete activeIssues[issueIndex].resolvedBy;
+      delete activeIssues[issueIndex].resolvedImageUrl;
+      delete activeIssues[issueIndex].resolvedDate;
+    }
+
+    localStorage.setItem('pinpoint_issues', JSON.stringify(activeIssues));
+    
+    // Broadcast updates
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+    
+    showToast(`Issue ${selectedIssueId.toUpperCase()} updated successfully to ${currentStatus}!`);
+    closeIssueModal();
+
+    calculateMetrics();
+    renderQueueTable();
+  });
+
+  // Attach search & filter hooks
+  searchInput.addEventListener('input', renderQueueTable);
+  filterStatus.addEventListener('change', renderQueueTable);
+  filterSeverity.addEventListener('change', renderQueueTable);
+  filterCategory.addEventListener('change', renderQueueTable);
+  filterLocality.addEventListener('change', renderQueueTable);
+
+  btnClearFilters?.addEventListener('click', () => {
+    searchInput.value = '';
+    filterStatus.value = 'All';
+    filterSeverity.value = 'All';
+    filterCategory.value = 'All';
+    filterLocality.value = 'All';
+    renderQueueTable();
+  });
+
+  updateAuthUI();
+
+  // Cross-tab Synchronization
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'pinpoint_issues') {
+      window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+    }
+    if (e.key === 'pinpoint_admin_authorized') {
+      adminAuthorized = localStorage.getItem('pinpoint_admin_authorized') === 'true';
+      updateAuthUI();
+    }
+  });
+
+  // Keep synced with other components
+  window.addEventListener('pinpoint_issues_updated', () => {
+    const raw = localStorage.getItem('pinpoint_issues');
+    if (raw) {
+      activeIssues = JSON.parse(raw);
+      calculateMetrics();
+      renderQueueTable();
+    }
+  });
+</script>
+
+<style>
+  #admin-map {
+    filter: sepia(0.08) saturate(0.95) hue-rotate(5deg);
+  }
+  @keyframes pin-ping {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+  :global(.animate-pin-ping) {
+    animation: pin-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .animate-slide-up-fade {
+    animation: slideUpFade 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  @keyframes slideUpFade {
+    0% { opacity: 0; transform: translate(-50%, 20px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    90% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+  }
+
+  /* Premium dark Leaflet popups */
+  :global(.leaflet-popup-content-wrapper) {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 0px 4px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+  :global(.leaflet-popup-content) {
+    margin: 8px 12px !important;
+  }
+  :global(.leaflet-popup-tip) {
+    background-color: #0a0a0a !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+</style>

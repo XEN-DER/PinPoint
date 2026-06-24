@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import GlobalNav from '../components/GlobalNav.astro';
 import SubNav from '../components/SubNav.astro';
 import Map from '../components/Map.astro';
 import Footer from '../components/Footer.astro';
@@ -8,12 +7,11 @@ import Footer from '../components/Footer.astro';
 
 <Layout title="Pinpoint — Hyperlocal Civic Action Platform">
   <!-- Nav Bar Stack -->
-  <GlobalNav />
   <SubNav />
 
   <main class="flex-grow select-none bg-canvas">
     <!-- Hero Section (Alternating Light Tile matching {component.hero-band} in clay/DESIGN.md) -->
-    <section class="bg-canvas border-b border-hairline py-20 px-6 sm:px-12 flex flex-col items-center text-center">
+    <section id="analytics-section" class="bg-canvas border-b border-hairline py-20 px-6 sm:px-12 flex flex-col items-center text-center scroll-mt-[52px]">
       <div class="max-w-4xl mx-auto flex flex-col items-center">
         <!-- Badge Pill -->
         <span class="text-ink text-xs font-bold tracking-wider uppercase mb-4 bg-surface-card px-3.5 py-1.5 rounded-pill border border-hairline">
@@ -159,7 +157,7 @@ import Footer from '../components/Footer.astro';
     </section>
 
     <!-- Analytics Section (Dark Teal/Navy Tile matching {colors.surface-dark}) -->
-    <section id="analytics-section" class="bg-surface-dark text-on-dark border-b border-hairline/10 py-20 px-6 sm:px-12 scroll-mt-[52px]">
+    <section id="hotspots-section" class="bg-surface-dark text-on-dark border-b border-hairline/10 py-20 px-6 sm:px-12 scroll-mt-[52px]">
       <div class="max-w-[1280px] mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
@@ -266,11 +264,11 @@ import Footer from '../components/Footer.astro';
             <div class="bg-surface-pearl border border-hairline p-6 rounded-lg">
               <div class="flex items-center gap-4 mb-6">
                 <!-- Avatar circle -->
-                <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-bold text-lg font-display">
-                  JD
+                <div id="profile-avatar" class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center font-bold text-lg font-display">
+                  RV
                 </div>
                 <div>
-                  <h4 class="text-body-strong text-ink font-bold mb-0.5">Jane Doe</h4>
+                  <h4 id="profile-name" class="text-body-strong text-ink font-bold mb-0.5">Ritvik Vedangi</h4>
                   <p class="text-xs text-muted font-medium" id="profile-level-badge">Level 1: Civic Scout</p>
                 </div>
                 <!-- Points -->
@@ -409,20 +407,99 @@ import Footer from '../components/Footer.astro';
           ></textarea>
         </div>
 
-        <!-- Attached Media -->
+        <!-- AI Copilot Scanner Block -->
+        <div id="ai-copilot-widget" class="bg-surface-card border border-hairline rounded-md p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-hairline pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">✨</span>
+              <span class="text-caption-strong text-ink font-bold">AI Copilot Scanner</span>
+            </div>
+            <span id="ai-copilot-status" class="text-[10px] uppercase font-bold tracking-wider text-muted">Awaiting Input...</span>
+          </div>
+          <div class="flex items-center gap-3 py-1">
+            <div id="ai-copilot-spinner" class="hidden w-4.5 h-4.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div id="ai-copilot-result" class="text-xs text-muted leading-relaxed font-normal">
+              Type a description or upload a photo to activate the live copilot suggestions.
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue Category (Auto-filled by AI) -->
         <div class="flex flex-col gap-1.5">
-          <label for="form-media" class="text-caption-strong text-ink font-bold">Attach Photo / Video Evidence</label>
+          <label for="form-category" class="text-caption-strong text-ink font-bold flex items-center justify-between">
+            <span>Category</span>
+            <span class="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-full font-bold font-mono">AI Classifiable</span>
+          </label>
           <select 
-            id="form-media" 
-            required
-            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink"
+            id="form-category" 
+            required 
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink font-semibold"
           >
-            <option value="pothole">Suburban Pothole (Camera Render)</option>
-            <option value="streetlight">Dark Alleyway Streetlamp (Dusk Render)</option>
-            <option value="water">Sidewalk Water Pipe Burst (Water Render)</option>
-            <option value="garbage">Central Square Overfilled Trash Bins (Recycle Render)</option>
+            <option value="Infrastructure">Infrastructure</option>
+            <option value="Water Leakage">Water Leakage</option>
+            <option value="Streetlight">Streetlights</option>
+            <option value="Waste Management">Waste Management</option>
           </select>
-          <span class="text-[11px] text-muted">Pre-seeded premium photorealistic assets will link to your report automatically.</span>
+        </div>
+
+        <!-- Severity Hazard Index (Auto-filled by AI) -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-caption-strong text-ink font-bold flex items-center justify-between">
+            <span>Severity Hazard Index</span>
+            <span class="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-full font-bold font-mono">AI Classifiable</span>
+          </label>
+          <div class="flex gap-3">
+            <label class="flex-1 flex items-center justify-center h-11 bg-canvas border border-hairline rounded-md cursor-pointer select-none text-xs font-bold text-ink hover:bg-surface-card transition-all">
+              <input type="radio" name="form-severity" value="Low" class="sr-only" />
+              <span>Low</span>
+            </label>
+            <label class="flex-1 flex items-center justify-center h-11 bg-canvas border border-hairline rounded-md cursor-pointer select-none text-xs font-bold text-ink hover:bg-surface-card transition-all border-primary bg-primary/5 ring-1 ring-primary">
+              <input type="radio" name="form-severity" value="Medium" checked class="sr-only" />
+              <span>Medium</span>
+            </label>
+            <label class="flex-1 flex items-center justify-center h-11 bg-canvas border border-hairline rounded-md cursor-pointer select-none text-xs font-bold text-ink hover:bg-surface-card transition-all">
+              <input type="radio" name="form-severity" value="High" class="sr-only" />
+              <span>High</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Attached Media -->
+        <div class="flex flex-col gap-2">
+          <label class="text-caption-strong text-ink font-bold">Attach Photo Evidence</label>
+          
+          <!-- File Input for Real Upload -->
+          <div class="flex flex-col gap-1">
+            <input 
+              type="file" 
+              id="form-file-upload" 
+              accept="image/*"
+              class="block w-full text-xs text-muted
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-xs file:font-semibold
+                file:bg-primary file:text-on-primary
+                hover:file:bg-primary-active
+                cursor-pointer"
+            />
+            <span class="text-[11px] text-muted">Upload a real photo from your device.</span>
+          </div>
+
+          <div class="text-[11px] text-muted font-bold text-center py-0.5">OR</div>
+
+          <!-- Select Dropdown for Pre-seeded Fallback -->
+          <div class="flex flex-col gap-1">
+            <select 
+              id="form-media" 
+              class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink"
+            >
+              <option value="pothole" selected>Suburban Pothole (Camera Render)</option>
+              <option value="streetlight">Dark Alleyway Streetlamp (Dusk Render)</option>
+              <option value="water">Sidewalk Water Pipe Burst (Water Render)</option>
+              <option value="garbage">Central Square Overfilled Trash Bins (Recycle Render)</option>
+            </select>
+            <span class="text-[11px] text-muted">Use a pre-seeded photorealistic asset.</span>
+          </div>
         </div>
 
         <!-- Action Buttons (Clay rounded-md) -->
@@ -442,6 +519,295 @@ import Footer from '../components/Footer.astro';
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: RESOLVE & VERIFY CIVIC ISSUE -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="resolve-issue-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-lg overflow-hidden flex flex-col animate-scale-up"
+      style="max-height: 90vh;"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight" id="resolve-modal-title">Verify & Resolve Issue</h3>
+        <button id="resolve-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Modal Form Body (Rounded 12px Inputs) -->
+      <form id="resolve-issue-form" class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[calc(90vh-120px)] no-scrollbar">
+        <input type="hidden" id="resolve-form-issue-id" value="" />
+
+        <!-- Resolution Notes -->
+        <div class="flex flex-col gap-1.5">
+          <label for="resolve-form-notes" class="text-caption-strong text-ink font-bold">Action Taken / Resolution Notes</label>
+          <textarea 
+            id="resolve-form-notes" 
+            placeholder="Describe what was done to resolve the issue (e.g. patched pothole, replaced streetlight bulb, cleared waste bins)..." 
+            required 
+            rows="3"
+            class="bg-canvas border border-hairline rounded-md p-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Resolution Photo Proof -->
+        <div class="flex flex-col gap-2">
+          <label class="text-caption-strong text-ink font-bold">Attach Resolution Photo Proof</label>
+          
+          <!-- File Input for Real Upload -->
+          <div class="flex flex-col gap-1">
+            <input 
+              type="file" 
+              id="resolve-form-file-upload" 
+              accept="image/*"
+              class="block w-full text-xs text-muted
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-xs file:font-semibold
+                file:bg-primary file:text-on-primary
+                hover:file:bg-primary-active
+                cursor-pointer"
+            />
+            <span class="text-[11px] text-muted">Upload a photo of the resolved state from your device.</span>
+          </div>
+
+          <div class="text-[11px] text-muted font-bold text-center py-0.5">OR</div>
+
+          <!-- Select Dropdown for Pre-seeded Fallback -->
+          <div class="flex flex-col gap-1">
+            <select 
+              id="resolve-form-media" 
+              class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink"
+            >
+              <option value="pothole" selected>Patched Asphalt / Repaired Road</option>
+              <option value="streetlight">Working LED Light / Bright Street</option>
+              <option value="water">Repaired Water Line / Dry Footpath</option>
+              <option value="garbage">Cleared Trash Bins / Swept Street corner</option>
+            </select>
+            <span class="text-[11px] text-muted">Use a pre-seeded resolved asset.</span>
+          </div>
+        </div>
+
+        <!-- Verified By -->
+        <div class="flex flex-col gap-1.5">
+          <label for="resolve-form-by" class="text-caption-strong text-ink font-bold">Verified By</label>
+          <input 
+            type="text" 
+            id="resolve-form-by" 
+            value="Ritvik Vedangi (Citizen Verification)" 
+            required
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Action Buttons (Clay rounded-md) -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-hairline">
+          <button 
+            type="button" 
+            id="resolve-modal-cancel-btn" 
+            class="text-caption font-bold text-muted bg-surface-card hover:bg-hairline rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="bg-primary hover:bg-primary-active text-on-primary font-sans text-caption font-bold rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Verify & Close Issue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: DISPUTE RESOLVED ISSUE -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="dispute-issue-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-lg overflow-hidden flex flex-col animate-scale-up"
+      style="max-height: 90vh;"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight">Dispute Resolution</h3>
+        <button id="dispute-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Modal Form Body -->
+      <form id="dispute-issue-form" class="p-6 flex flex-col gap-5">
+        <input type="hidden" id="dispute-form-issue-id" value="" />
+
+        <div class="bg-red-50 border border-red-100 rounded-md p-3.5 text-xs text-red-800 leading-relaxed">
+          <strong>Disputing Resolution:</strong> Reopening this issue will notify the municipal authority. Your civic verification points will be updated, and the SLA compliance tracking will reset.
+        </div>
+
+        <!-- Dispute Notes -->
+        <div class="flex flex-col gap-1.5">
+          <label for="dispute-form-notes" class="text-caption-strong text-ink font-bold">Why is this fix unsatisfactory?</label>
+          <textarea 
+            id="dispute-form-notes" 
+            placeholder="Provide specific feedback (e.g., 'The pothole patch cracked after the first rain', 'Trash was cleared but bins are still leaking')..." 
+            required 
+            rows="4"
+            class="bg-canvas border border-hairline rounded-md p-3 text-[15px] focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-ink resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-hairline">
+          <button 
+            type="button" 
+            id="dispute-modal-cancel-btn" 
+            class="text-caption font-bold text-muted bg-surface-card hover:bg-hairline rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="bg-red-600 hover:bg-red-700 text-white font-sans text-caption font-bold rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Reopen Issue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: LOGIN / SIGNUP WIZARD -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="auth-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-sm overflow-hidden flex flex-col animate-scale-up"
+    >
+      <!-- Modal Header with Tab Toggle -->
+      <div class="border-b border-hairline px-6 py-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-tagline font-bold text-ink font-display tracking-tight" id="auth-modal-title">Sign In</h3>
+          <button id="auth-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+        </div>
+        
+        <!-- Toggle Tabs -->
+        <div class="flex bg-surface-card p-1 rounded-md border border-divider-soft">
+          <button type="button" id="tab-login" class="flex-1 text-center py-1.5 rounded-md text-xs font-bold bg-canvas text-ink shadow-sm transition-all cursor-pointer">
+            Log In
+          </button>
+          <button type="button" id="tab-signup" class="flex-1 text-center py-1.5 rounded-md text-xs font-semibold text-muted hover:text-ink transition-all cursor-pointer">
+            Sign Up
+          </button>
+        </div>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="auth-form" class="p-6 flex flex-col gap-4">
+        <!-- Signup Only: Full Name -->
+        <div class="flex flex-col gap-1.5 hidden" id="auth-field-name">
+          <label for="auth-name" class="text-caption-strong text-ink font-bold">Full Name</label>
+          <input 
+            type="text" 
+            id="auth-name" 
+            placeholder="e.g. Ritvik Vedangi" 
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="flex flex-col gap-1.5">
+          <label for="auth-email" class="text-caption-strong text-ink font-bold">Email Address</label>
+          <input 
+            type="email" 
+            id="auth-email" 
+            placeholder="name@example.com" 
+            required
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1.5">
+          <label for="auth-password" class="text-caption-strong text-ink font-bold">Password</label>
+          <input 
+            type="password" 
+            id="auth-password" 
+            placeholder="••••••••" 
+            required
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Action Button -->
+        <button 
+          type="submit" 
+          id="auth-submit-btn"
+          class="bg-primary hover:bg-primary-active text-on-primary font-sans text-caption font-bold rounded-md w-full h-11 flex items-center justify-center active-scale transition-colors cursor-pointer mt-2"
+        >
+          Log In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: USER PROFILE / LOGOUT -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="profile-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-sm overflow-hidden flex flex-col animate-scale-up"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight">Your Profile</h3>
+        <button id="profile-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Profile Body -->
+      <div class="p-6 flex flex-col items-center text-center gap-5">
+        <!-- Avatar badge -->
+        <div id="profile-modal-avatar" class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center font-bold text-2xl font-display border border-hairline shadow-sm">
+          RV
+        </div>
+        
+        <div>
+          <h4 class="text-lead font-bold text-ink font-display mb-1" id="profile-modal-name">Ritvik Vedangi</h4>
+          <p class="text-xs text-muted font-medium" id="profile-modal-badge">Level 1: Civic Scout</p>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-cols-2 gap-4 w-full border-t border-b border-hairline py-4 my-2">
+          <div class="text-center border-r border-hairline">
+            <div class="text-lg font-bold text-ink" id="profile-modal-points">350</div>
+            <div class="text-[10px] uppercase font-mono text-muted font-bold">Points</div>
+          </div>
+          <div class="text-center">
+            <div class="text-lg font-bold text-ink">Vadodara</div>
+            <div class="text-[10px] uppercase font-mono text-muted font-bold">Region</div>
+          </div>
+        </div>
+
+        <!-- Logout button -->
+        <button 
+          type="button" 
+          id="profile-logout-btn"
+          class="bg-surface-card hover:bg-hairline text-ink border border-hairline font-sans text-caption font-bold rounded-md w-full h-11 flex items-center justify-center active-scale transition-colors cursor-pointer"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   </div>
 
@@ -497,6 +863,87 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <script>
+  // Helper to convert file input to Base64 data URL
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  // Helper to calculate SLA timers
+  function getSLATimerHtml(issue: any, textLight: boolean): string {
+    const reportDateStr = issue.date;
+    const currentSimulatedDateStr = '2026-06-24';
+    
+    let targetDays = 5; // Low severity
+    if (issue.severity === 'High') targetDays = 2;
+    else if (issue.severity === 'Medium') targetDays = 3;
+    
+    const d1 = new Date(reportDateStr);
+    let d2 = new Date(currentSimulatedDateStr);
+    
+    if (issue.status === 'Resolved' && issue.resolvedDate) {
+      d2 = new Date(issue.resolvedDate);
+    }
+    
+    d1.setHours(12, 0, 0, 0);
+    d2.setHours(12, 0, 0, 0);
+    
+    const diffTime = d2.getTime() - d1.getTime();
+    const elapsedDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    
+    const isDisputed = issue.disputed === true;
+    const isSlaComplied = elapsedDays <= targetDays;
+    
+    let badgeClass = '';
+    let badgeText = '';
+    
+    if (issue.status === 'Resolved') {
+      if (isDisputed) {
+        badgeClass = textLight ? 'bg-red-500/30 text-white' : 'bg-red-50 text-red-700 border-red-200 border';
+        badgeText = 'SLA Breached (Disputed)';
+      } else if (isSlaComplied) {
+        badgeClass = textLight ? 'bg-emerald-500/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200 border';
+        badgeText = 'Resolved within SLA';
+      } else {
+        badgeClass = textLight ? 'bg-red-500/30 text-white' : 'bg-red-50 text-red-700 border-red-200 border';
+        badgeText = 'Resolved Late (SLA Breached)';
+      }
+    } else {
+      if (isDisputed) {
+        badgeClass = textLight ? 'bg-red-500/30 text-white animate-pulse' : 'bg-red-50 text-red-700 border-red-300 border animate-pulse';
+        badgeText = `⚠️ Disputed · SLA BREACHED`;
+      } else if (elapsedDays > targetDays) {
+        const overDays = elapsedDays - targetDays;
+        badgeClass = textLight ? 'bg-red-500/30 text-white animate-pulse' : 'bg-red-50 text-red-700 border-red-300 border animate-pulse';
+        badgeText = `⚠️ SLA BREACHED by ${overDays} day${overDays > 1 ? 's' : ''}`;
+      } else {
+        const remainingDays = targetDays - elapsedDays;
+        badgeClass = textLight ? 'bg-canvas/10 text-on-dark' : 'bg-canvas text-ink border-hairline border';
+        if (remainingDays === 0) {
+          badgeText = `SLA expires today`;
+        } else {
+          badgeText = `${remainingDays} day${remainingDays > 1 ? 's' : ''} remaining`;
+        }
+      }
+    }
+    
+    return `<span class="text-[11px] font-bold px-3 py-1 rounded-pill ${badgeClass}">${badgeText}</span>`;
+  }
+
+  // Preseeded users database
+  const defaultUser = { name: "Ritvik Vedangi", email: "ritvik@example.com", password: "password123", points: 350, level: "Civic Scout" };
+  if (!localStorage.getItem('pinpoint_users')) {
+    localStorage.setItem('pinpoint_users', JSON.stringify([defaultUser]));
+  }
+  if (localStorage.getItem('pinpoint_is_logged_in') === null) {
+    localStorage.setItem('pinpoint_is_logged_in', 'true');
+    localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(defaultUser));
+  }
+
   // Dynamic issues database
   const preseededIssues = [
     {
@@ -511,7 +958,7 @@ import Footer from '../components/Footer.astro';
       lat: 22.3105,
       lng: 73.2215,
       date: "2026-06-21",
-      reportedBy: "Sarah Patel",
+      reportedBy: "Sneha Patel",
       imageUrl: "/images/pothole_vadodara.png"
     },
     {
@@ -526,7 +973,7 @@ import Footer from '../components/Footer.astro';
       lat: 22.2985,
       lng: 73.2240,
       date: "2026-06-20",
-      reportedBy: "David Parmar",
+      reportedBy: "Devendra Parmar",
       imageUrl: "/images/streetlight_vadodara.png"
     },
     {
@@ -541,7 +988,7 @@ import Footer from '../components/Footer.astro';
       lat: 22.3160,
       lng: 73.2185,
       date: "2026-06-22",
-      reportedBy: "Elena Amin",
+      reportedBy: "Esha Amin",
       imageUrl: "/images/water_vadodara.png"
     },
     {
@@ -556,8 +1003,12 @@ import Footer from '../components/Footer.astro';
       lat: 22.3130,
       lng: 73.2085,
       date: "2026-06-18",
-      reportedBy: "Marcus Shah",
-      imageUrl: "/images/garbage_vadodara.png"
+      reportedBy: "Manish Shah",
+      imageUrl: "/images/garbage_vadodara.png",
+      resolvedImageUrl: "/images/garbage_fixed_vadodara.png",
+      resolvedNotes: "Municipal waste team cleared the bins and swept the area clean.",
+      resolvedBy: "VMC Waste Management",
+      resolvedDate: "2026-06-19"
     },
     {
       id: "issue-5",
@@ -571,17 +1022,29 @@ import Footer from '../components/Footer.astro';
       lat: 22.3095,
       lng: 73.2205,
       date: "2026-06-19",
-      reportedBy: "Clara W.",
+      reportedBy: "Kavita Verma",
       imageUrl: "/images/pothole_vadodara.png"
     }
   ];
 
-  // Initialize DB in localStorage if empty or if it uses the old SVG coordinates/images
+  // Initialize DB in localStorage if empty or if it uses the old SVG coordinates/images/foreign names/lacks resolved details/Priya Sharma names
   let storedIssues = localStorage.getItem('pinpoint_issues');
   if (storedIssues) {
     try {
       const parsed = JSON.parse(storedIssues);
-      if (parsed.length > 0 && (parsed[0].hasOwnProperty('mapX') || parsed[0].imageUrl === '/images/pothole.png')) {
+      const hasOldKeys = parsed.length > 0 && (parsed[0].hasOwnProperty('mapX') || parsed[0].imageUrl === '/images/pothole.png');
+      const hasForeignNames = parsed.some((issue: any) => 
+        issue.reportedBy === "Jane Doe" || 
+        issue.reportedBy.includes("Jane Doe") ||
+        issue.reportedBy.includes("Priya Sharma") ||
+        issue.reportedBy === "Sarah Patel" || 
+        issue.reportedBy === "David Parmar" || 
+        issue.reportedBy === "Elena Amin" || 
+        issue.reportedBy === "Marcus Shah" || 
+        issue.reportedBy === "Clara W."
+      );
+      const hasOldResolved = parsed.some((issue: any) => issue.status === 'Resolved' && !issue.resolvedImageUrl);
+      if (hasOldKeys || hasForeignNames || hasOldResolved) {
         localStorage.removeItem('pinpoint_issues');
       }
     } catch(e) {
@@ -595,12 +1058,32 @@ import Footer from '../components/Footer.astro';
 
   // Preseeded Leaderboard citizens
   const topCitizens = [
-    { name: "Sarah Patel", points: 840, issues: 8, badge: "Civic Champion" },
-    { name: "Marcus Shah", points: 710, issues: 6, badge: "Community Guardian" },
-    { name: "Elena Amin", points: 520, issues: 4, badge: "Community Guardian" },
-    { name: "You (Jane Doe)", points: 350, issues: 3, badge: "Civic Scout", isUser: true },
-    { name: "David Parmar", points: 290, issues: 2, badge: "Civic Scout" }
+    { name: "Sneha Patel", points: 840, issues: 8, badge: "Civic Champion" },
+    { name: "Manish Shah", points: 710, issues: 6, badge: "Community Guardian" },
+    { name: "Esha Amin", points: 520, issues: 4, badge: "Community Guardian" },
+    { name: "You (Ritvik Vedangi)", points: 350, issues: 3, badge: "Civic Scout", isUser: true },
+    { name: "Devendra Parmar", points: 290, issues: 2, badge: "Civic Scout" }
   ];
+
+  let storedLeaderboard = localStorage.getItem('pinpoint_leaderboard');
+  if (storedLeaderboard) {
+    try {
+      const parsedL = JSON.parse(storedLeaderboard);
+      const hasForeignNames = parsedL.some((c: any) => 
+        c.name.includes("Jane Doe") || 
+        c.name.includes("Priya Sharma") ||
+        c.name.includes("Sarah Patel") || 
+        c.name.includes("David Parmar") || 
+        c.name.includes("Elena Amin") || 
+        c.name.includes("Marcus Shah")
+      );
+      if (hasForeignNames) {
+        localStorage.removeItem('pinpoint_leaderboard');
+      }
+    } catch(e) {
+      localStorage.removeItem('pinpoint_leaderboard');
+    }
+  }
 
   if (!localStorage.getItem('pinpoint_leaderboard')) {
     localStorage.setItem('pinpoint_leaderboard', JSON.stringify(topCitizens));
@@ -632,12 +1115,24 @@ import Footer from '../components/Footer.astro';
   const cancelModalBtn = document.getElementById('modal-cancel-btn');
   const closeModalBtn = document.getElementById('modal-close-btn');
 
+  // Resolve Modal DOM bindings
+  const resolveModal = document.getElementById('resolve-issue-modal');
+  const resolveForm = document.getElementById('resolve-issue-form') as HTMLFormElement;
+  const resolveCancelModalBtn = document.getElementById('resolve-modal-cancel-btn');
+  const resolveCloseModalBtn = document.getElementById('resolve-modal-close-btn');
+
   // AI Overlay DOM bindings
   const aiOverlay = document.getElementById('ai-scanning-overlay');
   const aiStatusText = document.getElementById('ai-scanning-status-text');
   const aiVision = document.getElementById('ai-metric-vision');
   const aiGeo = document.getElementById('ai-metric-geo');
   const aiSeverity = document.getElementById('ai-metric-severity');
+
+  // Dispute Modal DOM bindings
+  const disputeModal = document.getElementById('dispute-issue-modal');
+  const disputeForm = document.getElementById('dispute-issue-form') as HTMLFormElement;
+  const disputeCancelModalBtn = document.getElementById('dispute-modal-cancel-btn');
+  const disputeCloseModalBtn = document.getElementById('dispute-modal-close-btn');
 
   // Current states
   let currentLocalityFilter = 'All';
@@ -733,16 +1228,42 @@ import Footer from '../components/Footer.astro';
     }
   });
 
+  // Synchronize scroll lock state across all modals
+  function syncScrollLock() {
+    const rm = document.getElementById('report-issue-modal');
+    const rsm = document.getElementById('resolve-issue-modal');
+    const am = document.getElementById('auth-modal');
+    const pm = document.getElementById('profile-modal');
+    
+    const isAnyModalOpen = 
+      (rm && !rm.classList.contains('hidden')) ||
+      (rsm && !rsm.classList.contains('hidden')) ||
+      (am && !am.classList.contains('hidden')) ||
+      (pm && !pm.classList.contains('hidden'));
+      
+    if (isAnyModalOpen) {
+      document.body.classList.add('overflow-hidden');
+      document.documentElement.classList.add('overflow-hidden');
+      document.body.style.setProperty('overflow', 'hidden', 'important');
+      document.documentElement.style.setProperty('overflow', 'hidden', 'important');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+      document.documentElement.classList.remove('overflow-hidden');
+      document.body.style.removeProperty('overflow');
+      document.documentElement.style.removeProperty('overflow');
+    }
+  }
+
   // Modal show / hide functions
   function openReportModal() {
     reportModal?.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
+    syncScrollLock();
     initReportMap();
   }
 
   function closeReportModal() {
     reportModal?.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
+    syncScrollLock();
     reportForm.reset();
     if (reportMarker) {
       reportMarker.setLatLng([22.3090, 73.2200]);
@@ -752,6 +1273,19 @@ import Footer from '../components/Footer.astro';
     if (formLat) formLat.value = '22.3090';
     if (formLng) formLng.value = '73.2200';
   }
+
+  // Sync modifications across browser tabs/windows
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'pinpoint_issues') {
+      window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+    }
+    if (e.key === 'pinpoint_user_stats') {
+      window.dispatchEvent(new CustomEvent('pinpoint_stats_changed'));
+    }
+    if (e.key === 'pinpoint_logged_in_user') {
+      window.dispatchEvent(new CustomEvent('pinpoint_auth_changed'));
+    }
+  });
 
   window.addEventListener('pinpoint_open_report_modal', openReportModal);
   document.getElementById('hero-report-btn')?.addEventListener('click', openReportModal);
@@ -764,6 +1298,261 @@ import Footer from '../components/Footer.astro';
       closeReportModal();
     }
   });
+
+  // Resolve Modal Helpers
+  function openResolveModal(issueId: string) {
+    resolveModal?.classList.remove('hidden');
+    syncScrollLock();
+    
+    // Find target issue to set auto-selected media and title
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === issueId);
+    
+    const issueIdInput = document.getElementById('resolve-form-issue-id') as HTMLInputElement;
+    if (issueIdInput) issueIdInput.value = issueId;
+    
+    const modalTitle = document.getElementById('resolve-modal-title');
+    if (modalTitle && issue) {
+      modalTitle.textContent = `Verify & Resolve: ${issue.title}`;
+    }
+    
+    // Auto-select resolution proof media category
+    const mediaSelect = document.getElementById('resolve-form-media') as HTMLSelectElement;
+    if (mediaSelect && issue) {
+      if (issue.category === 'Infrastructure') mediaSelect.value = 'pothole';
+      else if (issue.category === 'Streetlight') mediaSelect.value = 'streetlight';
+      else if (issue.category === 'Water Leakage') mediaSelect.value = 'water';
+      else if (issue.category === 'Waste Management') mediaSelect.value = 'garbage';
+    }
+
+    const resolvedByInput = document.getElementById('resolve-form-by') as HTMLInputElement;
+    if (resolvedByInput) {
+      const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+      const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+      let name = "Ritvik Vedangi";
+      if (isLoggedIn && loggedInUser) {
+        try {
+          name = JSON.parse(loggedInUser).name;
+        } catch (e) {}
+      }
+      resolvedByInput.value = `${name} (Citizen Verification)`;
+    }
+  }
+
+  function closeResolveModal() {
+    resolveModal?.classList.add('hidden');
+    syncScrollLock();
+    resolveForm.reset();
+  }
+
+  resolveCancelModalBtn?.addEventListener('click', closeResolveModal);
+  resolveCloseModalBtn?.addEventListener('click', closeResolveModal);
+
+  resolveModal?.addEventListener('click', (e) => {
+    if (e.target === resolveModal) {
+      closeResolveModal();
+    }
+  });
+
+  // Resolve Form Submit handler
+  resolveForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const issueId = (document.getElementById('resolve-form-issue-id') as HTMLInputElement).value;
+    const notes = (document.getElementById('resolve-form-notes') as HTMLTextAreaElement).value;
+    const mediaVal = (document.getElementById('resolve-form-media') as HTMLSelectElement).value;
+    const resolvedBy = (document.getElementById('resolve-form-by') as HTMLInputElement).value;
+    const fileInput = document.getElementById('resolve-form-file-upload') as HTMLInputElement;
+    
+    let resolvedImageUrl = "/images/pothole_fixed_vadodara.png";
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      try {
+        resolvedImageUrl = await fileToBase64(fileInput.files[0]);
+      } catch (err) {
+        console.error("Failed to read resolution file upload:", err);
+      }
+    } else {
+      if (mediaVal === 'streetlight') resolvedImageUrl = "/images/streetlight_fixed_vadodara.png";
+      if (mediaVal === 'water') resolvedImageUrl = "/images/water_fixed_vadodara.png";
+      if (mediaVal === 'garbage') resolvedImageUrl = "/images/garbage_fixed_vadodara.png";
+    }
+    
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === issueId);
+    if (issue) {
+      issue.status = 'Resolved';
+      issue.resolvedImageUrl = resolvedImageUrl;
+      issue.resolvedNotes = notes;
+      issue.resolvedBy = resolvedBy;
+      issue.resolvedDate = new Date().toISOString().split('T')[0];
+      
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+      
+      // Award points
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points += 30;
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+      
+      showToast("Issue resolved and verified! +30 points awarded.");
+    }
+    
+    closeResolveModal();
+    renderFeed();
+    updateStatsWidgets();
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+  });
+
+  // Dispute Modal Helpers
+  function openDisputeModal(issueId: string) {
+    disputeModal?.classList.remove('hidden');
+    syncScrollLock();
+    
+    const issueIdInput = document.getElementById('dispute-form-issue-id') as HTMLInputElement;
+    if (issueIdInput) issueIdInput.value = issueId;
+  }
+
+  function closeDisputeModal() {
+    disputeModal?.classList.add('hidden');
+    syncScrollLock();
+    disputeForm.reset();
+  }
+
+  disputeCancelModalBtn?.addEventListener('click', closeDisputeModal);
+  disputeCloseModalBtn?.addEventListener('click', closeDisputeModal);
+
+  disputeModal?.addEventListener('click', (e) => {
+    if (e.target === disputeModal) {
+      closeDisputeModal();
+    }
+  });
+
+  (window as any).handleDispute = function(id: string) {
+    openDisputeModal(id);
+  };
+
+  disputeForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const issueId = (document.getElementById('dispute-form-issue-id') as HTMLInputElement).value;
+    const notes = (document.getElementById('dispute-form-notes') as HTMLTextAreaElement).value;
+
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === issueId);
+    if (issue) {
+      issue.status = 'Open';
+      issue.disputed = true;
+      issue.disputeNotes = notes;
+      
+      // Clear resolved details since it is reopened
+      delete issue.resolvedNotes;
+      delete issue.resolvedBy;
+      delete issue.resolvedImageUrl;
+      delete issue.resolvedDate;
+      
+      // Deduct civic points for disputing
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points = Math.max(0, userStats.points - 50);
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+      showToast("Issue reopened. Municipal authority notified of dispute. -50 Civic points.");
+    }
+
+    closeDisputeModal();
+    renderFeed();
+    updateStatsWidgets();
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+  });
+
+  // AI Copilot Live Analyzer Helper
+  let aiAnalysisTimeout: any = null;
+
+  function triggerLiveAIScan() {
+    const description = (document.getElementById('form-description') as HTMLTextAreaElement).value;
+    const title = (document.getElementById('form-title') as HTMLInputElement).value;
+
+    const queryText = (title + ' ' + description).trim().toLowerCase();
+
+    const copilotStatus = document.getElementById('ai-copilot-status');
+    const copilotResult = document.getElementById('ai-copilot-result');
+    const copilotSpinner = document.getElementById('ai-copilot-spinner');
+
+    if (queryText.length < 5) {
+      if (copilotStatus) copilotStatus.textContent = 'Awaiting Input...';
+      if (copilotResult) copilotResult.textContent = 'Type a description or upload a photo to activate the live copilot suggestions.';
+      if (copilotSpinner) copilotSpinner.classList.add('hidden');
+      return;
+    }
+
+    if (copilotStatus) copilotStatus.textContent = 'Scanning...';
+    if (copilotSpinner) copilotSpinner.classList.remove('hidden');
+    if (copilotResult) {
+      copilotResult.innerHTML = '<span class="text-primary italic font-medium">AI analyzing details...</span>';
+    }
+
+    if (aiAnalysisTimeout) clearTimeout(aiAnalysisTimeout);
+    
+    aiAnalysisTimeout = setTimeout(() => {
+      let category = "Infrastructure";
+      if (queryText.includes("leak") || queryText.includes("water") || queryText.includes("pipe") || queryText.includes("drain")) {
+        category = "Water Leakage";
+      } else if (queryText.includes("light") || queryText.includes("lamp") || queryText.includes("dark") || queryText.includes("bulb")) {
+        category = "Streetlight";
+      } else if (queryText.includes("trash") || queryText.includes("garbage") || queryText.includes("bin") || queryText.includes("waste")) {
+        category = "Waste Management";
+      }
+
+      let severity = "Medium";
+      if (queryText.includes("danger") || queryText.includes("severe") || queryText.includes("accident") || queryText.includes("flooding") || queryText.includes("injury")) {
+        severity = "High";
+      } else if (queryText.includes("small") || queryText.includes("minor") || queryText.includes("cosmetic")) {
+        severity = "Low";
+      }
+
+      const formCategory = document.getElementById('form-category') as HTMLSelectElement;
+      if (formCategory) {
+        formCategory.value = category;
+      }
+
+      const radio = document.querySelector(`input[name="form-severity"][value="${severity}"]`) as HTMLInputElement;
+      if (radio) {
+        radio.checked = true;
+        updateSeverityRadioUI();
+      }
+
+      if (copilotSpinner) copilotSpinner.classList.add('hidden');
+      if (copilotStatus) copilotStatus.textContent = 'Matched ✨';
+      if (copilotResult) {
+        copilotResult.innerHTML = `<strong>AI Match:</strong> <span class="text-primary">${category} (${severity} Severity)</span>. Suggested parameters applied.`;
+      }
+    }, 1000);
+  }
+
+  // Handle severity radio pill clicks
+  const severityRadios = document.querySelectorAll('input[name="form-severity"]');
+  severityRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      updateSeverityRadioUI();
+    });
+  });
+
+  function updateSeverityRadioUI() {
+    severityRadios.forEach((r: any) => {
+      const label = r.closest('label');
+      if (r.checked) {
+        label?.classList.remove('border-hairline', 'bg-canvas');
+        label?.classList.add('border-primary', 'bg-primary/5', 'ring-1', 'ring-primary');
+      } else {
+        label?.classList.remove('border-primary', 'bg-primary/5', 'ring-1', 'ring-primary');
+        label?.classList.add('border-hairline', 'bg-canvas');
+      }
+    });
+  }
+
+  // Attach Copilot listeners
+  document.getElementById('form-description')?.addEventListener('input', triggerLiveAIScan);
+  document.getElementById('form-title')?.addEventListener('input', triggerLiveAIScan);
+  document.getElementById('form-file-upload')?.addEventListener('change', triggerLiveAIScan);
+  document.getElementById('form-media')?.addEventListener('change', triggerLiveAIScan);
 
   // Handle Locality Filter Event from Map
   window.addEventListener('pinpoint_filter_locality', (e: any) => {
@@ -827,6 +1616,30 @@ import Footer from '../components/Footer.astro';
 
     const levelBadge = document.getElementById('profile-level-badge');
     if (levelBadge) levelBadge.textContent = userStats.level;
+
+    // Update user profile name and avatar initials dynamically
+    const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    let name = "Guest Citizen";
+    let initials = "GC";
+    
+    if (isLoggedIn && loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        name = u.name;
+        initials = u.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+      } catch (e) {
+        console.error(e);
+      }
+    } else if (!isLoggedIn) {
+      name = "Guest Citizen";
+      initials = "GC";
+    }
+
+    const profName = document.getElementById('profile-name');
+    const profAvatar = document.getElementById('profile-avatar');
+    if (profName) profName.textContent = name;
+    if (profAvatar) profAvatar.textContent = initials;
 
     const progText = document.getElementById('level-progress-text');
     if (progText) progText.textContent = `${userStats.points} / ${maxPoints} pts`;
@@ -1000,10 +1813,21 @@ import Footer from '../components/Footer.astro';
         textLight = true;
       }
 
-      if (issue.status === 'Resolved') {
+      if (issue.disputed) {
+        statusBadgeColor = textLight
+          ? 'bg-red-500/25 text-white border-transparent animate-pulse'
+          : 'bg-red-50 text-red-700 border-red-200 border animate-pulse';
+      } else if (issue.status === 'Resolved') {
         statusBadgeColor = textLight 
           ? 'bg-canvas/20 text-on-dark border-transparent' 
           : 'bg-success/20 text-success border-success/30 border';
+      }
+
+      let disputeBtnClass = '';
+      if (textLight) {
+        disputeBtnClass = 'bg-red-500/25 hover:bg-red-500/40 text-white border border-red-500/30';
+      } else {
+        disputeBtnClass = 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200';
       }
 
       const hasUpvoted = upvoted.includes(issue.id);
@@ -1032,9 +1856,49 @@ import Footer from '../components/Footer.astro';
 
       const upvoteBtnText = hasUpvoted ? 'Upvoted' : 'Upvote';
 
-      const imageElement = issue.imageUrl 
-        ? `<img src="${issue.imageUrl}" alt="${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product mb-5 hover:opacity-95 transition-opacity" />`
-        : '';
+      let imageElement = '';
+      if (issue.status === 'Resolved') {
+        const originalImg = issue.imageUrl || '/images/pothole_vadodara.png';
+        const resolvedImg = issue.resolvedImageUrl || '/images/pothole_fixed_vadodara.png';
+        imageElement = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            <div class="relative">
+              <img src="${originalImg}" alt="Before - ${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity" />
+              <span class="absolute top-2 left-2 bg-black/75 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow">BEFORE (Reported)</span>
+            </div>
+            <div class="relative">
+              <img src="${resolvedImg}" alt="After - ${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity border-success/30" />
+              <span class="absolute top-2 left-2 bg-success text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow">AFTER (Resolved)</span>
+            </div>
+          </div>
+        `;
+      } else {
+        imageElement = issue.imageUrl 
+          ? `<img src="${issue.imageUrl}" alt="${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product mb-5 hover:opacity-95 transition-opacity" />`
+          : '';
+      }
+
+      let auditPanel = '';
+      if (issue.status === 'Resolved') {
+        const resolvedBy = issue.resolvedBy || 'VMC Waste Management';
+        const resolvedDate = issue.resolvedDate || '2026-06-19';
+        const resolvedNotes = issue.resolvedNotes || 'Municipal waste team cleared the bins and swept the area clean.';
+        
+        auditPanel = `
+          <div class="bg-canvas/60 border border-hairline rounded-md p-3.5 mb-4 text-xs">
+            <div class="flex items-center gap-2 text-ink font-bold mb-1">
+              <span class="text-success text-sm">✓</span>
+              <span>Resolution Verified</span>
+            </div>
+            <div class="text-muted leading-relaxed font-normal mb-1.5">
+              "${resolvedNotes}"
+            </div>
+            <div class="text-[10px] text-muted uppercase tracking-wider font-mono font-bold">
+              By: ${resolvedBy} · Date: ${resolvedDate}
+            </div>
+          </div>
+        `;
+      }
 
       issuesFeed.innerHTML += `
         <div 
@@ -1061,6 +1925,9 @@ import Footer from '../components/Footer.astro';
             ${issue.description}
           </p>
 
+          <!-- Audit Log Panel (Resolved state verification proof) -->
+          ${auditPanel}
+
           <!-- Badges & Controls Row -->
           <div class="flex flex-wrap items-center gap-3 border-t border-divider-soft pt-4 mt-4">
             <!-- Severity Badge -->
@@ -1070,8 +1937,11 @@ import Footer from '../components/Footer.astro';
 
             <!-- Status Badge -->
             <span class="text-[11px] font-bold px-3 py-1 rounded-pill ${statusBadgeColor}">
-              ${issue.status}
+              ${issue.disputed ? '⚠️ Disputed' : issue.status}
             </span>
+
+            <!-- SLA Countdown Badge -->
+            ${getSLATimerHtml(issue, textLight)}
 
             <span class="text-xs ${textLight ? 'text-on-dark-soft' : 'text-muted'} ml-1 font-medium">By ${issue.reportedBy}</span>
 
@@ -1092,6 +1962,16 @@ import Footer from '../components/Footer.astro';
                   class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${verifyBtnClass}"
                 >
                   Verify
+                </button>
+              ` : ''}
+
+              <!-- Dispute Fix (Only for Resolved issues that are not already disputed) -->
+              ${issue.status === 'Resolved' && !issue.disputed ? `
+                <button 
+                  onclick="handleDispute('${issue.id}')"
+                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${disputeBtnClass}"
+                >
+                  Dispute Fix
                 </button>
               ` : ''}
 
@@ -1188,37 +2068,37 @@ import Footer from '../components/Footer.astro';
     window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
   };
 
-  // Resolve Action Handler (Authority Simulation)
+  // Resolve Action Handler (Open verification modal)
   (window as any).handleResolve = function(id: string) {
-    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
-    const issue = issues.find((i: any) => i.id === id);
-    if (issue) {
-      issue.status = 'Resolved';
-      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
-      
-      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
-      userStats.points += 30;
-      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
-
-      showToast("Issue resolved! +30 points awarded.");
-    }
-
-    renderFeed();
-    updateStatsWidgets();
-    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+    openResolveModal(id);
   };
 
   // Form Submit with AI Auto-Tagging simulation
-  reportForm?.addEventListener('submit', (e) => {
+  reportForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const title = (document.getElementById('form-title') as HTMLInputElement).value;
     const locality = (document.getElementById('form-locality') as HTMLSelectElement).value;
     const description = (document.getElementById('form-description') as HTMLTextAreaElement).value;
     const mediaSelection = (document.getElementById('form-media') as HTMLSelectElement).value;
+    const fileInput = document.getElementById('form-file-upload') as HTMLInputElement;
 
     const latVal = parseFloat((document.getElementById('form-lat') as HTMLInputElement).value || '22.3090');
     const lngVal = parseFloat((document.getElementById('form-lng') as HTMLInputElement).value || '73.2200');
+
+    const category = (document.getElementById('form-category') as HTMLSelectElement).value || "Infrastructure";
+    const severityInput = document.querySelector('input[name="form-severity"]:checked') as HTMLInputElement;
+    const severity = severityInput ? severityInput.value : "Medium";
+
+    // Read the uploaded file if present
+    let uploadedImageUrl = '';
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      try {
+        uploadedImageUrl = await fileToBase64(fileInput.files[0]);
+      } catch (err) {
+        console.error("Failed to read file upload:", err);
+      }
+    }
 
     closeReportModal();
 
@@ -1254,29 +2134,14 @@ import Footer from '../components/Footer.astro';
       aiOverlay?.classList.add('hidden');
       aiOverlay?.classList.remove('flex');
 
-      let category = "Infrastructure";
-      const descLower = description.toLowerCase() + " " + title.toLowerCase();
-      if (descLower.includes("pothole") || descLower.includes("road") || descLower.includes("pavement") || descLower.includes("curb")) {
-        category = "Infrastructure";
-      } else if (descLower.includes("leak") || descLower.includes("water") || descLower.includes("pipe") || descLower.includes("drain")) {
-        category = "Water Leakage";
-      } else if (descLower.includes("light") || descLower.includes("lamp") || descLower.includes("dark") || descLower.includes("bulb")) {
-        category = "Streetlight";
-      } else if (descLower.includes("trash") || descLower.includes("garbage") || descLower.includes("bin") || descLower.includes("waste")) {
-        category = "Waste Management";
-      }
-
-      let severity = "Medium";
-      if (descLower.includes("danger") || descLower.includes("severe") || descLower.includes("accident") || descLower.includes("flooding") || descLower.includes("injury")) {
-        severity = "High";
-      } else if (descLower.includes("small") || descLower.includes("minor") || descLower.includes("cosmetic")) {
-        severity = "Medium";
-      }
-
       let imageUrl = "/images/pothole_vadodara.png";
-      if (mediaSelection === 'streetlight') imageUrl = "/images/streetlight_vadodara.png";
-      if (mediaSelection === 'water') imageUrl = "/images/water_vadodara.png";
-      if (mediaSelection === 'garbage') imageUrl = "/images/garbage_vadodara.png";
+      if (uploadedImageUrl) {
+        imageUrl = uploadedImageUrl;
+      } else {
+        if (mediaSelection === 'streetlight') imageUrl = "/images/streetlight_vadodara.png";
+        if (mediaSelection === 'water') imageUrl = "/images/water_vadodara.png";
+        if (mediaSelection === 'garbage') imageUrl = "/images/garbage_vadodara.png";
+      }
 
       const newIssue = {
         id: "issue-" + Date.now(),
@@ -1290,7 +2155,16 @@ import Footer from '../components/Footer.astro';
         lat: latVal,
         lng: lngVal,
         date: new Date().toISOString().split('T')[0],
-        reportedBy: "Jane Doe (You)",
+        reportedBy: (() => {
+          const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+          const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+          if (isLoggedIn && loggedInUser) {
+            try {
+              return JSON.parse(loggedInUser).name + " (You)";
+            } catch (e) {}
+          }
+          return "Ritvik Vedangi (You)";
+        })(),
         imageUrl
       };
 
@@ -1332,6 +2206,243 @@ import Footer from '../components/Footer.astro';
   searchInput?.addEventListener('input', renderFeed);
   categoryFilter?.addEventListener('change', renderFeed);
   statusFilter?.addEventListener('change', renderFeed);
+
+  // Auth & Profile Modal DOM bindings
+  const authModal = document.getElementById('auth-modal');
+  const authForm = document.getElementById('auth-form') as HTMLFormElement;
+  const authCloseBtn = document.getElementById('auth-modal-close-btn');
+  const profileModal = document.getElementById('profile-modal');
+  const profileCloseBtn = document.getElementById('profile-modal-close-btn');
+  const logoutBtn = document.getElementById('profile-logout-btn');
+  
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const fieldName = document.getElementById('auth-field-name');
+  const authTitle = document.getElementById('auth-modal-title');
+  const authSubmitBtn = document.getElementById('auth-submit-btn');
+
+  let authMode: 'login' | 'signup' = 'login';
+  
+  tabLogin?.addEventListener('click', () => {
+    authMode = 'login';
+    tabLogin.className = "flex-1 text-center py-1.5 rounded-md text-xs font-bold bg-canvas text-ink shadow-sm transition-all cursor-pointer";
+    tabSignup!.className = "flex-1 text-center py-1.5 rounded-md text-xs font-semibold text-muted hover:text-ink transition-all cursor-pointer";
+    fieldName?.classList.add('hidden');
+    (document.getElementById('auth-name') as HTMLInputElement).required = false;
+    if (authTitle) authTitle.textContent = "Sign In";
+    if (authSubmitBtn) authSubmitBtn.textContent = "Log In";
+  });
+  
+  tabSignup?.addEventListener('click', () => {
+    authMode = 'signup';
+    tabSignup.className = "flex-1 text-center py-1.5 rounded-md text-xs font-bold bg-canvas text-ink shadow-sm transition-all cursor-pointer";
+    tabLogin.className = "flex-1 text-center py-1.5 rounded-md text-xs font-semibold text-muted hover:text-ink transition-all cursor-pointer";
+    fieldName?.classList.remove('hidden');
+    (document.getElementById('auth-name') as HTMLInputElement).required = true;
+    if (authTitle) authTitle.textContent = "Create Account";
+    if (authSubmitBtn) authSubmitBtn.textContent = "Create Account";
+  });
+
+  function openAuthModal() {
+    authModal?.classList.remove('hidden');
+    syncScrollLock();
+  }
+  
+  function closeAuthModal() {
+    authModal?.classList.add('hidden');
+    syncScrollLock();
+    authForm.reset();
+  }
+  
+  function openProfileModal() {
+    profileModal?.classList.remove('hidden');
+    syncScrollLock();
+    
+    // Set profile details dynamically
+    const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    let name = "Ritvik Vedangi";
+    let initials = "RV";
+    
+    if (loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        name = u.name;
+        initials = u.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    const profModalName = document.getElementById('profile-modal-name');
+    const profModalBadge = document.getElementById('profile-modal-badge');
+    const profModalPoints = document.getElementById('profile-modal-points');
+    const profModalAvatar = document.getElementById('profile-modal-avatar');
+    
+    if (profModalName) profModalName.textContent = name;
+    if (profModalBadge) profModalBadge.textContent = userStats.level;
+    if (profModalPoints) profModalPoints.textContent = userStats.points;
+    if (profModalAvatar) profModalAvatar.textContent = initials;
+  }
+  
+  function closeProfileModal() {
+    profileModal?.classList.add('hidden');
+    syncScrollLock();
+  }
+  
+  authCloseBtn?.addEventListener('click', closeAuthModal);
+  authModal?.addEventListener('click', (e) => {
+    if (e.target === authModal) closeAuthModal();
+  });
+  
+  profileCloseBtn?.addEventListener('click', closeProfileModal);
+  profileModal?.addEventListener('click', (e) => {
+    if (e.target === profileModal) closeProfileModal();
+  });
+  
+  // Register custom events for navbar mapping
+  window.addEventListener('pinpoint_open_auth_modal', openAuthModal);
+  window.addEventListener('pinpoint_open_profile_modal', openProfileModal);
+
+  // Auth Form submit logic
+  authForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const email = (document.getElementById('auth-email') as HTMLInputElement).value;
+    const password = (document.getElementById('auth-password') as HTMLInputElement).value;
+    
+    let users = JSON.parse(localStorage.getItem('pinpoint_users') || '[]');
+    
+    if (authMode === 'signup') {
+      const name = (document.getElementById('auth-name') as HTMLInputElement).value;
+      
+      // Check if user already exists
+      if (users.some((u: any) => u.email === email)) {
+        showToast("An account with this email already exists!");
+        return;
+      }
+      
+      const newUser = {
+        name,
+        email,
+        password,
+        points: 350,
+        level: "Civic Scout"
+      };
+      
+      users.push(newUser);
+      localStorage.setItem('pinpoint_users', JSON.stringify(users));
+      
+      // Log in the new user
+      localStorage.setItem('pinpoint_is_logged_in', 'true');
+      localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(newUser));
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: 350, level: "Civic Scout" }));
+      
+      // Add or update entry in leaderboard
+      let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+      const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+      if (userIndex !== -1) {
+        leaderboard[userIndex].name = `You (${name})`;
+        leaderboard[userIndex].points = 350;
+        leaderboard[userIndex].badge = "Civic Scout";
+      } else {
+        leaderboard.push({ name: `You (${name})`, points: 350, issues: 3, badge: "Civic Scout", isUser: true });
+      }
+      localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+      
+      showToast(`Welcome ${name}! Account created and signed in.`);
+    } else {
+      // Login mode
+      const user = users.find((u: any) => u.email === email && u.password === password);
+      
+      // Fallback for default seed user (Ritvik Vedangi)
+      const defaultUser = { name: "Ritvik Vedangi", email: "ritvik@example.com", password: "password123", points: 350, level: "Civic Scout" };
+      
+      if (email === "ritvik@example.com" && password === "password123") {
+        localStorage.setItem('pinpoint_is_logged_in', 'true');
+        localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(defaultUser));
+        localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: defaultUser.points, level: defaultUser.level }));
+        
+        let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+        const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+        if (userIndex !== -1) {
+          leaderboard[userIndex].name = `You (${defaultUser.name})`;
+        }
+        localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+        
+        showToast("Signed in successfully as Ritvik Vedangi!");
+      } else if (user) {
+        localStorage.setItem('pinpoint_is_logged_in', 'true');
+        localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(user));
+        localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: user.points, level: user.level }));
+        
+        let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+        const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+        if (userIndex !== -1) {
+          leaderboard[userIndex].name = `You (${user.name})`;
+          leaderboard[userIndex].points = user.points;
+          leaderboard[userIndex].badge = user.level;
+        }
+        localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+        
+        showToast(`Signed in successfully as ${user.name}!`);
+      } else {
+        showToast("Invalid email or password!");
+        return;
+      }
+    }
+    
+    closeAuthModal();
+    
+    // Dispatch events to refresh navbar and components
+    window.dispatchEvent(new CustomEvent('pinpoint_auth_changed'));
+    renderLeaderboard();
+    updateStatsWidgets();
+  });
+
+  // Logout logic
+  logoutBtn?.addEventListener('click', () => {
+    // Save current points back to the user database in localStorage before logging out
+    const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    if (isLoggedIn && loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+        let users = JSON.parse(localStorage.getItem('pinpoint_users') || '[]');
+        const userIndex = users.findIndex((usr: any) => usr.email === u.email);
+        if (userIndex !== -1) {
+          users[userIndex].points = userStats.points;
+          users[userIndex].level = userStats.level;
+          localStorage.setItem('pinpoint_users', JSON.stringify(users));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    localStorage.setItem('pinpoint_is_logged_in', 'false');
+    localStorage.removeItem('pinpoint_logged_in_user');
+    // Set guest user stats
+    localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: 350, level: "Civic Scout" }));
+    
+    let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+    const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+    if (userIndex !== -1) {
+      leaderboard[userIndex].name = "You (Guest Citizen)";
+      leaderboard[userIndex].points = 350;
+      leaderboard[userIndex].badge = "Civic Scout";
+    }
+    localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+    
+    showToast("Signed out successfully.");
+    closeProfileModal();
+    
+    // Dispatch events to refresh navbar and components
+    window.dispatchEvent(new CustomEvent('pinpoint_auth_changed'));
+    renderLeaderboard();
+    updateStatsWidgets();
+  });
 
   renderFeed();
   updateStatsWidgets();
