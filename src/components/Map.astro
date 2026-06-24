@@ -313,24 +313,24 @@
   :global(.animate-pin-ping) {
     animation: pin-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
   }
-  /* Fix popup styling to be Clay dark brand style */
+  /* Fix popup styling to adapt to light/dark mode */
   :global(.leaflet-popup-content-wrapper) {
-    background-color: #0a0a0a !important;
-    color: #ffffff !important;
+    background-color: var(--color-surface-card) !important;
+    color: var(--color-ink) !important;
     border-radius: 8px !important;
     font-family: 'Inter', system-ui, sans-serif !important;
     font-size: 11px !important;
     font-weight: 600 !important;
     padding: 0px 4px !important;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--color-hairline) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   }
   :global(.leaflet-popup-content) {
     margin: 8px 12px !important;
   }
   :global(.leaflet-popup-tip) {
-    background-color: #0a0a0a !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.15);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: var(--color-surface-card) !important;
+    border-left: 1px solid var(--color-hairline) !important;
+    border-bottom: 1px solid var(--color-hairline) !important;
   }
 </style>
