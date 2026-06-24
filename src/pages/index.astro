@@ -388,6 +388,15 @@ import Footer from '../components/Footer.astro';
           </select>
         </div>
 
+        <!-- Map Location Picker -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-caption-strong text-ink font-bold">Pick Pin Location on Map</label>
+          <div id="report-map-picker" class="w-full h-[180px] rounded-md border border-hairline overflow-hidden z-10" style="min-height: 180px;"></div>
+          <input type="hidden" id="form-lat" value="22.3090" />
+          <input type="hidden" id="form-lng" value="73.2200" />
+          <span class="text-[11px] text-muted">Click the map or drag the marker to specify the exact issue location.</span>
+        </div>
+
         <!-- Description -->
         <div class="flex flex-col gap-1.5">
           <label for="form-description" class="text-caption-strong text-ink font-bold">Detailed Description</label>
@@ -499,11 +508,11 @@ import Footer from '../components/Footer.astro';
       status: "Open",
       locality: "Bapod",
       verifications: 2,
-      mapX: 180,
-      mapY: 90,
+      lat: 22.3105,
+      lng: 73.2215,
       date: "2026-06-21",
       reportedBy: "Sarah Patel",
-      imageUrl: "/images/pothole.png"
+      imageUrl: "/images/pothole_vadodara.png"
     },
     {
       id: "issue-2",
@@ -514,11 +523,11 @@ import Footer from '../components/Footer.astro';
       status: "In Progress",
       locality: "Waghodia Road",
       verifications: 3,
-      mapX: 480,
-      mapY: 130,
+      lat: 22.2985,
+      lng: 73.2240,
       date: "2026-06-20",
       reportedBy: "David Parmar",
-      imageUrl: "/images/streetlight.png"
+      imageUrl: "/images/streetlight_vadodara.png"
     },
     {
       id: "issue-3",
@@ -529,11 +538,11 @@ import Footer from '../components/Footer.astro';
       status: "Open",
       locality: "Ajwa Road",
       verifications: 1,
-      mapX: 80,
-      mapY: 260,
+      lat: 22.3160,
+      lng: 73.2185,
       date: "2026-06-22",
       reportedBy: "Elena Amin",
-      imageUrl: "/images/water.png"
+      imageUrl: "/images/water_vadodara.png"
     },
     {
       id: "issue-4",
@@ -544,11 +553,11 @@ import Footer from '../components/Footer.astro';
       status: "Resolved",
       locality: "Kishanwadi",
       verifications: 5,
-      mapX: 410,
-      mapY: 60,
+      lat: 22.3130,
+      lng: 73.2085,
       date: "2026-06-18",
       reportedBy: "Marcus Shah",
-      imageUrl: "/images/garbage.png"
+      imageUrl: "/images/garbage_vadodara.png"
     },
     {
       id: "issue-5",
@@ -559,15 +568,27 @@ import Footer from '../components/Footer.astro';
       status: "In Progress",
       locality: "Bapod",
       verifications: 4,
-      mapX: 380,
-      mapY: 250,
+      lat: 22.3095,
+      lng: 73.2205,
       date: "2026-06-19",
       reportedBy: "Clara W.",
-      imageUrl: "/images/pothole.png"
+      imageUrl: "/images/pothole_vadodara.png"
     }
   ];
 
-  // Initialize DB in localStorage if empty
+  // Initialize DB in localStorage if empty or if it uses the old SVG coordinates/images
+  let storedIssues = localStorage.getItem('pinpoint_issues');
+  if (storedIssues) {
+    try {
+      const parsed = JSON.parse(storedIssues);
+      if (parsed.length > 0 && (parsed[0].hasOwnProperty('mapX') || parsed[0].imageUrl === '/images/pothole.png')) {
+        localStorage.removeItem('pinpoint_issues');
+      }
+    } catch(e) {
+      localStorage.removeItem('pinpoint_issues');
+    }
+  }
+
   if (!localStorage.getItem('pinpoint_issues')) {
     localStorage.setItem('pinpoint_issues', JSON.stringify(preseededIssues));
   }
@@ -621,16 +642,115 @@ import Footer from '../components/Footer.astro';
   // Current states
   let currentLocalityFilter = 'All';
 
+  // Leaflet Report Map Picker logic
+  let reportMap: any = null;
+  let reportMarker: any = null;
+
+  const localityCenters: Record<string, [number, number]> = {
+    'Bapod': [22.3100, 73.2210],
+    'Ajwa Road': [22.3150, 73.2100],
+    'Waghodia Road': [22.2980, 73.2200],
+    'Kishanwadi': [22.3090, 73.2050]
+  };
+
+  function initReportMap() {
+    if (typeof L === 'undefined') {
+      setTimeout(initReportMap, 100);
+      return;
+    }
+
+    if (reportMap) {
+      setTimeout(() => {
+        reportMap.invalidateSize();
+      }, 100);
+      return;
+    }
+
+    const defaultLat = 22.3090;
+    const defaultLng = 73.2200;
+
+    reportMap = L.map('report-map-picker', {
+      zoomControl: true,
+      dragging: true,
+      touchZoom: true
+    }).setView([defaultLat, defaultLng], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(reportMap);
+
+    const pickerIcon = L.divIcon({
+      html: `
+        <div class="relative flex items-center justify-center w-8 h-8">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-40 animate-ping"></span>
+          <div class="relative w-4.5 h-4.5 rounded-full bg-red-500 border-2 border-white shadow-md flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+          </div>
+        </div>
+      `,
+      className: 'custom-picker-marker',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+
+    reportMarker = L.marker([defaultLat, defaultLng], {
+      draggable: true,
+      icon: pickerIcon
+    }).addTo(reportMap);
+
+    function updateCoords(lat: number, lng: number) {
+      const formLat = document.getElementById('form-lat') as HTMLInputElement;
+      const formLng = document.getElementById('form-lng') as HTMLInputElement;
+      if (formLat) formLat.value = lat.toFixed(6);
+      if (formLng) formLng.value = lng.toFixed(6);
+      reportMarker.setLatLng([lat, lng]);
+    }
+
+    reportMarker.on('dragend', () => {
+      const position = reportMarker.getLatLng();
+      updateCoords(position.lat, position.lng);
+    });
+
+    reportMap.on('click', (e: any) => {
+      updateCoords(e.latlng.lat, e.latlng.lng);
+    });
+
+    setTimeout(() => {
+      reportMap.invalidateSize();
+    }, 100);
+  }
+
+  document.getElementById('form-locality')?.addEventListener('change', (e: any) => {
+    const selected = e.target.value;
+    const center = localityCenters[selected];
+    if (center && reportMap) {
+      reportMap.setView(center, 15);
+      reportMarker.setLatLng(center);
+      const formLat = document.getElementById('form-lat') as HTMLInputElement;
+      const formLng = document.getElementById('form-lng') as HTMLInputElement;
+      if (formLat) formLat.value = center[0].toFixed(6);
+      if (formLng) formLng.value = center[1].toFixed(6);
+    }
+  });
+
   // Modal show / hide functions
   function openReportModal() {
     reportModal?.classList.remove('hidden');
     document.body.classList.add('overflow-hidden');
+    initReportMap();
   }
 
   function closeReportModal() {
     reportModal?.classList.add('hidden');
     document.body.classList.remove('overflow-hidden');
     reportForm.reset();
+    if (reportMarker) {
+      reportMarker.setLatLng([22.3090, 73.2200]);
+    }
+    const formLat = document.getElementById('form-lat') as HTMLInputElement;
+    const formLng = document.getElementById('form-lng') as HTMLInputElement;
+    if (formLat) formLat.value = '22.3090';
+    if (formLng) formLng.value = '73.2200';
   }
 
   window.addEventListener('pinpoint_open_report_modal', openReportModal);
@@ -1097,6 +1217,9 @@ import Footer from '../components/Footer.astro';
     const description = (document.getElementById('form-description') as HTMLTextAreaElement).value;
     const mediaSelection = (document.getElementById('form-media') as HTMLSelectElement).value;
 
+    const latVal = parseFloat((document.getElementById('form-lat') as HTMLInputElement).value || '22.3090');
+    const lngVal = parseFloat((document.getElementById('form-lng') as HTMLInputElement).value || '73.2200');
+
     closeReportModal();
 
     if (aiOverlay) {
@@ -1107,8 +1230,8 @@ import Footer from '../components/Footer.astro';
     const states = [
       { text: "Initializing AI Vision Analyzer...", v: "Activating...", g: "Pending...", s: "Pending..." },
       { text: "Scanning description for key infrastructure indicators...", v: "Media Loaded.", g: "Locality Locked.", s: "Pending..." },
-      { text: "Verifying exact geographical coordinates...", v: "Media Loaded.", g: "GPS Lat/Lng Plotted.", s: "Scanning Hazards..." },
-      { text: "Analyzing severity hazard index...", v: "Media Verified.", g: "GPS Lat/Lng Plotted.", s: "Determining SLA Class..." },
+      { text: `Verifying coordinates [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]...`, v: "Media Loaded.", g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Scanning Hazards..." },
+      { text: "Analyzing severity hazard index...", v: "Media Verified.", g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Determining SLA Class..." },
       { text: "Finalizing civic report...", v: "Complete.", g: "Complete.", s: "Complete." }
     ];
 
@@ -1150,27 +1273,10 @@ import Footer from '../components/Footer.astro';
         severity = "Medium";
       }
 
-      let mapX = 300;
-      let mapY = 200;
-      
-      if (locality === 'Bapod') {
-        mapX = Math.round(50 + Math.random() * 190);
-        mapY = Math.round(30 + Math.random() * 110);
-      } else if (locality === 'Ajwa Road') {
-        mapX = Math.round(350 + Math.random() * 210);
-        mapY = Math.round(30 + Math.random() * 130);
-      } else if (locality === 'Waghodia Road') {
-        mapX = Math.round(30 + Math.random() * 210);
-        mapY = Math.round(200 + Math.random() * 140);
-      } else if (locality === 'Kishanwadi') {
-        mapX = Math.round(320 + Math.random() * 240);
-        mapY = Math.round(200 + Math.random() * 120);
-      }
-
-      let imageUrl = "/images/pothole.png";
-      if (mediaSelection === 'streetlight') imageUrl = "/images/streetlight.png";
-      if (mediaSelection === 'water') imageUrl = "/images/water.png";
-      if (mediaSelection === 'garbage') imageUrl = "/images/garbage.png";
+      let imageUrl = "/images/pothole_vadodara.png";
+      if (mediaSelection === 'streetlight') imageUrl = "/images/streetlight_vadodara.png";
+      if (mediaSelection === 'water') imageUrl = "/images/water_vadodara.png";
+      if (mediaSelection === 'garbage') imageUrl = "/images/garbage_vadodara.png";
 
       const newIssue = {
         id: "issue-" + Date.now(),
@@ -1181,8 +1287,8 @@ import Footer from '../components/Footer.astro';
         status: "Open",
         locality,
         verifications: 0,
-        mapX,
-        mapY,
+        lat: latVal,
+        lng: lngVal,
         date: new Date().toISOString().split('T')[0],
         reportedBy: "Jane Doe (You)",
         imageUrl

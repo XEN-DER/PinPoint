@@ -1,10 +1,10 @@
 ---
-// Interactive SVG Map component for Pinpoint localized to Vadodara, India (Bapod area)
+// Interactive Leaflet.js Map component for Pinpoint localized to Vadodara, India (Bapod area)
 ---
 
-<div class="relative w-full h-[360px] md:h-[450px] bg-canvas border border-hairline rounded-lg overflow-hidden select-none">
+<div class="relative w-full h-[360px] md:h-[450px] bg-canvas border border-hairline rounded-lg overflow-hidden select-none z-10 shadow-sm">
   <!-- Map Legend (Top Left) -->
-  <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3.5 py-2.5 rounded-md z-10 flex flex-col gap-1.5 text-xs text-ink shadow-sm">
+  <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3.5 py-2.5 rounded-md z-20 flex flex-col gap-1.5 text-xs text-ink shadow-sm pointer-events-none">
     <div class="font-bold text-[10px] uppercase tracking-wider text-muted mb-0.5">Status Legend</div>
     <div class="flex items-center gap-2">
       <span class="w-2.5 h-2.5 rounded-full bg-error border border-canvas"></span>
@@ -21,139 +21,147 @@
   </div>
 
   <!-- Neighborhood Indicator (Top Right) -->
-  <div class="absolute top-4 right-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3 py-1.5 rounded-md z-10 text-xs text-ink shadow-sm">
+  <div class="absolute top-4 right-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3 py-1.5 rounded-md z-20 text-xs text-ink shadow-sm pointer-events-none">
     <span class="text-muted">Viewing: </span>
     <span id="active-neighborhood-label" class="font-bold">All Localities</span>
   </div>
 
-  <!-- SVG Map Canvas -->
-  <svg 
-    id="pinpoint-svg-map"
-    viewBox="0 0 600 400" 
-    class="w-full h-full object-cover transition-colors duration-300"
-    style="background-color: #fffaf0;"
-  >
-    <!-- Grid Pattern Background -->
-    <defs>
-      <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
-        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e5e5" stroke-width="0.5" stroke-opacity="0.6" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#grid-pattern)" />
-
-    <!-- Geographical Elements -->
-    <!-- Canal / Lake (Vadodara Local Feature in Riverside/Waghodia Road) -->
-    <path 
-      d="M -10,250 C 150,230 200,320 280,340 C 350,350 450,280 610,290 L 610,410 L -10,410 Z" 
-      fill="#dcefe8" 
-      opacity="0.9"
-      stroke="#a4d4c5"
-      stroke-width="1.5"
-    />
-    
-    <!-- Bapod Garden / Public Park -->
-    <rect x="420" y="40" width="120" height="80" rx="12" fill="#e2f3ee" stroke="#a4d4c5" stroke-width="1.5" opacity="0.95" />
-    <text x="480" y="85" fill="#1a3a3a" font-size="11" font-weight="600" text-anchor="middle" font-family="system-ui">Bapod Garden</text>
-
-    <!-- Neighborhood Boundaries (Polygons for Hover States) -->
-    <!-- Bapod (Top Left - User's Locality) -->
-    <polygon 
-      id="poly-bapod" 
-      points="0,0 300,0 280,180 120,200 0,160" 
-      class="neighborhood-poly fill-transparent hover:fill-brand-peach/10 cursor-pointer transition-colors duration-200" 
-      data-name="Bapod"
-    />
-    
-    <!-- Ajwa Road (Top Right) -->
-    <polygon 
-      id="poly-ajwa" 
-      points="300,0 600,0 600,180 380,220 280,180" 
-      class="neighborhood-poly fill-transparent hover:fill-brand-mint/10 cursor-pointer transition-colors duration-200" 
-      data-name="Ajwa Road"
-    />
-    
-    <!-- Waghodia Road (Bottom Left) -->
-    <polygon 
-      id="poly-waghodia" 
-      points="0,160 120,200 280,180 280,340 0,400" 
-      class="neighborhood-poly fill-transparent hover:fill-brand-lavender/10 cursor-pointer transition-colors duration-200" 
-      data-name="Waghodia Road"
-    />
-    
-    <!-- Kishanwadi (Bottom Right) -->
-    <polygon 
-      id="poly-kishanwadi" 
-      points="280,180 380,220 600,180 600,400 280,340" 
-      class="neighborhood-poly fill-transparent hover:fill-brand-coral/10 cursor-pointer transition-colors duration-200" 
-      data-name="Kishanwadi"
-    />
-
-    <!-- Neighborhood Division Lines -->
-    <line x1="300" y1="0" x2="280" y2="180" stroke="#e5e5e5" stroke-width="1.5" stroke-dasharray="4,4" />
-    <line x1="280" y1="180" x2="600" y2="180" stroke="#e5e5e5" stroke-width="1.5" stroke-dasharray="4,4" />
-    <line x1="280" y1="180" x2="120" y2="200" stroke="#e5e5e5" stroke-width="1.5" stroke-dasharray="4,4" />
-    <line x1="120" y1="200" x2="0" y2="160" stroke="#e5e5e5" stroke-width="1.5" stroke-dasharray="4,4" />
-    <line x1="280" y1="180" x2="280" y2="340" stroke="#e5e5e5" stroke-width="1.5" stroke-dasharray="4,4" />
-
-    <!-- Major Roads -->
-    <!-- Ajwa-Waghodia Ring Road -->
-    <path d="M 0,100 Q 300,110 600,90" fill="none" stroke="#fffaf0" stroke-width="6" opacity="0.9" />
-    <path d="M 0,100 Q 300,110 600,90" fill="none" stroke="#e5e5e5" stroke-width="4" stroke-dasharray="5,3" />
-    <text x="50" y="92" fill="#9a9a9a" font-size="8" font-weight="600" font-family="system-ui">Ajwa-Waghodia Ring Rd</text>
-    
-    <!-- Bapod Main Road -->
-    <path d="M 120,0 L 120,400" fill="none" stroke="#fffaf0" stroke-width="6" opacity="0.9" />
-    <path d="M 120,0 L 120,400" fill="none" stroke="#e5e5e5" stroke-width="4" stroke-dasharray="5,3" />
-    <text x="114" y="320" fill="#9a9a9a" font-size="8" font-weight="600" font-family="system-ui" transform="rotate(-90,114,320)">Bapod Main Road</text>
-
-    <!-- Local Map Text Labels -->
-    <text x="150" y="60" fill="#0a0a0a" font-size="12" font-weight="600" opacity="0.25" font-family="system-ui">BAPOD</text>
-    <text x="460" y="160" fill="#0a0a0a" font-size="12" font-weight="600" opacity="0.25" font-family="system-ui">AJWA ROAD</text>
-    <text x="60" y="240" fill="#0a0a0a" font-size="12" font-weight="600" opacity="0.25" font-family="system-ui">WAGHODIA ROAD</text>
-    <text x="420" y="270" fill="#0a0a0a" font-size="12" font-weight="600" opacity="0.25" font-family="system-ui">KISHANWADI</text>
-
-    <!-- Pins Container -->
-    <g id="map-pins-group"></g>
-  </svg>
+  <!-- Leaflet Map Container -->
+  <div id="pinpoint-leaflet-map" class="w-full h-full z-10"></div>
 </div>
 
 <script>
-  // Neighborhood Selection Hover Logic
-  const polys = document.querySelectorAll('.neighborhood-poly');
-  const label = document.getElementById('active-neighborhood-label');
+  let map: any = null;
+  let markersMap: Record<string, any> = {};
+  let polygonsMap: Record<string, any> = {};
+  let selectedLocality = 'All';
 
-  polys.forEach(poly => {
-    poly.addEventListener('mouseenter', () => {
-      if (label) {
-        label.textContent = poly.getAttribute('data-name');
+  const defaultCenter: [number, number] = [22.3090, 73.2200];
+  const activeLabel = document.getElementById('active-neighborhood-label');
+
+  const regionPolygons: Record<string, [number, number][]> = {
+    'Bapod': [[22.3060, 73.2180], [22.3180, 73.2180], [22.3180, 73.2320], [22.3060, 73.2320]],
+    'Ajwa Road': [[22.3120, 73.1980], [22.3180, 73.1980], [22.3180, 73.2180], [22.3120, 73.2180]],
+    'Waghodia Road': [[22.2900, 73.2100], [22.3060, 73.2100], [22.3060, 73.2320], [22.2900, 73.2320]],
+    'Kishanwadi': [[22.3060, 73.1980], [22.3120, 73.1980], [22.3120, 73.2180], [22.3060, 73.2180]]
+  };
+
+  const regionStyles: Record<string, any> = {
+    'Bapod': { color: '#ffb084', fillColor: '#ffb084', fillOpacity: 0.02, weight: 1.5, dashArray: '4, 4' },
+    'Ajwa Road': { color: '#a4d4c5', fillColor: '#a4d4c5', fillOpacity: 0.02, weight: 1.5, dashArray: '4, 4' },
+    'Waghodia Road': { color: '#b8a4ed', fillColor: '#b8a4ed', fillOpacity: 0.02, weight: 1.5, dashArray: '4, 4' },
+    'Kishanwadi': { color: '#ff6b5a', fillColor: '#ff6b5a', fillOpacity: 0.02, weight: 1.5, dashArray: '4, 4' }
+  };
+
+  const statusColors: Record<string, string> = {
+    'Open': '#ef4444',
+    'In Progress': '#f59e0b',
+    'Resolved': '#22c55e',
+  };
+
+  function initMap() {
+    if (typeof L === 'undefined') {
+      setTimeout(initMap, 100);
+      return;
+    }
+
+    if (map) return;
+
+    // Initialize Leaflet Map
+    map = L.map('pinpoint-leaflet-map', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView(defaultCenter, 14);
+
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // Draw Polygons
+    Object.keys(regionPolygons).forEach(name => {
+      const coords = regionPolygons[name];
+      const style = regionStyles[name];
+      
+      const poly = L.polygon(coords, style).addTo(map);
+      polygonsMap[name] = poly;
+
+      // Hover events
+      poly.on('mouseover', () => {
+        if (activeLabel) activeLabel.textContent = name;
+        if (selectedLocality !== name) {
+          poly.setStyle({ fillOpacity: 0.12, weight: 2 });
+        }
+      });
+
+      poly.on('mouseout', () => {
+        if (activeLabel) {
+          activeLabel.textContent = selectedLocality === 'All' ? 'All Localities' : selectedLocality;
+        }
+        if (selectedLocality !== name) {
+          poly.setStyle(regionStyles[name]);
+        }
+      });
+
+      // Click event
+      poly.on('click', (e: any) => {
+        L.DomEvent.stopPropagation(e);
+        filterLocality(name);
+      });
+    });
+
+    // Reset filter click on base map
+    map.on('click', () => {
+      filterLocality('All');
+    });
+
+    renderMarkers();
+  }
+
+  function filterLocality(name: string) {
+    selectedLocality = name;
+    if (activeLabel) activeLabel.textContent = name === 'All' ? 'All Localities' : name;
+
+    // Reset styles
+    Object.keys(polygonsMap).forEach(key => {
+      const poly = polygonsMap[key];
+      if (key === name) {
+        poly.setStyle({ fillOpacity: 0.22, weight: 2.5, dashArray: '' });
+      } else {
+        poly.setStyle(regionStyles[key]);
       }
     });
 
-    poly.addEventListener('mouseleave', () => {
-      const selected = document.querySelector('.neighborhood-poly.selected-region');
-      if (label) {
-        label.textContent = selected ? selected.getAttribute('data-name') : 'All Localities';
-      }
+    window.dispatchEvent(new CustomEvent('pinpoint_filter_locality', {
+      detail: { locality: name }
+    }));
+    window.dispatchEvent(new CustomEvent('pinpoint_clear_highlights'));
+
+    // Pan map to locality center
+    if (name !== 'All') {
+      const coords = regionPolygons[name];
+      let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+      coords.forEach(([lat, lng]) => {
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+        if (lng < minLng) minLng = lng;
+        if (lng > maxLng) maxLng = lng;
+      });
+      map.panTo([(minLat + maxLat) / 2, (minLng + maxLng) / 2]);
+    } else {
+      map.panTo(defaultCenter);
+    }
+  }
+
+  function renderMarkers() {
+    if (!map) return;
+
+    // Clear old markers
+    Object.keys(markersMap).forEach(key => {
+      map.removeLayer(markersMap[key]);
     });
-
-    poly.addEventListener('click', () => {
-      const name = poly.getAttribute('data-name');
-      
-      polys.forEach(p => p.classList.remove('selected-region', 'fill-black/5'));
-      poly.classList.add('selected-region', 'fill-black/5');
-      
-      window.dispatchEvent(new CustomEvent('pinpoint_filter_locality', {
-        detail: { locality: name }
-      }));
-    });
-  });
-
-  // Dynamic Pin Plotting Engine
-  const pinsGroup = document.getElementById('map-pins-group');
-
-  function renderPins() {
-    if (!pinsGroup) return;
-    pinsGroup.innerHTML = '';
+    markersMap = {};
 
     let issues = [];
     try {
@@ -164,130 +172,165 @@
     }
 
     issues.forEach(issue => {
-      if (!issue.mapX || !issue.mapY) return;
+      if (!issue.lat || !issue.lng) return;
 
-      let hexColor = '#ef4444'; // Red for Open
-      if (issue.status === 'In Progress') {
-        hexColor = '#f59e0b'; // Orange
-      } else if (issue.status === 'Resolved') {
-        hexColor = '#22c55e'; // Green
-      }
-
-      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      g.setAttribute('class', 'map-pin cursor-pointer group');
-      g.setAttribute('data-id', issue.id);
-      g.setAttribute('transform', `translate(${issue.mapX}, ${issue.mapY})`);
-
-      if (issue.status !== 'Resolved') {
-        const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        pulse.setAttribute('r', '9');
-        pulse.setAttribute('fill', hexColor);
-        pulse.setAttribute('opacity', '0.35');
-        
-        const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-        animate.setAttribute('attributeName', 'r');
-        animate.setAttribute('values', '5;14;5');
-        animate.setAttribute('dur', '2s');
-        animate.setAttribute('repeatCount', 'indefinite');
-        pulse.appendChild(animate);
-
-        const animateOpacity = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-        animateOpacity.setAttribute('attributeName', 'opacity');
-        animateOpacity.setAttribute('values', '0.35;0.05;0.35');
-        animateOpacity.setAttribute('dur', '2s');
-        animateOpacity.setAttribute('repeatCount', 'indefinite');
-        pulse.appendChild(animateOpacity);
-
-        g.appendChild(pulse);
-      }
-
-      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      dot.setAttribute('r', '5.5');
-      dot.setAttribute('fill', hexColor);
-      dot.setAttribute('stroke', '#fffaf0');
-      dot.setAttribute('stroke-width', '1.5');
-      dot.setAttribute('class', 'transition-all duration-200 group-hover:scale-125');
-      g.appendChild(dot);
-
-      const tooltip = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      tooltip.setAttribute('class', 'hidden group-hover:block');
-      tooltip.setAttribute('transform', 'translate(0, -14)');
+      const color = statusColors[issue.status] || '#ef4444';
+      const isResolved = issue.status === 'Resolved';
       
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', '-60');
-      rect.setAttribute('y', '-16');
-      rect.setAttribute('width', '120');
-      rect.setAttribute('height', '22');
-      rect.setAttribute('rx', '6');
-      rect.setAttribute('fill', '#0a0a0a');
-      tooltip.appendChild(rect);
+      const pulseHtml = !isResolved 
+        ? `<span class="absolute inline-flex w-6 h-6 rounded-full animate-pin-ping" style="background-color: ${color};"></span>` 
+        : '';
 
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('fill', '#ffffff');
-      text.setAttribute('font-size', '9');
-      text.setAttribute('font-weight', '600');
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('y', '-2');
-      text.setAttribute('font-family', 'system-ui');
-      
-      const title = issue.title.length > 18 ? issue.title.substring(0, 16) + '...' : issue.title;
-      text.textContent = title;
-      tooltip.appendChild(text);
+      const markerIcon = L.divIcon({
+        html: `
+          <div class="relative flex items-center justify-center w-8 h-8">
+            ${pulseHtml}
+            <div class="relative w-4 h-4 rounded-full border-2 border-white shadow-md flex items-center justify-center transition-all duration-200 hover:scale-125" style="background-color: ${color};">
+              <div class="w-1.2 h-1.2 rounded-full bg-white"></div>
+            </div>
+          </div>
+        `,
+        className: 'custom-map-marker',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
 
-      g.appendChild(tooltip);
+      const marker = L.marker([issue.lat, issue.lng], { icon: markerIcon }).addTo(map);
+      markersMap[issue.id] = marker;
 
-      g.addEventListener('click', (e) => {
-        e.stopPropagation();
+      const truncatedTitle = issue.title.length > 22 ? issue.title.substring(0, 20) + '...' : issue.title;
+      marker.bindPopup(truncatedTitle, {
+        closeButton: false,
+        offset: L.point(0, -6)
+      });
+
+      marker.on('mouseover', () => {
+        marker.openPopup();
+      });
+
+      marker.on('mouseout', () => {
+        const card = document.getElementById(`feed-card-${issue.id}`);
+        if (!card?.classList.contains('border-primary')) {
+          marker.closePopup();
+        }
+      });
+
+      marker.on('click', (e: any) => {
+        L.DomEvent.stopPropagation(e);
         window.dispatchEvent(new CustomEvent('pinpoint_select_issue', {
           detail: { id: issue.id }
         }));
       });
-
-      pinsGroup.appendChild(g);
     });
   }
 
-  // Initial render
-  renderPins();
-
-  window.addEventListener('pinpoint_issues_updated', renderPins);
+  // Event Listeners
+  window.addEventListener('pinpoint_issues_updated', renderMarkers);
 
   window.addEventListener('pinpoint_highlight_pin', (e: any) => {
+    if (!map) return;
     const targetId = e.detail.id;
-    const pins = document.querySelectorAll('.map-pin');
     
-    pins.forEach((pin: any) => {
-      const pinId = pin.getAttribute('data-id');
-      const dot = pin.querySelector('circle:last-of-type');
-      if (pinId === targetId) {
-        dot.setAttribute('r', '8.5');
-        dot.setAttribute('stroke', '#0a0a0a');
-        dot.setAttribute('stroke-width', '2');
-        pinsGroup?.appendChild(pin);
-      } else {
-        dot.setAttribute('r', '5.5');
-        dot.setAttribute('stroke', '#fffaf0');
-        dot.setAttribute('stroke-width', '1.5');
+    map.closePopup();
+
+    Object.keys(markersMap).forEach(id => {
+      const marker = markersMap[id];
+      const element = marker.getElement();
+      if (element) {
+        const dot = element.querySelector('div.rounded-full');
+        if (id === targetId) {
+          if (dot) {
+            dot.style.transform = 'scale(1.35)';
+            dot.style.borderWidth = '2px';
+            dot.style.borderColor = '#0a0a0a';
+          }
+          map.setView(marker.getLatLng(), 16);
+          marker.openPopup();
+        } else {
+          if (dot) {
+            dot.style.transform = '';
+            dot.style.borderWidth = '2px';
+            dot.style.borderColor = '#ffffff';
+          }
+          marker.closePopup();
+        }
       }
     });
   });
 
-  const mapSvg = document.getElementById('pinpoint-svg-map');
-  if (mapSvg) {
-    mapSvg.addEventListener('click', () => {
-      polys.forEach(p => p.classList.remove('selected-region', 'fill-black/5'));
-      if (label) label.textContent = 'All Localities';
-      
-      window.dispatchEvent(new CustomEvent('pinpoint_filter_locality', {
-        detail: { locality: 'All' }
-      }));
-      window.dispatchEvent(new CustomEvent('pinpoint_clear_highlights'));
+  window.addEventListener('pinpoint_clear_highlights', () => {
+    if (!map) return;
+    map.closePopup();
+    Object.keys(markersMap).forEach(id => {
+      const marker = markersMap[id];
+      const element = marker.getElement();
+      if (element) {
+        const dot = element.querySelector('div.rounded-full');
+        if (dot) {
+          dot.style.transform = '';
+          dot.style.borderWidth = '2px';
+          dot.style.borderColor = '#ffffff';
+        }
+      }
     });
-  }
+  });
+
+  window.addEventListener('pinpoint_filter_locality', (e: any) => {
+    const locName = e.detail.locality;
+    if (selectedLocality !== locName) {
+      selectedLocality = locName;
+      if (activeLabel) activeLabel.textContent = locName === 'All' ? 'All Localities' : locName;
+      
+      Object.keys(polygonsMap).forEach(key => {
+        const poly = polygonsMap[key];
+        if (key === locName) {
+          poly.setStyle({ fillOpacity: 0.22, weight: 2.5, dashArray: '' });
+        } else {
+          poly.setStyle(regionStyles[key]);
+        }
+      });
+    }
+  });
+
+  // Initialize Map
+  initMap();
 </script>
 
 <style>
-  .neighborhood-poly {
-    outline: none;
+  #pinpoint-leaflet-map {
+    filter: sepia(0.08) saturate(0.95) hue-rotate(5deg);
+  }
+  @keyframes pin-ping {
+    0% {
+      transform: scale(0.5);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.0);
+      opacity: 0;
+    }
+  }
+  :global(.animate-pin-ping) {
+    animation: pin-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  /* Fix popup styling to be Clay dark brand style */
+  :global(.leaflet-popup-content-wrapper) {
+    background-color: #0a0a0a !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    padding: 0px 4px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+  :global(.leaflet-popup-content) {
+    margin: 8px 12px !important;
+  }
+  :global(.leaflet-popup-tip) {
+    background-color: #0a0a0a !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
 </style>
