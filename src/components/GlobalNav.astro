@@ -117,4 +117,12 @@
 
   // Listen for points updates from the dashboard
   window.addEventListener('pinpoint_stats_changed', updateNavStats);
+
+  // Wire up GlobalNav profile badge to open the profile modal
+  const profileBadge = document.getElementById('user-profile-badge');
+  if (profileBadge) {
+    profileBadge.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('pinpoint_open_profile_modal'));
+    });
+  }
 </script>
