@@ -1,0 +1,1626 @@
+<script>
+  document.addEventListener('astro:page-load', () => {
+  // Helper to convert file input to Base64 data URL
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  // Helper to calculate SLA timers
+  function getSLATimerHtml(issue: any, textLight: boolean): string {
+    const reportDateStr = issue.date;
+    const currentSimulatedDateStr = '2026-06-24';
+    
+    let targetDays = 5; // Low severity
+    if (issue.severity === 'High') targetDays = 2;
+    else if (issue.severity === 'Medium') targetDays = 3;
+    
+    const d1 = new Date(reportDateStr);
+    let d2 = new Date(currentSimulatedDateStr);
+    
+    if (issue.status === 'Resolved' && issue.resolvedDate) {
+      d2 = new Date(issue.resolvedDate);
+    }
+    
+    d1.setHours(12, 0, 0, 0);
+    d2.setHours(12, 0, 0, 0);
+    
+    const diffTime = d2.getTime() - d1.getTime();
+    const elapsedDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    
+    const isDisputed = issue.disputed === true;
+    const isSlaComplied = elapsedDays <= targetDays;
+    
+    let badgeClass = '';
+    let badgeText = '';
+    
+    if (issue.status === 'Resolved') {
+      if (isDisputed) {
+        badgeClass = textLight ? 'bg-red-500/30 text-white' : 'bg-red-50 text-red-700 border-red-200 border';
+        badgeText = 'SLA Breached (Disputed)';
+      } else if (isSlaComplied) {
+        badgeClass = textLight ? 'bg-emerald-500/30 text-white' : 'bg-emerald-50 text-emerald-700 border-emerald-200 border';
+        badgeText = 'Resolved within SLA';
+      } else {
+        badgeClass = textLight ? 'bg-red-500/30 text-white' : 'bg-red-50 text-red-700 border-red-200 border';
+        badgeText = 'Resolved Late (SLA Breached)';
+      }
+    } else {
+      if (isDisputed) {
+        badgeClass = textLight ? 'bg-red-500/30 text-white animate-pulse' : 'bg-red-50 text-red-700 border-red-300 border animate-pulse';
+        badgeText = `âš ï¸ Disputed Â· SLA BREACHED`;
+      } else if (elapsedDays > targetDays) {
+        const overDays = elapsedDays - targetDays;
+        badgeClass = textLight ? 'bg-red-500/30 text-white animate-pulse' : 'bg-red-50 text-red-700 border-red-300 border animate-pulse';
+        badgeText = `âš ï¸ SLA BREACHED by ${overDays} day${overDays > 1 ? 's' : ''}`;
+      } else {
+        const remainingDays = targetDays - elapsedDays;
+        badgeClass = textLight ? 'bg-canvas/10 text-on-dark' : 'bg-canvas text-ink border-hairline border';
+        if (remainingDays === 0) {
+          badgeText = `SLA expires today`;
+        } else {
+          badgeText = `${remainingDays} day${remainingDays > 1 ? 's' : ''} remaining`;
+        }
+      }
+    }
+    
+    return `<span class="text-[11px] font-bold px-3 py-1 rounded-pill ${badgeClass}">${badgeText}</span>`;
+  }
+
+  // Preseeded users database
+  const defaultUser = { name: "Ritvik Vedangi", email: "ritvik@example.com", password: "password123", points: 350, level: "Civic Scout" };
+  if (!localStorage.getItem('pinpoint_users')) {
+    localStorage.setItem('pinpoint_users', JSON.stringify([defaultUser]));
+  }
+  if (localStorage.getItem('pinpoint_is_logged_in') === null) {
+    localStorage.setItem('pinpoint_is_logged_in', 'true');
+    localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(defaultUser));
+  }
+
+  // Dynamic issues database
+  const preseededIssues = [
+    {
+      id: "issue-1",
+      title: "Deep Pothole near Bapod Crossing",
+      description: "A large, dangerous pothole is forcing two-wheelers and auto-rickshaws to swerve near the Bapod Crossing. Needs immediate patching.",
+      category: "Infrastructure",
+      severity: "High",
+      status: "Open",
+      locality: "Bapod",
+      verifications: 2,
+      lat: 22.3105,
+      lng: 73.2215,
+      date: "2026-06-21",
+      reportedBy: "Sneha Patel",
+      imageUrl: "/images/pothole_vadodara.png"
+    },
+    {
+      id: "issue-2",
+      title: "Broken Streetlight near Shanti Hospital",
+      description: "The streetlight near Shanti Hospital on Waghodia Road has been completely out. The road section is pitch black at night, making it unsafe.",
+      category: "Streetlight",
+      severity: "Medium",
+      status: "In Progress",
+      locality: "Waghodia Road",
+      verifications: 3,
+      lat: 22.2985,
+      lng: 73.2240,
+      date: "2026-06-20",
+      reportedBy: "Devendra Parmar",
+      imageUrl: "/images/streetlight_vadodara.png"
+    },
+    {
+      id: "issue-3",
+      title: "Burst Water Main on Sayaji Park Road",
+      description: "Drinking water is continuously leaking from the main pipe under the footpath, flooding Sayaji Park Road near Ajwa Road.",
+      category: "Water Leakage",
+      severity: "High",
+      status: "Open",
+      locality: "Ajwa Road",
+      verifications: 1,
+      lat: 22.3160,
+      lng: 73.2185,
+      date: "2026-06-22",
+      reportedBy: "Esha Amin",
+      imageUrl: "/images/water_vadodara.png"
+    },
+    {
+      id: "issue-4",
+      title: "Overflowing Garbage Bins near Kishanwadi Market",
+      description: "Municipal trash bins near Kishanwadi Market are overflowing. Trash is scattering onto the road, creating an unhygienic block.",
+      category: "Waste Management",
+      severity: "Medium",
+      status: "Resolved",
+      locality: "Kishanwadi",
+      verifications: 5,
+      lat: 22.3130,
+      lng: 73.2085,
+      date: "2026-06-18",
+      reportedBy: "Manish Shah",
+      imageUrl: "/images/garbage_vadodara.png",
+      resolvedImageUrl: "/images/garbage_fixed_vadodara.png",
+      resolvedNotes: "Municipal waste team cleared the bins and swept the area clean.",
+      resolvedBy: "VMC Waste Management",
+      resolvedDate: "2026-06-19"
+    },
+    {
+      id: "issue-5",
+      title: "Damaged Road Divider near Bapod Talav",
+      description: "The concrete road divider is damaged and displaced after a vehicle collision. Needs realignment to prevent traffic hazards.",
+      category: "Infrastructure",
+      severity: "High",
+      status: "In Progress",
+      locality: "Bapod",
+      verifications: 4,
+      lat: 22.3095,
+      lng: 73.2205,
+      date: "2026-06-19",
+      reportedBy: "Kavita Verma",
+      imageUrl: "/images/pothole_vadodara.png"
+    }
+  ];
+
+  // Initialize DB in localStorage if empty or if it uses the old SVG coordinates/images/foreign names/lacks resolved details/Priya Sharma names
+  let storedIssues = localStorage.getItem('pinpoint_issues');
+  if (storedIssues) {
+    try {
+      const parsed = JSON.parse(storedIssues);
+      const hasOldKeys = parsed.length > 0 && (parsed[0].hasOwnProperty('mapX') || parsed[0].imageUrl === '/images/pothole.png');
+      const hasForeignNames = parsed.some((issue: any) => 
+        issue.reportedBy === "Jane Doe" || 
+        issue.reportedBy.includes("Jane Doe") ||
+        issue.reportedBy.includes("Priya Sharma") ||
+        issue.reportedBy === "Sarah Patel" || 
+        issue.reportedBy === "David Parmar" || 
+        issue.reportedBy === "Elena Amin" || 
+        issue.reportedBy === "Marcus Shah" || 
+        issue.reportedBy === "Clara W."
+      );
+      const hasOldResolved = parsed.some((issue: any) => issue.status === 'Resolved' && !issue.resolvedImageUrl);
+      if (hasOldKeys || hasForeignNames || hasOldResolved) {
+        localStorage.removeItem('pinpoint_issues');
+      }
+    } catch(e) {
+      localStorage.removeItem('pinpoint_issues');
+    }
+  }
+
+  if (!localStorage.getItem('pinpoint_issues')) {
+    localStorage.setItem('pinpoint_issues', JSON.stringify(preseededIssues));
+  }
+
+  // Preseeded Leaderboard citizens
+  const topCitizens = [
+    { name: "Sneha Patel", points: 840, issues: 8, badge: "Civic Champion" },
+    { name: "Manish Shah", points: 710, issues: 6, badge: "Community Guardian" },
+    { name: "Esha Amin", points: 520, issues: 4, badge: "Community Guardian" },
+    { name: "You (Ritvik Vedangi)", points: 350, issues: 3, badge: "Civic Scout", isUser: true },
+    { name: "Devendra Parmar", points: 290, issues: 2, badge: "Civic Scout" }
+  ];
+
+  let storedLeaderboard = localStorage.getItem('pinpoint_leaderboard');
+  if (storedLeaderboard) {
+    try {
+      const parsedL = JSON.parse(storedLeaderboard);
+      const hasForeignNames = parsedL.some((c: any) => 
+        c.name.includes("Jane Doe") || 
+        c.name.includes("Priya Sharma") ||
+        c.name.includes("Sarah Patel") || 
+        c.name.includes("David Parmar") || 
+        c.name.includes("Elena Amin") || 
+        c.name.includes("Marcus Shah")
+      );
+      if (hasForeignNames) {
+        localStorage.removeItem('pinpoint_leaderboard');
+      }
+    } catch(e) {
+      localStorage.removeItem('pinpoint_leaderboard');
+    }
+  }
+
+  if (!localStorage.getItem('pinpoint_leaderboard')) {
+    localStorage.setItem('pinpoint_leaderboard', JSON.stringify(topCitizens));
+  }
+
+  // User Stats initialization
+  if (!localStorage.getItem('pinpoint_user_stats')) {
+    localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: 350, level: "Civic Scout" }));
+  }
+
+  // Track upvoted issues by user
+  if (!localStorage.getItem('pinpoint_user_upvotes')) {
+    localStorage.setItem('pinpoint_user_upvotes', JSON.stringify([]));
+  }
+
+  // Main Feed DOM bindings
+  const searchInput = document.getElementById('feed-search') as HTMLInputElement;
+  const categoryFilter = document.getElementById('feed-category-filter') as HTMLSelectElement;
+  const statusFilter = document.getElementById('feed-status-filter') as HTMLSelectElement;
+  const issuesFeed = document.getElementById('issues-feed');
+  const emptyState = document.getElementById('feed-empty-state');
+  const activeLocalityTag = document.getElementById('active-locality-filter-tag');
+  const activeLocalityName = document.getElementById('active-locality-name');
+  const clearLocalityBtn = document.getElementById('clear-locality-filter');
+
+  // Modal DOM bindings
+  const reportModal = document.getElementById('report-issue-modal');
+  const reportForm = document.getElementById('report-issue-form') as HTMLFormElement;
+  const cancelModalBtn = document.getElementById('modal-cancel-btn');
+  const closeModalBtn = document.getElementById('modal-close-btn');
+
+  // Resolve Modal DOM bindings
+  const resolveModal = document.getElementById('resolve-issue-modal');
+  const resolveForm = document.getElementById('resolve-issue-form') as HTMLFormElement;
+  const resolveCancelModalBtn = document.getElementById('resolve-modal-cancel-btn');
+  const resolveCloseModalBtn = document.getElementById('resolve-modal-close-btn');
+
+  // AI Overlay DOM bindings
+  const aiOverlay = document.getElementById('ai-scanning-overlay');
+  const aiStatusText = document.getElementById('ai-scanning-status-text');
+  const aiVision = document.getElementById('ai-metric-vision');
+  const aiGeo = document.getElementById('ai-metric-geo');
+  const aiSeverity = document.getElementById('ai-metric-severity');
+
+  // Dispute Modal DOM bindings
+  const disputeModal = document.getElementById('dispute-issue-modal');
+  const disputeForm = document.getElementById('dispute-issue-form') as HTMLFormElement;
+  const disputeCancelModalBtn = document.getElementById('dispute-modal-cancel-btn');
+  const disputeCloseModalBtn = document.getElementById('dispute-modal-close-btn');
+
+  // Current states
+  let currentLocalityFilter = 'All';
+
+  // Leaflet Report Map Picker logic
+  let reportMap: any = null;
+  let reportMarker: any = null;
+
+  const localityCenters: Record<string, [number, number]> = {
+    'Bapod': [22.3100, 73.2210],
+    'Ajwa Road': [22.3150, 73.2100],
+    'Waghodia Road': [22.2980, 73.2200],
+    'Kishanwadi': [22.3090, 73.2050]
+  };
+
+  function initReportMap() {
+    if (typeof L === 'undefined') {
+      setTimeout(initReportMap, 100);
+      return;
+    }
+
+    if (reportMap) {
+      setTimeout(() => {
+        reportMap.invalidateSize();
+      }, 100);
+      return;
+    }
+
+    const defaultLat = 22.3090;
+    const defaultLng = 73.2200;
+
+    reportMap = L.map('report-map-picker', {
+      zoomControl: true,
+      dragging: true,
+      touchZoom: true
+    }).setView([defaultLat, defaultLng], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(reportMap);
+
+    const pickerIcon = L.divIcon({
+      html: `
+        <div class="relative flex items-center justify-center w-8 h-8">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-40 animate-ping"></span>
+          <div class="relative w-4.5 h-4.5 rounded-full bg-red-500 border-2 border-white shadow-md flex items-center justify-center">
+            <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+          </div>
+        </div>
+      `,
+      className: 'custom-picker-marker',
+      iconSize: [32, 32],
+      iconAnchor: [16, 16],
+    });
+
+    reportMarker = L.marker([defaultLat, defaultLng], {
+      draggable: true,
+      icon: pickerIcon
+    }).addTo(reportMap);
+
+    function updateCoords(lat: number, lng: number) {
+      const formLat = document.getElementById('form-lat') as HTMLInputElement;
+      const formLng = document.getElementById('form-lng') as HTMLInputElement;
+      if (formLat) formLat.value = lat.toFixed(6);
+      if (formLng) formLng.value = lng.toFixed(6);
+      reportMarker.setLatLng([lat, lng]);
+    }
+
+    reportMarker.on('dragend', () => {
+      const position = reportMarker.getLatLng();
+      updateCoords(position.lat, position.lng);
+    });
+
+    reportMap.on('click', (e: any) => {
+      updateCoords(e.latlng.lat, e.latlng.lng);
+    });
+
+    setTimeout(() => {
+      reportMap.invalidateSize();
+    }, 100);
+  }
+
+  document.getElementById('form-locality')?.addEventListener('change', (e: any) => {
+    const selected = e.target.value;
+    const center = localityCenters[selected];
+    if (center && reportMap) {
+      reportMap.setView(center, 15);
+      reportMarker.setLatLng(center);
+      const formLat = document.getElementById('form-lat') as HTMLInputElement;
+      const formLng = document.getElementById('form-lng') as HTMLInputElement;
+      if (formLat) formLat.value = center[0].toFixed(6);
+      if (formLng) formLng.value = center[1].toFixed(6);
+    }
+  });
+
+  // Synchronize scroll lock state across all modals
+  function syncScrollLock() {
+    const rm = document.getElementById('report-issue-modal');
+    const rsm = document.getElementById('resolve-issue-modal');
+    const am = document.getElementById('auth-modal');
+    const pm = document.getElementById('profile-modal');
+    
+    const isAnyModalOpen = 
+      (rm && !rm.classList.contains('hidden')) ||
+      (rsm && !rsm.classList.contains('hidden')) ||
+      (am && !am.classList.contains('hidden')) ||
+      (pm && !pm.classList.contains('hidden'));
+      
+    if (isAnyModalOpen) {
+      document.body.classList.add('overflow-hidden');
+      document.documentElement.classList.add('overflow-hidden');
+      document.body.style.setProperty('overflow', 'hidden', 'important');
+      document.documentElement.style.setProperty('overflow', 'hidden', 'important');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+      document.documentElement.classList.remove('overflow-hidden');
+      document.body.style.removeProperty('overflow');
+      document.documentElement.style.removeProperty('overflow');
+    }
+  }
+
+  // Modal show / hide functions
+  function openReportModal() {
+    reportModal?.classList.remove('hidden');
+    syncScrollLock();
+    initReportMap();
+  }
+
+  function closeReportModal() {
+    reportModal?.classList.add('hidden');
+    syncScrollLock();
+    reportForm.reset();
+    if (reportMarker) {
+      reportMarker.setLatLng([22.3090, 73.2200]);
+    }
+    const formLat = document.getElementById('form-lat') as HTMLInputElement;
+    const formLng = document.getElementById('form-lng') as HTMLInputElement;
+    if (formLat) formLat.value = '22.3090';
+    if (formLng) formLng.value = '73.2200';
+  }
+
+  // Sync modifications across browser tabs/windows
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'pinpoint_issues') {
+      window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+    }
+    if (e.key === 'pinpoint_user_stats') {
+      window.dispatchEvent(new CustomEvent('pinpoint_stats_changed'));
+    }
+    if (e.key === 'pinpoint_logged_in_user') {
+      window.dispatchEvent(new CustomEvent('pinpoint_auth_changed'));
+    }
+  });
+
+  window.addEventListener('pinpoint_open_report_modal', openReportModal);
+  document.getElementById('hero-report-btn')?.addEventListener('click', openReportModal);
+  cancelModalBtn?.addEventListener('click', closeReportModal);
+  closeModalBtn?.addEventListener('click', closeReportModal);
+
+  // Close modal when clicking outside form
+  reportModal?.addEventListener('click', (e) => {
+    if (e.target === reportModal) {
+      closeReportModal();
+    }
+  });
+
+  // Resolve Modal Helpers
+  function openResolveModal(issueId: string) {
+    resolveModal?.classList.remove('hidden');
+    syncScrollLock();
+    
+    // Find target issue to set auto-selected media and title
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === issueId);
+    
+    const issueIdInput = document.getElementById('resolve-form-issue-id') as HTMLInputElement;
+    if (issueIdInput) issueIdInput.value = issueId;
+    
+    const modalTitle = document.getElementById('resolve-modal-title');
+    if (modalTitle && issue) {
+      modalTitle.textContent = `Verify & Resolve: ${issue.title}`;
+    }
+    
+    // Auto-select resolution proof media category
+    const mediaSelect = document.getElementById('resolve-form-media') as HTMLSelectElement;
+    if (mediaSelect && issue) {
+      if (issue.category === 'Infrastructure') mediaSelect.value = 'pothole';
+      else if (issue.category === 'Streetlight') mediaSelect.value = 'streetlight';
+      else if (issue.category === 'Water Leakage') mediaSelect.value = 'water';
+      else if (issue.category === 'Waste Management') mediaSelect.value = 'garbage';
+    }
+
+    const resolvedByInput = document.getElementById('resolve-form-by') as HTMLInputElement;
+    if (resolvedByInput) {
+      const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+      const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+      let name = "Ritvik Vedangi";
+      if (isLoggedIn && loggedInUser) {
+        try {
+          name = JSON.parse(loggedInUser).name;
+        } catch (e) {}
+      }
+      resolvedByInput.value = `${name} (Citizen Verification)`;
+    }
+  }
+
+  function closeResolveModal() {
+    resolveModal?.classList.add('hidden');
+    syncScrollLock();
+    resolveForm.reset();
+  }
+
+  resolveCancelModalBtn?.addEventListener('click', closeResolveModal);
+  resolveCloseModalBtn?.addEventListener('click', closeResolveModal);
+
+  resolveModal?.addEventListener('click', (e) => {
+    if (e.target === resolveModal) {
+      closeResolveModal();
+    }
+  });
+
+  // Resolve Form Submit handler
+  resolveForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const issueId = (document.getElementById('resolve-form-issue-id') as HTMLInputElement).value;
+    const notes = (document.getElementById('resolve-form-notes') as HTMLTextAreaElement).value;
+    const mediaVal = (document.getElementById('resolve-form-media') as HTMLSelectElement).value;
+    const resolvedBy = (document.getElementById('resolve-form-by') as HTMLInputElement).value;
+    const fileInput = document.getElementById('resolve-form-file-upload') as HTMLInputElement;
+    
+    let resolvedImageUrl = "/images/pothole_fixed_vadodara.png";
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      try {
+        resolvedImageUrl = await fileToBase64(fileInput.files[0]);
+      } catch (err) {
+        console.error("Failed to read resolution file upload:", err);
+      }
+    } else {
+      if (mediaVal === 'streetlight') resolvedImageUrl = "/images/streetlight_fixed_vadodara.png";
+      if (mediaVal === 'water') resolvedImageUrl = "/images/water_fixed_vadodara.png";
+      if (mediaVal === 'garbage') resolvedImageUrl = "/images/garbage_fixed_vadodara.png";
+    }
+    
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === issueId);
+    if (issue) {
+      issue.status = 'Resolved';
+      issue.resolvedImageUrl = resolvedImageUrl;
+      issue.resolvedNotes = notes;
+      issue.resolvedBy = resolvedBy;
+      issue.resolvedDate = new Date().toISOString().split('T')[0];
+      
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+      
+      // Award points
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points += 30;
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+      
+      showToast("Issue resolved and verified! +30 points awarded.");
+    }
+    
+    closeResolveModal();
+    renderFeed();
+    updateStatsWidgets();
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+  });
+
+  // Dispute Modal Helpers
+  function openDisputeModal(issueId: string) {
+    disputeModal?.classList.remove('hidden');
+    syncScrollLock();
+    
+    const issueIdInput = document.getElementById('dispute-form-issue-id') as HTMLInputElement;
+    if (issueIdInput) issueIdInput.value = issueId;
+  }
+
+  function closeDisputeModal() {
+    disputeModal?.classList.add('hidden');
+    syncScrollLock();
+    disputeForm.reset();
+  }
+
+  disputeCancelModalBtn?.addEventListener('click', closeDisputeModal);
+  disputeCloseModalBtn?.addEventListener('click', closeDisputeModal);
+
+  disputeModal?.addEventListener('click', (e) => {
+    if (e.target === disputeModal) {
+      closeDisputeModal();
+    }
+  });
+
+  (window as any).handleDispute = function(id: string) {
+    openDisputeModal(id);
+  };
+
+  disputeForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const issueId = (document.getElementById('dispute-form-issue-id') as HTMLInputElement).value;
+    const notes = (document.getElementById('dispute-form-notes') as HTMLTextAreaElement).value;
+
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === issueId);
+    if (issue) {
+      issue.status = 'Open';
+      issue.disputed = true;
+      issue.disputeNotes = notes;
+      
+      // Clear resolved details since it is reopened
+      delete issue.resolvedNotes;
+      delete issue.resolvedBy;
+      delete issue.resolvedImageUrl;
+      delete issue.resolvedDate;
+      
+      // Deduct civic points for disputing
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points = Math.max(0, userStats.points - 50);
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+      showToast("Issue reopened. Municipal authority notified of dispute. -50 Civic points.");
+    }
+
+    closeDisputeModal();
+    renderFeed();
+    updateStatsWidgets();
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+  });
+
+  // AI Copilot Live Analyzer Helper
+  let aiAnalysisTimeout: any = null;
+
+  function triggerLiveAIScan() {
+    const description = (document.getElementById('form-description') as HTMLTextAreaElement).value;
+    const title = (document.getElementById('form-title') as HTMLInputElement).value;
+
+    const queryText = (title + ' ' + description).trim().toLowerCase();
+
+    const copilotStatus = document.getElementById('ai-copilot-status');
+    const copilotResult = document.getElementById('ai-copilot-result');
+    const copilotSpinner = document.getElementById('ai-copilot-spinner');
+
+    if (queryText.length < 5) {
+      if (copilotStatus) copilotStatus.textContent = 'Awaiting Input...';
+      if (copilotResult) copilotResult.textContent = 'Type a description or upload a photo to activate the live copilot suggestions.';
+      if (copilotSpinner) copilotSpinner.classList.add('hidden');
+      return;
+    }
+
+    if (copilotStatus) copilotStatus.textContent = 'Scanning...';
+    if (copilotSpinner) copilotSpinner.classList.remove('hidden');
+    if (copilotResult) {
+      copilotResult.innerHTML = '<span class="text-primary italic font-medium">AI analyzing details...</span>';
+    }
+
+    if (aiAnalysisTimeout) clearTimeout(aiAnalysisTimeout);
+    
+    aiAnalysisTimeout = setTimeout(() => {
+      let category = "Infrastructure";
+      if (queryText.includes("leak") || queryText.includes("water") || queryText.includes("pipe") || queryText.includes("drain")) {
+        category = "Water Leakage";
+      } else if (queryText.includes("light") || queryText.includes("lamp") || queryText.includes("dark") || queryText.includes("bulb")) {
+        category = "Streetlight";
+      } else if (queryText.includes("trash") || queryText.includes("garbage") || queryText.includes("bin") || queryText.includes("waste")) {
+        category = "Waste Management";
+      }
+
+      let severity = "Medium";
+      if (queryText.includes("danger") || queryText.includes("severe") || queryText.includes("accident") || queryText.includes("flooding") || queryText.includes("injury")) {
+        severity = "High";
+      } else if (queryText.includes("small") || queryText.includes("minor") || queryText.includes("cosmetic")) {
+        severity = "Low";
+      }
+
+      const formCategory = document.getElementById('form-category') as HTMLSelectElement;
+      if (formCategory) {
+        formCategory.value = category;
+      }
+
+      const radio = document.querySelector(`input[name="form-severity"][value="${severity}"]`) as HTMLInputElement;
+      if (radio) {
+        radio.checked = true;
+        updateSeverityRadioUI();
+      }
+
+      if (copilotSpinner) copilotSpinner.classList.add('hidden');
+      if (copilotStatus) copilotStatus.textContent = 'Matched âœ¨';
+      if (copilotResult) {
+        copilotResult.innerHTML = `<strong>AI Match:</strong> <span class="text-primary">${category} (${severity} Severity)</span>. Suggested parameters applied.`;
+      }
+    }, 1000);
+  }
+
+  // Handle severity radio pill clicks
+  const severityRadios = document.querySelectorAll('input[name="form-severity"]');
+  severityRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      updateSeverityRadioUI();
+    });
+  });
+
+  function updateSeverityRadioUI() {
+    severityRadios.forEach((r: any) => {
+      const label = r.closest('label');
+      if (r.checked) {
+        label?.classList.remove('border-hairline', 'bg-canvas');
+        label?.classList.add('border-primary', 'bg-primary/5', 'ring-1', 'ring-primary');
+      } else {
+        label?.classList.remove('border-primary', 'bg-primary/5', 'ring-1', 'ring-primary');
+        label?.classList.add('border-hairline', 'bg-canvas');
+      }
+    });
+  }
+
+  // Attach Copilot listeners
+  document.getElementById('form-description')?.addEventListener('input', triggerLiveAIScan);
+  document.getElementById('form-title')?.addEventListener('input', triggerLiveAIScan);
+  document.getElementById('form-file-upload')?.addEventListener('change', triggerLiveAIScan);
+  document.getElementById('form-media')?.addEventListener('change', triggerLiveAIScan);
+
+  // Handle Locality Filter Event from Map
+  window.addEventListener('pinpoint_filter_locality', (e: any) => {
+    currentLocalityFilter = e.detail.locality;
+    
+    if (currentLocalityFilter === 'All') {
+      activeLocalityTag?.classList.add('hidden');
+    } else {
+      activeLocalityTag?.classList.remove('hidden');
+      if (activeLocalityName) activeLocalityName.textContent = currentLocalityFilter;
+    }
+    renderFeed();
+  });
+
+  // Clear Locality Filter
+  clearLocalityBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentLocalityFilter = 'All';
+    activeLocalityTag?.classList.add('hidden');
+    
+    window.dispatchEvent(new CustomEvent('pinpoint_clear_highlights'));
+    renderFeed();
+  });
+
+  // Rerender ticker and profile stats
+  function updateStatsWidgets() {
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const total = issues.length;
+    const resolved = issues.filter((i: any) => i.status === 'Resolved').length;
+    const active = total - resolved;
+    const rate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+
+    const tRep = document.getElementById('ticker-reported');
+    const tRes = document.getElementById('ticker-resolved');
+    const tAct = document.getElementById('ticker-active');
+    const tRate = document.getElementById('ticker-rate');
+
+    if (tRep) tRep.textContent = total;
+    if (tRes) tRes.textContent = resolved;
+    if (tAct) tAct.textContent = active;
+    if (tRate) tRate.textContent = `${rate}%`;
+
+    const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+    
+    const profPoints = document.getElementById('profile-points');
+    if (profPoints) profPoints.textContent = userStats.points;
+
+    let maxPoints = 450;
+    if (userStats.points >= 600) {
+      userStats.level = "Civic Champion";
+      maxPoints = 1000;
+    } else if (userStats.points >= 450) {
+      userStats.level = "Community Guardian";
+      maxPoints = 600;
+    } else {
+      userStats.level = "Civic Scout";
+      maxPoints = 450;
+    }
+    
+    localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+    const levelBadge = document.getElementById('profile-level-badge');
+    if (levelBadge) levelBadge.textContent = userStats.level;
+
+    // Update user profile name and avatar initials dynamically
+    const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    let name = "Guest Citizen";
+    let initials = "GC";
+    
+    if (isLoggedIn && loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        name = u.name;
+        initials = u.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+      } catch (e) {
+        console.error(e);
+      }
+    } else if (!isLoggedIn) {
+      name = "Guest Citizen";
+      initials = "GC";
+    }
+
+    const profName = document.getElementById('profile-name');
+    const profAvatar = document.getElementById('profile-avatar');
+    if (profName) profName.textContent = name;
+    if (profAvatar) profAvatar.textContent = initials;
+
+    const progText = document.getElementById('level-progress-text');
+    if (progText) progText.textContent = `${userStats.points} / ${maxPoints} pts`;
+
+    const progBar = document.getElementById('level-progress-bar');
+    if (progBar) {
+      const percentage = Math.min(100, Math.round((userStats.points / maxPoints) * 100));
+      progBar.style.width = `${percentage}%`;
+    }
+
+    const badgesContainer = document.getElementById('badges-container');
+    if (badgesContainer) {
+      badgesContainer.innerHTML = '';
+      
+      // Pothole badge
+      badgesContainer.innerHTML += `
+        <div class="flex items-center gap-1.5 bg-canvas border border-hairline px-3 py-1.5 rounded-md text-xs shadow-sm">
+          <span class="text-base">ðŸ•³ï¸</span>
+          <span class="font-bold text-ink">Pothole Patrol</span>
+        </div>
+      `;
+
+      // Streetlight badge
+      if (userStats.points >= 380) {
+        badgesContainer.innerHTML += `
+          <div class="flex items-center gap-1.5 bg-canvas border border-hairline px-3 py-1.5 rounded-md text-xs shadow-sm">
+            <span class="text-base">ðŸ”¦</span>
+            <span class="font-bold text-ink">Light Guardian</span>
+          </div>
+        `;
+      } else {
+        badgesContainer.innerHTML += `
+          <div class="flex items-center gap-1.5 bg-canvas/30 border border-hairline border-dashed px-3 py-1.5 rounded-md text-xs opacity-50 select-none">
+            <span class="text-base">ðŸ”¦</span>
+            <span class="font-semibold text-muted">Light Guardian (Locked)</span>
+          </div>
+        `;
+      }
+
+      // Water badge
+      if (userStats.points >= 450) {
+        badgesContainer.innerHTML += `
+          <div class="flex items-center gap-1.5 bg-canvas border border-hairline px-3 py-1.5 rounded-md text-xs shadow-sm">
+            <span class="text-base">ðŸ’§</span>
+            <span class="font-bold text-ink">Aqua Guard</span>
+          </div>
+        `;
+      } else {
+        badgesContainer.innerHTML += `
+          <div class="flex items-center gap-1.5 bg-canvas/30 border border-hairline border-dashed px-3 py-1.5 rounded-md text-xs opacity-50 select-none">
+            <span class="text-base">ðŸ’§</span>
+            <span class="font-semibold text-muted">Water Guard (Locked)</span>
+          </div>
+        `;
+      }
+    }
+
+    renderLeaderboard();
+    window.dispatchEvent(new CustomEvent('pinpoint_stats_changed'));
+  }
+
+  // Render leaderboard list dynamically (Clay styled)
+  function renderLeaderboard() {
+    const list = document.getElementById('leaderboard-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+    const leaders = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+
+    const userIndex = leaders.findIndex((l: any) => l.isUser === true);
+    if (userIndex !== -1) {
+      leaders[userIndex].points = userStats.points;
+      leaders[userIndex].badge = userStats.level;
+    }
+
+    leaders.sort((a: any, b: any) => b.points - a.points);
+    localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaders));
+
+    leaders.forEach((c: any, index: number) => {
+      const position = index + 1;
+      const highlightClass = c.isUser ? 'bg-brand-mint border-primary/20' : 'bg-canvas border-hairline';
+      const medal = position === 1 ? 'ðŸ¥‡' : position === 2 ? 'ðŸ¥ˆ' : position === 3 ? 'ðŸ¥‰' : `${position}`;
+
+      list.innerHTML += `
+        <div class="flex items-center justify-between p-3.5 rounded-md transition-colors border ${highlightClass}">
+          <div class="flex items-center gap-4">
+            <span class="w-6 text-center text-sm font-bold font-sans">${medal}</span>
+            <div>
+              <div class="text-caption font-bold text-ink">${c.name}</div>
+              <div class="text-[11px] text-muted font-medium">${c.badge}</div>
+            </div>
+          </div>
+          <div class="text-right font-sans text-sm font-bold text-ink">
+            ${c.points} <span class="text-[10px] text-muted font-normal">pts</span>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // Toast notifier
+  function showToast(message: string) {
+    const toast = document.getElementById('toast-notification');
+    const toastMsg = document.getElementById('toast-message');
+    if (toast && toastMsg) {
+      toastMsg.textContent = message;
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+  }
+
+  // Render Issues Feed in Clay's Saturated Card system
+  function renderFeed() {
+    if (!issuesFeed || !emptyState) return;
+    issuesFeed.innerHTML = '';
+
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const upvoted = JSON.parse(localStorage.getItem('pinpoint_user_upvotes') || '[]');
+
+    const query = searchInput?.value.toLowerCase() || '';
+    const cat = categoryFilter?.value || 'All';
+    const status = statusFilter?.value || 'All';
+
+    const filtered = issues.filter((issue: any) => {
+      const matchQuery = issue.title.toLowerCase().includes(query) || 
+                          issue.description.toLowerCase().includes(query) || 
+                          issue.locality.toLowerCase().includes(query);
+      const matchCat = cat === 'All' ? true : issue.category === cat;
+      const matchStatus = status === 'All' ? true : issue.status === status;
+      const matchLocality = currentLocalityFilter === 'All' ? true : issue.locality === currentLocalityFilter;
+
+      return matchQuery && matchCat && matchStatus && matchLocality;
+    });
+
+    if (filtered.length === 0) {
+      emptyState.classList.remove('hidden');
+      emptyState.classList.add('flex');
+    } else {
+      emptyState.classList.add('hidden');
+      emptyState.classList.remove('flex');
+    }
+
+    filtered.forEach((issue: any) => {
+      // 1. Map Saturated Card background colors by Category (Clay spec)
+      let cardBgClass = 'bg-surface-card text-ink border-hairline';
+      let textLight = false;
+      
+      let severityBadgeColor = 'text-red-700 bg-red-100/50 border-red-300';
+      let statusBadgeColor = 'text-amber-700 bg-amber-100/50 border-amber-300 border';
+
+      if (issue.category === 'Infrastructure') {
+        cardBgClass = 'bg-brand-peach text-ink border-transparent';
+        severityBadgeColor = 'bg-canvas/50 text-ink border-transparent';
+        statusBadgeColor = 'bg-canvas/50 text-ink border-transparent';
+      } else if (issue.category === 'Streetlight') {
+        cardBgClass = 'bg-brand-ochre text-ink border-transparent';
+        severityBadgeColor = 'bg-canvas/50 text-ink border-transparent';
+        statusBadgeColor = 'bg-canvas/50 text-ink border-transparent';
+      } else if (issue.category === 'Water Leakage') {
+        cardBgClass = 'bg-brand-lavender text-ink border-transparent';
+        severityBadgeColor = 'bg-canvas/50 text-ink border-transparent';
+        statusBadgeColor = 'bg-canvas/50 text-ink border-transparent';
+      } else if (issue.category === 'Waste Management') {
+        cardBgClass = 'bg-brand-teal text-on-dark border-transparent';
+        severityBadgeColor = 'bg-canvas/15 text-on-dark border-transparent';
+        statusBadgeColor = 'bg-canvas/15 text-on-dark border-transparent';
+        textLight = true;
+      }
+
+      if (issue.disputed) {
+        statusBadgeColor = textLight
+          ? 'bg-red-500/25 text-white border-transparent animate-pulse'
+          : 'bg-red-50 text-red-700 border-red-200 border animate-pulse';
+      } else if (issue.status === 'Resolved') {
+        statusBadgeColor = textLight 
+          ? 'bg-canvas/20 text-on-dark border-transparent' 
+          : 'bg-success/20 text-success border-success/30 border';
+      }
+
+      let disputeBtnClass = '';
+      if (textLight) {
+        disputeBtnClass = 'bg-red-500/25 hover:bg-red-500/40 text-white border border-red-500/30';
+      } else {
+        disputeBtnClass = 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200';
+      }
+
+      const hasUpvoted = upvoted.includes(issue.id);
+      const verifyText = issue.status === 'Open' ? `Verify (${issue.verifications})` : `Verified (${issue.verifications})`;
+      
+      // Secondary buttons over saturated backgrounds must be high-contrast white containers
+      let upvoteBtnClass = '';
+      let verifyBtnClass = '';
+      let resolveBtnClass = '';
+
+      if (textLight) {
+        // Over dark teal card
+        upvoteBtnClass = hasUpvoted 
+          ? 'bg-canvas/30 text-on-dark border border-canvas/25' 
+          : 'bg-canvas text-ink hover:bg-surface-card';
+        verifyBtnClass = 'bg-canvas/20 hover:bg-canvas/30 text-on-dark border border-canvas/25';
+        resolveBtnClass = 'bg-canvas text-ink hover:bg-surface-card';
+      } else {
+        // Over peach, lavender, ochre, or cream card
+        upvoteBtnClass = hasUpvoted 
+          ? 'bg-primary text-on-primary hover:bg-primary-active' 
+          : 'bg-canvas text-ink hover:bg-surface-card border border-hairline';
+        verifyBtnClass = 'bg-canvas hover:bg-surface-card text-ink border border-hairline';
+        resolveBtnClass = 'bg-primary text-on-primary hover:bg-primary-active';
+      }
+
+      const upvoteBtnText = hasUpvoted ? 'Upvoted' : 'Upvote';
+
+      let imageElement = '';
+      if (issue.status === 'Resolved') {
+        const originalImg = issue.imageUrl || '/images/pothole_vadodara.png';
+        const resolvedImg = issue.resolvedImageUrl || '/images/pothole_fixed_vadodara.png';
+        imageElement = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            <div class="relative">
+              <img src="${originalImg}" alt="Before - ${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity" />
+              <span class="absolute top-2 left-2 bg-black/75 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow">BEFORE (Reported)</span>
+            </div>
+            <div class="relative">
+              <img src="${resolvedImg}" alt="After - ${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity border-success/30" />
+              <span class="absolute top-2 left-2 bg-success text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow">AFTER (Resolved)</span>
+            </div>
+          </div>
+        `;
+      } else {
+        imageElement = issue.imageUrl 
+          ? `<img src="${issue.imageUrl}" alt="${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product mb-5 hover:opacity-95 transition-opacity" />`
+          : '';
+      }
+
+      let auditPanel = '';
+      if (issue.status === 'Resolved') {
+        const resolvedBy = issue.resolvedBy || 'VMC Waste Management';
+        const resolvedDate = issue.resolvedDate || '2026-06-19';
+        const resolvedNotes = issue.resolvedNotes || 'Municipal waste team cleared the bins and swept the area clean.';
+        
+        auditPanel = `
+          <div class="bg-canvas/60 border border-hairline rounded-md p-3.5 mb-4 text-xs">
+            <div class="flex items-center gap-2 text-ink font-bold mb-1">
+              <span class="text-success text-sm">âœ“</span>
+              <span>Resolution Verified</span>
+            </div>
+            <div class="text-muted leading-relaxed font-normal mb-1.5">
+              "${resolvedNotes}"
+            </div>
+            <div class="text-[10px] text-muted uppercase tracking-wider font-mono font-bold">
+              By: ${resolvedBy} Â· Date: ${resolvedDate}
+            </div>
+          </div>
+        `;
+      }
+
+      issuesFeed.innerHTML += `
+        <div 
+          class="border p-6 rounded-xl select-text transition-all duration-200 ${cardBgClass}" 
+          id="feed-card-${issue.id}"
+          data-id="${issue.id}"
+        >
+          <!-- Photo resting on surface with shadow -->
+          ${imageElement}
+
+          <!-- Header info -->
+          <div class="flex items-center justify-between gap-4 mb-3 text-caption font-bold">
+            <span class="${textLight ? 'text-on-dark-soft' : 'text-muted'}">${issue.category} Â· ${issue.locality}</span>
+            <span class="${textLight ? 'text-on-dark-soft' : 'text-muted'} font-mono">${issue.date}</span>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-title-md font-bold mb-2.5 leading-snug">
+            ${issue.title}
+          </h3>
+
+          <!-- Description -->
+          <p class="text-sm leading-relaxed mb-6 ${textLight ? 'text-on-dark-soft' : 'text-body'}">
+            ${issue.description}
+          </p>
+
+          <!-- Audit Log Panel (Resolved state verification proof) -->
+          ${auditPanel}
+
+          <!-- Badges & Controls Row -->
+          <div class="flex flex-wrap items-center gap-3 border-t border-divider-soft pt-4 mt-4">
+            <!-- Severity Badge -->
+            <span class="text-[11px] font-bold px-3 py-1 rounded-pill ${severityBadgeColor}">
+              ${issue.severity} Severity
+            </span>
+
+            <!-- Status Badge -->
+            <span class="text-[11px] font-bold px-3 py-1 rounded-pill ${statusBadgeColor}">
+              ${issue.disputed ? 'âš ï¸ Disputed' : issue.status}
+            </span>
+
+            <!-- SLA Countdown Badge -->
+            ${getSLATimerHtml(issue, textLight)}
+
+            <span class="text-xs ${textLight ? 'text-on-dark-soft' : 'text-muted'} ml-1 font-medium">By ${issue.reportedBy}</span>
+
+            <!-- Controls (Verify, Upvote, Resolve) -->
+            <div class="flex items-center gap-2 ml-auto">
+              <!-- Upvote -->
+              <button 
+                onclick="handleUpvote('${issue.id}')"
+                class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${upvoteBtnClass}"
+              >
+                ${upvoteBtnText} (${issue.verifications})
+              </button>
+
+              <!-- Verify (Only for Open issues) -->
+              ${issue.status === 'Open' ? `
+                <button 
+                  onclick="handleVerify('${issue.id}')"
+                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${verifyBtnClass}"
+                >
+                  Verify
+                </button>
+              ` : ''}
+
+              <!-- Dispute Fix (Only for Resolved issues that are not already disputed) -->
+              ${issue.status === 'Resolved' && !issue.disputed ? `
+                <button 
+                  onclick="handleDispute('${issue.id}')"
+                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${disputeBtnClass}"
+                >
+                  Dispute Fix
+                </button>
+              ` : ''}
+
+              <!-- Simulated Authority: Mark as Resolved -->
+              ${issue.status !== 'Resolved' ? `
+                <button 
+                  onclick="handleResolve('${issue.id}')"
+                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${resolveBtnClass}"
+                >
+                  Resolve
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    // Add card click listeners for map focusing
+    const cards = document.querySelectorAll('[id^="feed-card-"]');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        const id = card.getAttribute('data-id');
+        window.dispatchEvent(new CustomEvent('pinpoint_highlight_pin', {
+          detail: { id }
+        }));
+      });
+    });
+  }
+
+  // Upvote Action Handler
+  (window as any).handleUpvote = function(id: string) {
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const upvoted = JSON.parse(localStorage.getItem('pinpoint_user_upvotes') || '[]');
+    
+    if (upvoted.includes(id)) {
+      const index = upvoted.indexOf(id);
+      upvoted.splice(index, 1);
+      
+      const issue = issues.find((i: any) => i.id === id);
+      if (issue) issue.verifications = Math.max(0, issue.verifications - 1);
+      
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+      localStorage.setItem('pinpoint_user_upvotes', JSON.stringify(upvoted));
+      
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points = Math.max(0, userStats.points - 15);
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      showToast("Upvote removed.");
+    } else {
+      upvoted.push(id);
+      const issue = issues.find((i: any) => i.id === id);
+      if (issue) issue.verifications += 1;
+
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+      localStorage.setItem('pinpoint_user_upvotes', JSON.stringify(upvoted));
+      
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points += 15;
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      showToast("Upvoted issue. +15 Civic points!");
+    }
+
+    renderFeed();
+    updateStatsWidgets();
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+  };
+
+  // Verify Action Handler
+  (window as any).handleVerify = function(id: string) {
+    const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const issue = issues.find((i: any) => i.id === id);
+    if (issue) {
+      issue.verifications += 1;
+      
+      if (issue.verifications >= 3 && issue.status === 'Open') {
+        issue.status = 'In Progress';
+        showToast("Crowd verification complete. Escalated to 'In Progress'!");
+      } else {
+        showToast("Verification logged. +15 Civic points!");
+      }
+
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points += 15;
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+    }
+
+    renderFeed();
+    updateStatsWidgets();
+    window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+  };
+
+  // Resolve Action Handler (Open verification modal)
+  (window as any).handleResolve = function(id: string) {
+    openResolveModal(id);
+  };
+
+  // Form Submit with AI Auto-Tagging simulation
+  reportForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const title = (document.getElementById('form-title') as HTMLInputElement).value;
+    const locality = (document.getElementById('form-locality') as HTMLSelectElement).value;
+    const description = (document.getElementById('form-description') as HTMLTextAreaElement).value;
+    const mediaSelection = (document.getElementById('form-media') as HTMLSelectElement).value;
+    const fileInput = document.getElementById('form-file-upload') as HTMLInputElement;
+
+    const latVal = parseFloat((document.getElementById('form-lat') as HTMLInputElement).value || '22.3090');
+    const lngVal = parseFloat((document.getElementById('form-lng') as HTMLInputElement).value || '73.2200');
+
+    const category = (document.getElementById('form-category') as HTMLSelectElement).value || "Infrastructure";
+    const severityInput = document.querySelector('input[name="form-severity"]:checked') as HTMLInputElement;
+    const severity = severityInput ? severityInput.value : "Medium";
+
+    // Read the uploaded file if present
+    let uploadedImageUrl = '';
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      try {
+        uploadedImageUrl = await fileToBase64(fileInput.files[0]);
+      } catch (err) {
+        console.error("Failed to read file upload:", err);
+      }
+    }
+
+    closeReportModal();
+
+    if (aiOverlay) {
+      aiOverlay.classList.remove('hidden');
+      aiOverlay.classList.add('flex');
+    }
+
+    const states = [
+      { text: "Initializing AI Vision Analyzer...", v: "Activating...", g: "Pending...", s: "Pending..." },
+      { text: "Scanning description for key infrastructure indicators...", v: "Media Loaded.", g: "Locality Locked.", s: "Pending..." },
+      { text: `Verifying coordinates [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]...`, v: "Media Loaded.", g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Scanning Hazards..." },
+      { text: "Analyzing severity hazard index...", v: "Media Verified.", g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Determining SLA Class..." },
+      { text: "Finalizing civic report...", v: "Complete.", g: "Complete.", s: "Complete." }
+    ];
+
+    let currentStep = 0;
+    
+    const interval = setInterval(() => {
+      currentStep++;
+      if (currentStep < states.length) {
+        if (aiStatusText) aiStatusText.textContent = states[currentStep].text;
+        if (aiVision) aiVision.textContent = states[currentStep].v;
+        if (aiGeo) aiGeo.textContent = states[currentStep].g;
+        if (aiSeverity) aiSeverity.textContent = states[currentStep].s;
+      } else {
+        clearInterval(interval);
+        finalizeAIReport();
+      }
+    }, 700);
+
+    function finalizeAIReport() {
+      aiOverlay?.classList.add('hidden');
+      aiOverlay?.classList.remove('flex');
+
+      let imageUrl = "/images/pothole_vadodara.png";
+      if (uploadedImageUrl) {
+        imageUrl = uploadedImageUrl;
+      } else {
+        if (mediaSelection === 'streetlight') imageUrl = "/images/streetlight_vadodara.png";
+        if (mediaSelection === 'water') imageUrl = "/images/water_vadodara.png";
+        if (mediaSelection === 'garbage') imageUrl = "/images/garbage_vadodara.png";
+      }
+
+      const newIssue = {
+        id: "issue-" + Date.now(),
+        title,
+        description,
+        category,
+        severity,
+        status: "Open",
+        locality,
+        verifications: 0,
+        lat: latVal,
+        lng: lngVal,
+        date: new Date().toISOString().split('T')[0],
+        reportedBy: (() => {
+          const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+          const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+          if (isLoggedIn && loggedInUser) {
+            try {
+              return JSON.parse(loggedInUser).name + " (You)";
+            } catch (e) {}
+          }
+          return "Ritvik Vedangi (You)";
+        })(),
+        imageUrl
+      };
+
+      const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+      issues.unshift(newIssue);
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
+
+      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+      userStats.points += 100;
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      showToast(`AI analysis complete. Category: ${category} (${severity} Severity). Plotted on map! +100 Civic points!`);
+
+      renderFeed();
+      updateStatsWidgets();
+      
+      window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+    }
+  });
+
+  window.addEventListener('pinpoint_select_issue', (e: any) => {
+    const id = e.detail.id;
+    const card = document.getElementById(`feed-card-${id}`);
+    
+    if (card) {
+      const allCards = document.querySelectorAll('[id^="feed-card-"]');
+      allCards.forEach(c => c.classList.remove('border-primary', 'bg-primary/5'));
+
+      card.classList.add('border-primary', 'bg-primary/5');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  window.addEventListener('pinpoint_clear_highlights', () => {
+    const allCards = document.querySelectorAll('[id^="feed-card-"]');
+    allCards.forEach(c => c.classList.remove('border-primary', 'bg-primary/5'));
+  });
+
+  searchInput?.addEventListener('input', renderFeed);
+  categoryFilter?.addEventListener('change', renderFeed);
+  statusFilter?.addEventListener('change', renderFeed);
+
+  // Auth & Profile Modal DOM bindings
+  const authModal = document.getElementById('auth-modal');
+  const authForm = document.getElementById('auth-form') as HTMLFormElement;
+  const authCloseBtn = document.getElementById('auth-modal-close-btn');
+  const profileModal = document.getElementById('profile-modal');
+  const profileCloseBtn = document.getElementById('profile-modal-close-btn');
+  const logoutBtn = document.getElementById('profile-logout-btn');
+  
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const fieldName = document.getElementById('auth-field-name');
+  const authTitle = document.getElementById('auth-modal-title');
+  const authSubmitBtn = document.getElementById('auth-submit-btn');
+
+  let authMode: 'login' | 'signup' = 'login';
+  
+  tabLogin?.addEventListener('click', () => {
+    authMode = 'login';
+    tabLogin.className = "flex-1 text-center py-1.5 rounded-md text-xs font-bold bg-canvas text-ink shadow-sm transition-all cursor-pointer";
+    tabSignup!.className = "flex-1 text-center py-1.5 rounded-md text-xs font-semibold text-muted hover:text-ink transition-all cursor-pointer";
+    fieldName?.classList.add('hidden');
+    (document.getElementById('auth-name') as HTMLInputElement).required = false;
+    if (authTitle) authTitle.textContent = "Sign In";
+    if (authSubmitBtn) authSubmitBtn.textContent = "Log In";
+  });
+  
+  tabSignup?.addEventListener('click', () => {
+    authMode = 'signup';
+    tabSignup.className = "flex-1 text-center py-1.5 rounded-md text-xs font-bold bg-canvas text-ink shadow-sm transition-all cursor-pointer";
+    tabLogin.className = "flex-1 text-center py-1.5 rounded-md text-xs font-semibold text-muted hover:text-ink transition-all cursor-pointer";
+    fieldName?.classList.remove('hidden');
+    (document.getElementById('auth-name') as HTMLInputElement).required = true;
+    if (authTitle) authTitle.textContent = "Create Account";
+    if (authSubmitBtn) authSubmitBtn.textContent = "Create Account";
+  });
+
+  function openAuthModal() {
+    authModal?.classList.remove('hidden');
+    syncScrollLock();
+  }
+  
+  function closeAuthModal() {
+    authModal?.classList.add('hidden');
+    syncScrollLock();
+    authForm.reset();
+  }
+  
+  function openProfileModal() {
+    profileModal?.classList.remove('hidden');
+    syncScrollLock();
+    
+    // Set profile details dynamically
+    const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    let name = "Ritvik Vedangi";
+    let initials = "RV";
+    
+    if (loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        name = u.name;
+        initials = u.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    const profModalName = document.getElementById('profile-modal-name');
+    const profModalBadge = document.getElementById('profile-modal-badge');
+    const profModalPoints = document.getElementById('profile-modal-points');
+    const profModalAvatar = document.getElementById('profile-modal-avatar');
+    
+    if (profModalName) profModalName.textContent = name;
+    if (profModalBadge) profModalBadge.textContent = userStats.level;
+    if (profModalPoints) profModalPoints.textContent = userStats.points;
+    if (profModalAvatar) profModalAvatar.textContent = initials;
+  }
+  
+  function closeProfileModal() {
+    profileModal?.classList.add('hidden');
+    syncScrollLock();
+  }
+  
+  authCloseBtn?.addEventListener('click', closeAuthModal);
+  authModal?.addEventListener('click', (e) => {
+    if (e.target === authModal) closeAuthModal();
+  });
+  
+  profileCloseBtn?.addEventListener('click', closeProfileModal);
+  profileModal?.addEventListener('click', (e) => {
+    if (e.target === profileModal) closeProfileModal();
+  });
+  
+  // Register custom events for navbar mapping
+  window.addEventListener('pinpoint_open_auth_modal', openAuthModal);
+  window.addEventListener('pinpoint_open_profile_modal', openProfileModal);
+
+  // Auth Form submit logic
+  authForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const email = (document.getElementById('auth-email') as HTMLInputElement).value;
+    const password = (document.getElementById('auth-password') as HTMLInputElement).value;
+    
+    let users = JSON.parse(localStorage.getItem('pinpoint_users') || '[]');
+    
+    if (authMode === 'signup') {
+      const name = (document.getElementById('auth-name') as HTMLInputElement).value;
+      
+      // Check if user already exists
+      if (users.some((u: any) => u.email === email)) {
+        showToast("An account with this email already exists!");
+        return;
+      }
+      
+      const newUser = {
+        name,
+        email,
+        password,
+        points: 350,
+        level: "Civic Scout"
+      };
+      
+      users.push(newUser);
+      localStorage.setItem('pinpoint_users', JSON.stringify(users));
+      
+      // Log in the new user
+      localStorage.setItem('pinpoint_is_logged_in', 'true');
+      localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(newUser));
+      localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: 350, level: "Civic Scout" }));
+      
+      // Add or update entry in leaderboard
+      let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+      const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+      if (userIndex !== -1) {
+        leaderboard[userIndex].name = `You (${name})`;
+        leaderboard[userIndex].points = 350;
+        leaderboard[userIndex].badge = "Civic Scout";
+      } else {
+        leaderboard.push({ name: `You (${name})`, points: 350, issues: 3, badge: "Civic Scout", isUser: true });
+      }
+      localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+      
+      showToast(`Welcome ${name}! Account created and signed in.`);
+    } else {
+      // Login mode
+      const user = users.find((u: any) => u.email === email && u.password === password);
+      
+      // Fallback for default seed user (Ritvik Vedangi)
+      const defaultUser = { name: "Ritvik Vedangi", email: "ritvik@example.com", password: "password123", points: 350, level: "Civic Scout" };
+      
+      if (email === "ritvik@example.com" && password === "password123") {
+        localStorage.setItem('pinpoint_is_logged_in', 'true');
+        localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(defaultUser));
+        localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: defaultUser.points, level: defaultUser.level }));
+        
+        let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+        const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+        if (userIndex !== -1) {
+          leaderboard[userIndex].name = `You (${defaultUser.name})`;
+        }
+        localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+        
+        showToast("Signed in successfully as Ritvik Vedangi!");
+      } else if (user) {
+        localStorage.setItem('pinpoint_is_logged_in', 'true');
+        localStorage.setItem('pinpoint_logged_in_user', JSON.stringify(user));
+        localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: user.points, level: user.level }));
+        
+        let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+        const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+        if (userIndex !== -1) {
+          leaderboard[userIndex].name = `You (${user.name})`;
+          leaderboard[userIndex].points = user.points;
+          leaderboard[userIndex].badge = user.level;
+        }
+        localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+        
+        showToast(`Signed in successfully as ${user.name}!`);
+      } else {
+        showToast("Invalid email or password!");
+        return;
+      }
+    }
+    
+    closeAuthModal();
+    
+    // Dispatch events to refresh navbar and components
+    window.dispatchEvent(new CustomEvent('pinpoint_auth_changed'));
+    renderLeaderboard();
+    updateStatsWidgets();
+  });
+
+  // Logout logic
+  logoutBtn?.addEventListener('click', () => {
+    // Save current points back to the user database in localStorage before logging out
+    const isLoggedIn = localStorage.getItem('pinpoint_is_logged_in') === 'true';
+    const loggedInUser = localStorage.getItem('pinpoint_logged_in_user');
+    if (isLoggedIn && loggedInUser) {
+      try {
+        const u = JSON.parse(loggedInUser);
+        const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
+        let users = JSON.parse(localStorage.getItem('pinpoint_users') || '[]');
+        const userIndex = users.findIndex((usr: any) => usr.email === u.email);
+        if (userIndex !== -1) {
+          users[userIndex].points = userStats.points;
+          users[userIndex].level = userStats.level;
+          localStorage.setItem('pinpoint_users', JSON.stringify(users));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    localStorage.setItem('pinpoint_is_logged_in', 'false');
+    localStorage.removeItem('pinpoint_logged_in_user');
+    // Set guest user stats
+    localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: 350, level: "Civic Scout" }));
+    
+    let leaderboard = JSON.parse(localStorage.getItem('pinpoint_leaderboard') || '[]');
+    const userIndex = leaderboard.findIndex((l: any) => l.isUser === true);
+    if (userIndex !== -1) {
+      leaderboard[userIndex].name = "You (Guest Citizen)";
+      leaderboard[userIndex].points = 350;
+      leaderboard[userIndex].badge = "Civic Scout";
+    }
+    localStorage.setItem('pinpoint_leaderboard', JSON.stringify(leaderboard));
+    
+    showToast("Signed out successfully.");
+    closeProfileModal();
+    
+    // Dispatch events to refresh navbar and components
+    window.dispatchEvent(new CustomEvent('pinpoint_auth_changed'));
+    renderLeaderboard();
+    updateStatsWidgets();
+  });
+
+  renderFeed();
+  updateStatsWidgets();
+  });
+</script>
+
+<style>
+  /* Local animations */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes reverse-spin {
+    to { transform: rotate(-360deg); }
+  }
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  .animate-reverse-spin {
+    animation: reverse-spin 1.5s linear infinite;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .animate-scale-up {
+    animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-toast-slide-up {
+    animation: toastSlideUpFade 3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  @keyframes toastSlideUpFade {
+    0% { opacity: 0; transform: translate(-50%, 20px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    90% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+  }
+</style>

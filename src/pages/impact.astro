@@ -1,0 +1,64 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Impact & Analytics - Pinpoint">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-4 animate-toast-slide-up">
+    <h1 class="text-hero-display text-ink">Impact & Analytics</h1>
+    <p class="text-body text-lg mt-2">See the real-time difference we are making in the community.</p>
+  </div>
+    <section id="analytics-section" class="bg-canvas border-b border-hairline py-8 px-6 sm:px-12 flex flex-col items-center text-center scroll-mt-[52px]">
+      <div class="max-w-4xl mx-auto flex flex-col items-center">
+        <!-- Badge Pill -->
+        <span class="text-ink text-xs font-bold tracking-wider uppercase mb-4 bg-surface-card px-3.5 py-1.5 rounded-pill border border-hairline">
+          ðŸŒ± Hyperlocal Action Hub
+        </span>
+        
+        <!-- Headline in Plain Black style -->
+        <h1 class="text-hero-display text-ink font-medium mb-6 select-text tracking-[-2.5px] leading-tight font-display">
+          Pinpoint. Civic action, hand-crafted.
+        </h1>
+        
+        <!-- Tagline -->
+        <p class="text-lead text-body font-normal mb-8 max-w-2xl select-text leading-relaxed">
+          Identify, report, and verify community issues. Connect with local municipal authorities in a transparent, warm, and collaborative ecosystem.
+        </p>
+
+        <!-- CTA Buttons (Clay rounded-md 12px style) -->
+        <div class="flex flex-wrap justify-center gap-4 mb-16">
+          <button 
+            id="hero-report-btn" 
+            class="bg-primary hover:bg-primary-active text-on-primary font-sans text-button-utility font-semibold rounded-md px-6 py-3 cursor-pointer active-scale shadow-sm focus:outline-none transition-colors"
+          >
+            Report an Issue
+          </button>
+          <a 
+            href="#feed-section" 
+            class="text-ink hover:bg-surface-card font-sans text-button-utility font-semibold border border-hairline rounded-md px-6 py-3 cursor-pointer active-scale transition-all flex items-center justify-center bg-transparent"
+          >
+            Explore Map & Feed
+          </a>
+        </div>
+
+        <!-- Live Impact Stats Ticker (Clay-style horizontal list) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 w-full pt-12 border-t border-hairline">
+          <div>
+            <div class="text-display-md text-ink font-semibold font-display tracking-tight" id="ticker-reported">1,280</div>
+            <div class="text-caption text-muted font-medium">Issues Reported</div>
+          </div>
+          <div>
+            <div class="text-display-md text-primary font-semibold font-display tracking-tight" id="ticker-resolved">1,208</div>
+            <div class="text-caption text-muted font-medium">Problems Resolved</div>
+          </div>
+          <div>
+            <div class="text-display-md text-brand-coral font-semibold font-display tracking-tight" id="ticker-active">72</div>
+            <div class="text-caption text-muted font-medium">Active Reports</div>
+          </div>
+          <div>
+            <div class="text-display-md text-success font-semibold font-display tracking-tight" id="ticker-rate">94%</div>
+            <div class="text-caption text-muted font-medium">Resolution Rate</div>
+          </div>
+        </div>
+      </div>
+    </section>
+</Layout>

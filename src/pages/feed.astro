@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LeafletMap from '../components/Map.astro';
+---
+
+<Layout title="Active Issues - Pinpoint">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-4 animate-toast-slide-up">
+    <h1 class="text-hero-display text-ink">Active Issues</h1>
+    <p class="text-body text-lg mt-2">Browse, verify, and resolve issues reported in your neighborhood.</p>
+  </div>
+    <section id="feed-section" class="bg-surface-card border-b border-hairline py-8 px-6 sm:px-12 scroll-mt-[52px]">
+      <div class="max-w-[1280px] mx-auto">
+        <!-- Section Header -->
+        <div class="mb-12 text-center md:text-left">
+          <span class="text-caption-uppercase text-muted tracking-[1.5px] font-semibold mb-2 block">LOCAL ACTION GRID</span>
+          <h2 class="text-display-lg text-ink font-semibold mb-3 font-display tracking-tight">Hyperlocal Map & Feed</h2>
+          <p class="text-body-md text-muted max-w-xl">
+            Select a locality on the map to filter. Search keywords or filter by category to inspect active reports.
+          </p>
+        </div>
+
+        <!-- Two Column Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Left Column: Map Widget (lg:col-span-5) -->
+          <div class="lg:col-span-5 lg:sticky lg:top-[72px]">
+            <LeafletMap />
+          </div>
+
+          <!-- Right Column: Issues Feed and Filters (lg:col-span-7) -->
+          <div class="lg:col-span-7 flex flex-col gap-6">
+            <!-- Feed Search and Filters Panel (rounded-md 12px) -->
+            <div class="bg-canvas border border-hairline p-5 rounded-md flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <!-- Search Input (Pill Shaped matching {component.search-input}) -->
+              <div class="relative w-full sm:w-72">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-muted">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="feed-search" 
+                  placeholder="Search neighborhood or problem..." 
+                  class="w-full h-11 bg-canvas border border-hairline rounded-pill pl-11 pr-5 text-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-muted"
+                />
+              </div>
+
+              <!-- Filter Controls Stack -->
+              <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <!-- Locality Tag display -->
+                <span id="active-locality-filter-tag" class="hidden text-xs bg-brand-mint text-primary-active dark:bg-brand-mint/15 dark:text-brand-mint font-bold px-3 py-1 rounded-full flex items-center gap-1.5 animate-fade-in border border-hairline">
+                  Locality: <span id="active-locality-name">All</span>
+                  <button id="clear-locality-filter" class="hover:text-brand-coral cursor-pointer focus:outline-none font-bold text-sm ml-1" aria-label="Clear Locality Filter">Ã—</button>
+                </span>
+
+                <!-- Category Dropdown Filter (Rounded Pill) -->
+                <select 
+                  id="feed-category-filter"
+                  class="h-11 bg-canvas border border-hairline rounded-pill px-4 text-caption text-ink font-semibold focus:outline-none focus:border-primary cursor-pointer max-w-[160px]"
+                >
+                  <option value="All">All Categories</option>
+                  <option value="Infrastructure">Infrastructure</option>
+                  <option value="Water Leakage">Water Leakage</option>
+                  <option value="Streetlight">Streetlights</option>
+                  <option value="Waste Management">Waste Management</option>
+                </select>
+
+                <!-- Status Tabs -->
+                <select 
+                  id="feed-status-filter"
+                  class="h-11 bg-canvas border border-hairline rounded-pill px-4 text-caption text-ink font-semibold focus:outline-none focus:border-primary cursor-pointer max-w-[140px]"
+                >
+                  <option value="All">All Statuses</option>
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Issues Feed Container -->
+            <div id="issues-feed" class="flex flex-col gap-6">
+              <!-- Issue Cards are injected here dynamically via client-side javascript -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="feed-empty-state" class="hidden bg-canvas border border-hairline p-12 rounded-lg text-center flex-col items-center justify-center">
+              <svg class="w-10 h-10 text-muted mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <h3 class="text-body-strong text-ink mb-1">No matching reports found</h3>
+              <p class="text-caption text-muted">Try adjusting your filters or search terms.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</Layout>

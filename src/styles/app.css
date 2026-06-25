@@ -289,3 +289,35 @@ body {
   border-left: 1px solid var(--color-hairline) !important;
   border-bottom: 1px solid var(--color-hairline) !important;
 }
+
+/* Custom Micro-Animations for Multi-Page SPA feel */
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade {
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger utilities for lists */
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+
+/* Subtle pulse for active/hot elements */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-slow {
+  animation: subtlePulse 3s infinite ease-in-out;
+}

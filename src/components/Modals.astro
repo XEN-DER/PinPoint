@@ -1,0 +1,521 @@
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: REPORT CIVIC ISSUE WIZARD -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="report-issue-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-lg overflow-hidden flex flex-col animate-scale-up"
+      style="max-height: 90vh;"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight">Report New Issue</h3>
+        <button id="modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Modal Form Body (Rounded 12px Inputs) -->
+      <form id="report-issue-form" class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[calc(90vh-120px)] no-scrollbar">
+        <!-- Issue Title -->
+        <div class="flex flex-col gap-1.5">
+          <label for="form-title" class="text-caption-strong text-ink font-bold">Short Title / Subject</label>
+          <input 
+            type="text" 
+            id="form-title" 
+            placeholder="e.g. Broken pavement slabs or leaking sewer pipe" 
+            required 
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Issue Locality -->
+        <div class="flex flex-col gap-1.5">
+          <label for="form-locality" class="text-caption-strong text-ink font-bold">Locality / Neighborhood</label>
+          <select 
+            id="form-locality" 
+            required 
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink"
+          >
+            <option value="" disabled selected>Select neighborhood</option>
+            <option value="Bapod">Bapod</option>
+            <option value="Ajwa Road">Ajwa Road</option>
+            <option value="Waghodia Road">Waghodia Road</option>
+            <option value="Kishanwadi">Kishanwadi</option>
+          </select>
+        </div>
+
+        <!-- Map Location Picker -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-caption-strong text-ink font-bold">Pick Pin Location on Map</label>
+          <div id="report-map-picker" class="w-full h-[180px] rounded-md border border-hairline overflow-hidden z-10" style="min-height: 180px;"></div>
+          <input type="hidden" id="form-lat" value="22.3090" />
+          <input type="hidden" id="form-lng" value="73.2200" />
+          <span class="text-[11px] text-muted">Click the map or drag the marker to specify the exact issue location.</span>
+        </div>
+
+        <!-- Description -->
+        <div class="flex flex-col gap-1.5">
+          <label for="form-description" class="text-caption-strong text-ink font-bold">Detailed Description</label>
+          <textarea 
+            id="form-description" 
+            rows="3" 
+            placeholder="Please detail the location specifics, safety hazards, and any relevant context for the AI scan..." 
+            required 
+            class="bg-canvas border border-hairline rounded-md p-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink resize-none"
+          ></textarea>
+        </div>
+
+        <!-- AI Copilot Scanner Block -->
+        <div id="ai-copilot-widget" class="bg-surface-card border border-hairline rounded-md p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-hairline pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">✨</span>
+              <span class="text-caption-strong text-ink font-bold">AI Copilot Scanner</span>
+            </div>
+            <span id="ai-copilot-status" class="text-[10px] uppercase font-bold tracking-wider text-muted">Awaiting Input...</span>
+          </div>
+          <div class="flex items-center gap-3 py-1">
+            <div id="ai-copilot-spinner" class="hidden w-4.5 h-4.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div id="ai-copilot-result" class="text-xs text-muted leading-relaxed font-normal">
+              Type a description or upload a photo to activate the live copilot suggestions.
+            </div>
+          </div>
+        </div>
+
+        <!-- Issue Category (Auto-filled by AI) -->
+        <div class="flex flex-col gap-1.5">
+          <label for="form-category" class="text-caption-strong text-ink font-bold flex items-center justify-between">
+            <span>Category</span>
+            <span class="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-full font-bold font-mono">AI Classifiable</span>
+          </label>
+          <select 
+            id="form-category" 
+            required 
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink font-semibold"
+          >
+            <option value="Infrastructure">Infrastructure</option>
+            <option value="Water Leakage">Water Leakage</option>
+            <option value="Streetlight">Streetlights</option>
+            <option value="Waste Management">Waste Management</option>
+          </select>
+        </div>
+
+        <!-- Severity Hazard Index (Auto-filled by AI) -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-caption-strong text-ink font-bold flex items-center justify-between">
+            <span>Severity Hazard Index</span>
+            <span class="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded-full font-bold font-mono">AI Classifiable</span>
+          </label>
+          <div class="flex gap-3">
+            <label class="flex-1 flex items-center justify-center h-11 bg-canvas border border-hairline rounded-md cursor-pointer select-none text-xs font-bold text-ink hover:bg-surface-card transition-all">
+              <input type="radio" name="form-severity" value="Low" class="sr-only" />
+              <span>Low</span>
+            </label>
+            <label class="flex-1 flex items-center justify-center h-11 bg-canvas border border-hairline rounded-md cursor-pointer select-none text-xs font-bold text-ink hover:bg-surface-card transition-all border-primary bg-primary/5 ring-1 ring-primary">
+              <input type="radio" name="form-severity" value="Medium" checked class="sr-only" />
+              <span>Medium</span>
+            </label>
+            <label class="flex-1 flex items-center justify-center h-11 bg-canvas border border-hairline rounded-md cursor-pointer select-none text-xs font-bold text-ink hover:bg-surface-card transition-all">
+              <input type="radio" name="form-severity" value="High" class="sr-only" />
+              <span>High</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Attached Media -->
+        <div class="flex flex-col gap-2">
+          <label class="text-caption-strong text-ink font-bold">Attach Photo Evidence</label>
+          
+          <!-- File Input for Real Upload -->
+          <div class="flex flex-col gap-1">
+            <input 
+              type="file" 
+              id="form-file-upload" 
+              accept="image/*"
+              class="block w-full text-xs text-muted
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-xs file:font-semibold
+                file:bg-primary file:text-on-primary
+                hover:file:bg-primary-active
+                cursor-pointer"
+            />
+            <span class="text-[11px] text-muted">Upload a real photo from your device.</span>
+          </div>
+
+          <div class="text-[11px] text-muted font-bold text-center py-0.5">OR</div>
+
+          <!-- Select Dropdown for Pre-seeded Fallback -->
+          <div class="flex flex-col gap-1">
+            <select 
+              id="form-media" 
+              class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink"
+            >
+              <option value="pothole" selected>Suburban Pothole (Camera Render)</option>
+              <option value="streetlight">Dark Alleyway Streetlamp (Dusk Render)</option>
+              <option value="water">Sidewalk Water Pipe Burst (Water Render)</option>
+              <option value="garbage">Central Square Overfilled Trash Bins (Recycle Render)</option>
+            </select>
+            <span class="text-[11px] text-muted">Use a pre-seeded photorealistic asset.</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons (Clay rounded-md) -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-hairline">
+          <button 
+            type="button" 
+            id="modal-cancel-btn" 
+            class="text-caption font-bold text-muted bg-surface-card hover:bg-hairline rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="bg-primary hover:bg-primary-active text-on-primary font-sans text-caption font-bold rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Submit & Run AI Scan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: RESOLVE & VERIFY CIVIC ISSUE -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="resolve-issue-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-lg overflow-hidden flex flex-col animate-scale-up"
+      style="max-height: 90vh;"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight" id="resolve-modal-title">Verify & Resolve Issue</h3>
+        <button id="resolve-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Modal Form Body (Rounded 12px Inputs) -->
+      <form id="resolve-issue-form" class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[calc(90vh-120px)] no-scrollbar">
+        <input type="hidden" id="resolve-form-issue-id" value="" />
+
+        <!-- Resolution Notes -->
+        <div class="flex flex-col gap-1.5">
+          <label for="resolve-form-notes" class="text-caption-strong text-ink font-bold">Action Taken / Resolution Notes</label>
+          <textarea 
+            id="resolve-form-notes" 
+            placeholder="Describe what was done to resolve the issue (e.g. patched pothole, replaced streetlight bulb, cleared waste bins)..." 
+            required 
+            rows="3"
+            class="bg-canvas border border-hairline rounded-md p-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Resolution Photo Proof -->
+        <div class="flex flex-col gap-2">
+          <label class="text-caption-strong text-ink font-bold">Attach Resolution Photo Proof</label>
+          
+          <!-- File Input for Real Upload -->
+          <div class="flex flex-col gap-1">
+            <input 
+              type="file" 
+              id="resolve-form-file-upload" 
+              accept="image/*"
+              class="block w-full text-xs text-muted
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-xs file:font-semibold
+                file:bg-primary file:text-on-primary
+                hover:file:bg-primary-active
+                cursor-pointer"
+            />
+            <span class="text-[11px] text-muted">Upload a photo of the resolved state from your device.</span>
+          </div>
+
+          <div class="text-[11px] text-muted font-bold text-center py-0.5">OR</div>
+
+          <!-- Select Dropdown for Pre-seeded Fallback -->
+          <div class="flex flex-col gap-1">
+            <select 
+              id="resolve-form-media" 
+              class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary cursor-pointer text-ink"
+            >
+              <option value="pothole" selected>Patched Asphalt / Repaired Road</option>
+              <option value="streetlight">Working LED Light / Bright Street</option>
+              <option value="water">Repaired Water Line / Dry Footpath</option>
+              <option value="garbage">Cleared Trash Bins / Swept Street corner</option>
+            </select>
+            <span class="text-[11px] text-muted">Use a pre-seeded resolved asset.</span>
+          </div>
+        </div>
+
+        <!-- Verified By -->
+        <div class="flex flex-col gap-1.5">
+          <label for="resolve-form-by" class="text-caption-strong text-ink font-bold">Verified By</label>
+          <input 
+            type="text" 
+            id="resolve-form-by" 
+            value="Ritvik Vedangi (Citizen Verification)" 
+            required
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Action Buttons (Clay rounded-md) -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-hairline">
+          <button 
+            type="button" 
+            id="resolve-modal-cancel-btn" 
+            class="text-caption font-bold text-muted bg-surface-card hover:bg-hairline rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="bg-primary hover:bg-primary-active text-on-primary font-sans text-caption font-bold rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Verify & Close Issue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: DISPUTE RESOLVED ISSUE -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="dispute-issue-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-lg overflow-hidden flex flex-col animate-scale-up"
+      style="max-height: 90vh;"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight">Dispute Resolution</h3>
+        <button id="dispute-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Modal Form Body -->
+      <form id="dispute-issue-form" class="p-6 flex flex-col gap-5">
+        <input type="hidden" id="dispute-form-issue-id" value="" />
+
+        <div class="bg-red-50 border border-red-100 rounded-md p-3.5 text-xs text-red-800 leading-relaxed">
+          <strong>Disputing Resolution:</strong> Reopening this issue will notify the municipal authority. Your civic verification points will be updated, and the SLA compliance tracking will reset.
+        </div>
+
+        <!-- Dispute Notes -->
+        <div class="flex flex-col gap-1.5">
+          <label for="dispute-form-notes" class="text-caption-strong text-ink font-bold">Why is this fix unsatisfactory?</label>
+          <textarea 
+            id="dispute-form-notes" 
+            placeholder="Provide specific feedback (e.g., 'The pothole patch cracked after the first rain', 'Trash was cleared but bins are still leaking')..." 
+            required 
+            rows="4"
+            class="bg-canvas border border-hairline rounded-md p-3 text-[15px] focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 text-ink resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-hairline">
+          <button 
+            type="button" 
+            id="dispute-modal-cancel-btn" 
+            class="text-caption font-bold text-muted bg-surface-card hover:bg-hairline rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="bg-red-600 hover:bg-red-700 text-white font-sans text-caption font-bold rounded-md px-4 py-2.5 cursor-pointer active-scale transition-colors"
+          >
+            Reopen Issue
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: LOGIN / SIGNUP WIZARD -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="auth-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-sm overflow-hidden flex flex-col animate-scale-up"
+    >
+      <!-- Modal Header with Tab Toggle -->
+      <div class="border-b border-hairline px-6 py-4 flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-tagline font-bold text-ink font-display tracking-tight" id="auth-modal-title">Sign In</h3>
+          <button id="auth-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+        </div>
+        
+        <!-- Toggle Tabs -->
+        <div class="flex bg-surface-card p-1 rounded-md border border-divider-soft">
+          <button type="button" id="tab-login" class="flex-1 text-center py-1.5 rounded-md text-xs font-bold bg-canvas text-ink shadow-sm transition-all cursor-pointer">
+            Log In
+          </button>
+          <button type="button" id="tab-signup" class="flex-1 text-center py-1.5 rounded-md text-xs font-semibold text-muted hover:text-ink transition-all cursor-pointer">
+            Sign Up
+          </button>
+        </div>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="auth-form" class="p-6 flex flex-col gap-4">
+        <!-- Signup Only: Full Name -->
+        <div class="flex flex-col gap-1.5 hidden" id="auth-field-name">
+          <label for="auth-name" class="text-caption-strong text-ink font-bold">Full Name</label>
+          <input 
+            type="text" 
+            id="auth-name" 
+            placeholder="e.g. Ritvik Vedangi" 
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="flex flex-col gap-1.5">
+          <label for="auth-email" class="text-caption-strong text-ink font-bold">Email Address</label>
+          <input 
+            type="email" 
+            id="auth-email" 
+            placeholder="name@example.com" 
+            required
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="flex flex-col gap-1.5">
+          <label for="auth-password" class="text-caption-strong text-ink font-bold">Password</label>
+          <input 
+            type="password" 
+            id="auth-password" 
+            placeholder="••••••••" 
+            required
+            class="h-11 bg-canvas border border-hairline rounded-md px-3 text-[15px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-ink"
+          />
+        </div>
+
+        <!-- Action Button -->
+        <button 
+          type="submit" 
+          id="auth-submit-btn"
+          class="bg-primary hover:bg-primary-active text-on-primary font-sans text-caption font-bold rounded-md w-full h-11 flex items-center justify-center active-scale transition-colors cursor-pointer mt-2"
+        >
+          Log In
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MODAL: USER PROFILE / LOGOUT -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="profile-modal" 
+    class="hidden fixed inset-0 bg-surface-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 select-none animate-fade-in"
+  >
+    <div 
+      class="bg-canvas border border-hairline rounded-lg w-full max-w-sm overflow-hidden flex flex-col animate-scale-up"
+    >
+      <!-- Modal Header -->
+      <div class="border-b border-hairline px-6 py-4 flex items-center justify-between">
+        <h3 class="text-tagline font-bold text-ink font-display tracking-tight">Your Profile</h3>
+        <button id="profile-modal-close-btn" class="text-muted hover:text-ink cursor-pointer text-xl font-bold focus:outline-none">&times;</button>
+      </div>
+
+      <!-- Profile Body -->
+      <div class="p-6 flex flex-col items-center text-center gap-5">
+        <!-- Avatar badge -->
+        <div id="profile-modal-avatar" class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center font-bold text-2xl font-display border border-hairline shadow-sm">
+          RV
+        </div>
+        
+        <div>
+          <h4 class="text-lead font-bold text-ink font-display mb-1" id="profile-modal-name">Ritvik Vedangi</h4>
+          <p class="text-xs text-muted font-medium" id="profile-modal-badge">Level 1: Civic Scout</p>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="grid grid-cols-2 gap-4 w-full border-t border-b border-hairline py-4 my-2">
+          <div class="text-center border-r border-hairline">
+            <div class="text-lg font-bold text-ink" id="profile-modal-points">350</div>
+            <div class="text-[10px] uppercase font-mono text-muted font-bold">Points</div>
+          </div>
+          <div class="text-center">
+            <div class="text-lg font-bold text-ink">Vadodara</div>
+            <div class="text-[10px] uppercase font-mono text-muted font-bold">Region</div>
+          </div>
+        </div>
+
+        <!-- Logout button -->
+        <button 
+          type="button" 
+          id="profile-logout-btn"
+          class="bg-surface-card hover:bg-hairline text-ink border border-hairline font-sans text-caption font-bold rounded-md w-full h-11 flex items-center justify-center active-scale transition-colors cursor-pointer"
+        >
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MOCK AI SCAN OVERLAY SCREEN -->
+  <!-- ---------------------------------------------------- -->
+  <div 
+    id="ai-scanning-overlay" 
+    class="hidden fixed inset-0 bg-surface-black/85 backdrop-blur-sm z-[100] flex flex-col items-center justify-center text-center p-6 select-none animate-fade-in"
+  >
+    <div class="max-w-md flex flex-col items-center gap-6">
+      <!-- Rotating AI Core Ring -->
+      <div class="relative w-24 h-24">
+        <div class="absolute inset-0 rounded-full border-4 border-brand-mint/20 border-t-brand-mint animate-spin"></div>
+        <div class="absolute inset-2 rounded-full border-4 border-brand-pink/10 border-b-brand-pink animate-reverse-spin"></div>
+        <div class="absolute inset-4 rounded-full bg-surface-dark border border-hairline/10 flex items-center justify-center">
+          <svg class="w-6 h-6 text-brand-mint animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.904-4.43a9.002 9.002 0 10-18.09 0H3.75" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <h3 class="text-tagline font-bold text-white tracking-wide font-display">Pinpoint AI Engine</h3>
+        <p class="text-caption text-on-dark-soft h-6 overflow-hidden" id="ai-scanning-status-text">
+          Initializing image/video analysis...
+        </p>
+      </div>
+
+      <!-- Live metrics tags during analysis -->
+      <div class="flex flex-col gap-2 w-72 text-left bg-surface-dark-elevated border border-hairline/10 p-4 rounded-md text-xs font-mono">
+        <div class="flex justify-between text-on-dark-soft">
+          <span>Vision Classifier:</span>
+          <span class="text-brand-mint font-semibold" id="ai-metric-vision">Scanning...</span>
+        </div>
+        <div class="flex justify-between text-on-dark-soft">
+          <span>Locality Bounds:</span>
+          <span class="text-brand-mint font-semibold" id="ai-metric-geo">Aligning GPS...</span>
+        </div>
+        <div class="flex justify-between text-on-dark-soft text-[11px]">
+          <span>Severity Evaluator:</span>
+          <span class="text-brand-mint font-semibold" id="ai-metric-severity">Evaluating...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-notification" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-6 py-3 rounded-pill shadow-lg z-50 text-caption font-bold flex items-center gap-2.5 animate-toast-slide-up border border-hairline">
+    <span class="text-brand-mint">✓</span>
+    <span id="toast-message">Success message</span>
+  </div>

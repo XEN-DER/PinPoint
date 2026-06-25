@@ -1,5 +1,11 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import '../styles/app.css';
+import GlobalNav from '../components/GlobalNav.astro';
+import SubNav from '../components/SubNav.astro';
+import Footer from '../components/Footer.astro';
+import Modals from '../components/Modals.astro';
+import GlobalScripts from '../components/GlobalScripts.astro';
 
 interface Props {
 	title?: string;
@@ -17,6 +23,7 @@ const {
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<ClientRouter />
 		
 		<!-- Theme Initialization Script (Prevents flash) -->
 		<script is:inline>
@@ -66,7 +73,14 @@ const {
 
 		<meta name="generator" content={Astro.generator} />
 	</head>
-	<body class="h-full bg-canvas text-body text-[16px] leading-[1.55] font-sans antialiased flex flex-col">
-		<slot />
+	<body class="h-full bg-canvas text-body text-[16px] leading-[1.55] font-sans antialiased flex flex-col relative">
+		<GlobalNav />
+		<SubNav />
+		<div class="flex-grow pt-[104px]">
+			<slot />
+		</div>
+		<Footer />
+		<Modals />
+		<GlobalScripts />
 	</body>
 </html>

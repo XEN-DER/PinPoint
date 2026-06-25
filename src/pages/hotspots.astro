@@ -1,0 +1,95 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Hotspots Map - Pinpoint">
+  <div class="max-w-4xl mx-auto px-6 pt-12 pb-4 animate-toast-slide-up">
+    <h1 class="text-hero-display text-ink">Hotspots Map</h1>
+    <p class="text-body text-lg mt-2">Visualize problem areas and neighborhood clusters in real-time.</p>
+  </div>
+    <section id="hotspots-section" class="bg-surface-dark text-on-dark border-b border-hairline/10 py-8 px-6 sm:px-12 scroll-mt-[52px]">
+      <div class="max-w-[1280px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <!-- Left Content: Overview & Heatmap Stats -->
+          <div class="lg:col-span-6">
+            <span class="text-brand-mint text-caption-uppercase tracking-[1.5px] font-bold mb-3 block">AI PREDICTIVE INSIGHTS</span>
+            <h2 class="text-display-md text-white font-medium mb-4 leading-tight font-display tracking-tight">
+              Community Hotspots & Trends
+            </h2>
+            <p class="text-body-md text-on-dark-soft mb-8 leading-relaxed">
+              Pinpoint applies historical analytical heuristics to locate community infrastructure distress zones. System algorithms predict recurring water failures and municipal garbage bottlenecks, advising local departments on resource allocation.
+            </p>
+            
+            <!-- Locality breakdown progress bars -->
+            <div class="flex flex-col gap-5">
+              <div>
+                <div class="flex justify-between text-caption text-white mb-1.5">
+                  <span class="font-semibold">Ajwa Road (Water Line Failures)</span>
+                  <span class="text-brand-pink font-semibold">Critical Threat</span>
+                </div>
+                <div class="h-2.5 w-full bg-surface-dark-elevated rounded-full overflow-hidden">
+                  <div class="h-full bg-brand-pink rounded-full" style="width: 82%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-caption text-white mb-1.5">
+                  <span class="font-semibold">Bapod (Pothole Fissures)</span>
+                  <span class="text-brand-ochre font-semibold">Medium Threat</span>
+                </div>
+                <div class="h-2.5 w-full bg-surface-dark-elevated rounded-full overflow-hidden">
+                  <div class="h-full bg-brand-ochre rounded-full" style="width: 58%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-caption text-white mb-1.5">
+                  <span class="font-semibold">Waghodia Road (Waste Logistical Bottlenecks)</span>
+                  <span class="text-brand-mint font-semibold">Under Control</span>
+                </div>
+                <div class="h-2.5 w-full bg-surface-dark-elevated rounded-full overflow-hidden">
+                  <div class="h-full bg-brand-mint rounded-full" style="width: 25%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Content: Hotspots Alerts Widget (Dark Tile 2) -->
+          <div class="lg:col-span-6 bg-surface-dark-elevated border border-hairline/10 p-8 rounded-lg">
+            <h3 class="text-title-md text-white font-semibold mb-6 flex items-center gap-2">
+              <svg class="w-4 h-4 text-brand-coral animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              Predictive Alerts Feed
+            </h3>
+            
+            <div class="flex flex-col gap-4" id="predictive-alerts">
+              <!-- Alert Card 1 -->
+              <div class="bg-surface-dark border border-hairline/10 p-5 rounded-md flex items-start gap-4">
+                <span class="text-xl leading-none mt-1">âš ï¸</span>
+                <div>
+                  <h4 class="text-caption-strong text-white font-bold mb-1">Water mains recurrence in Ajwa Road</h4>
+                  <p class="text-xs text-on-dark-soft leading-relaxed mb-3">
+                    Water pipe fractures detected 3 times within 150m of Sayaji Park Road. High probability of underlying ground instability.
+                  </p>
+                  <span class="text-[10px] uppercase font-mono font-bold tracking-wider bg-brand-coral/20 text-brand-coral px-2.5 py-0.5 rounded">Action Suggested: Main Replacement</span>
+                </div>
+              </div>
+
+              <!-- Alert Card 2 -->
+              <div class="bg-surface-dark border border-hairline/10 p-5 rounded-md flex items-start gap-4">
+                <span class="text-xl leading-none mt-1">ðŸ“ˆ</span>
+                <div>
+                  <h4 class="text-caption-strong text-white font-bold mb-1">Pothole hotspot cluster in Bapod</h4>
+                  <p class="text-xs text-on-dark-soft leading-relaxed mb-3">
+                    Road surface degradation accelerated along Bapod Main Road. Traffic density modeling predicts secondary fissures.
+                  </p>
+                  <span class="text-[10px] uppercase font-mono font-bold tracking-wider bg-brand-ochre/20 text-brand-ochre px-2.5 py-0.5 rounded">Action Suggested: Patching Scheduled</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+</Layout>

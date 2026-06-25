@@ -23,10 +23,11 @@
   <div class="flex items-center gap-6">
     <!-- Inline Navigation Tabs in Clay's category-tab pill grammar -->
     <div class="hidden lg:flex items-center gap-2" id="subnav-tabs-container">
-      <a href="#feed-section" class="active-tab bg-surface-card text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Active Issues</a>
-      <a href="#analytics-section" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Impact</a>
-      <a href="#hotspots-section" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Hotspots</a>
-      <a href="#gamification-section" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150">Leaderboard</a>
+      <a href="/" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150" data-route="/">Home</a>
+      <a href="/feed" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150" data-route="/feed">Active Issues</a>
+      <a href="/hotspots" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150" data-route="/hotspots">Hotspots</a>
+      <a href="/impact" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150" data-route="/impact">Impact</a>
+      <a href="/leaderboard" class="text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150" data-route="/leaderboard">Leaderboard</a>
     </div>
 
     <!-- Report Issue CTA - Clay B2B near-black primary rounded button (rounded: 12px, height: 44px) -->
@@ -62,6 +63,7 @@
 </div>
 
 <script>
+document.addEventListener('astro:page-load', () => {
   // Setup click handler to open the Report Modal
   const reportBtn = document.getElementById('subnav-report-btn');
   if (reportBtn) {
@@ -71,15 +73,18 @@
     });
   }
 
-  // Handle active subnav pill tab highlights on scroll or click
+  // Handle active subnav pill tab highlights
   const tabLinks = document.querySelectorAll('#subnav-tabs-container a');
+  const currentPath = window.location.pathname;
+  
   tabLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      tabLinks.forEach(t => {
-        t.className = "text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150";
-      });
+    const route = link.getAttribute('data-route');
+    // Basic exact match or prefix match logic
+    if (currentPath === route || (route !== '/' && currentPath.startsWith(route))) {
       link.className = "active-tab bg-surface-card text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150";
-    });
+    } else {
+      link.className = "text-muted hover:text-ink px-4 py-1.5 rounded-pill text-caption font-semibold transition-colors duration-150";
+    }
   });
 
   // Hook into localStorage stats updates
@@ -192,7 +197,7 @@
     }
   });
 
-  // Update on mount
+  // Re-run theme application when view changes
   updateNavStats();
   renderAuthState();
 
@@ -202,4 +207,5 @@
     updateNavStats();
     renderAuthState();
   });
+});
 </script>
