@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import LeafletMap from '../components/Map.astro';
 ---
 
 <Layout title="Pinpoint — Hyperlocal Civic Action Platform">
@@ -19,7 +20,10 @@ import Layout from '../layouts/Layout.astro';
       
       <!-- Right Feature Graphic (Clean geometric composition) -->
       <div class="flex-1 w-full max-w-lg aspect-square bg-surface-card border border-hairline rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden group shadow-sm animate-slide-up-fade stagger-1">
-        <div class="absolute inset-0 bg-gradient-to-br from-brand-lavender/5 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-0 z-0 opacity-80">
+          <LeafletMap className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out pointer-events-auto" />
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-lavender/20 to-surface-card/50 pointer-events-none z-0"></div>
         <div class="flex justify-between items-start w-full relative z-10">
           <div class="bg-canvas border border-hairline px-4 py-2 rounded-full text-caption font-bold shadow-sm flex items-center gap-2 group-hover:-translate-y-1 transition-transform">
             <span class="w-2 h-2 rounded-full bg-brand-pink animate-pulse"></span>

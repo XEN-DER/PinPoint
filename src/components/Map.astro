@@ -1,8 +1,12 @@
 ---
 // Interactive Leaflet.js Map component for Pinpoint localized to Vadodara, India (Bapod area)
+interface Props {
+  className?: string;
+}
+const { className = "relative w-full h-[360px] md:h-[450px] bg-canvas border border-hairline rounded-lg overflow-hidden select-none z-10 shadow-sm" } = Astro.props;
 ---
 
-<div class="relative w-full h-[360px] md:h-[450px] bg-canvas border border-hairline rounded-lg overflow-hidden select-none z-10 shadow-sm">
+<div class={className}>
   <!-- Map Legend (Top Left) -->
   <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3.5 py-2.5 rounded-md z-20 flex flex-col gap-1.5 text-xs text-ink shadow-sm pointer-events-none">
     <div class="font-bold text-[10px] uppercase tracking-wider text-muted mb-0.5">Status Legend</div>
