@@ -10,6 +10,36 @@
     });
   }
 
+  // Helper to check if url/base64 is a video
+  function isVideo(url: string): boolean {
+    if (!url) return false;
+    if (url.startsWith('data:video/')) return true;
+    const cleanUrl = url.split('?')[0].split('#')[0];
+    return /\.(mp4|webm|mov|ogg|m4v|avi|mkv)$/i.test(cleanUrl);
+  }
+
+  // Helper to render media element (video or image)
+  function renderMediaElement(url: string, alt: string, className: string = '', badgeHtml: string = ''): string {
+    const baseClass = "w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity";
+    const extraClass = className ? ` ${className}` : '';
+    
+    if (isVideo(url)) {
+      return `
+        <div class="relative w-full h-48 rounded-md overflow-hidden border border-hairline/20 shadow-product">
+          <video src="${url}" class="w-full h-full object-cover" autoplay loop muted playsinline controls></video>
+          ${badgeHtml}
+        </div>
+      `;
+    } else {
+      return `
+        <div class="relative w-full h-48 rounded-md overflow-hidden">
+          <img src="${url}" alt="${alt}" class="${baseClass}${extraClass}" />
+          ${badgeHtml}
+        </div>
+      `;
+    }
+  }
+
   // Helper to calculate SLA timers
   function getSLATimerHtml(issue: any, textLight: boolean): string {
     const reportDateStr = issue.date;
@@ -161,6 +191,21 @@
       date: "2026-06-19",
       reportedBy: "Kavita Verma",
       imageUrl: "/images/pothole_vadodara.png"
+    },
+    {
+      id: "issue-6",
+      title: "Flickering Streetlight on Waghodia Road",
+      description: "A streetlight near the intersection is flickering rapidly, creating distracting and unsafe driving conditions at night. Dispatched team to investigate.",
+      category: "Streetlight",
+      severity: "Low",
+      status: "Open",
+      locality: "Waghodia Road",
+      verifications: 1,
+      lat: 22.3010,
+      lng: 73.2220,
+      date: "2026-06-23",
+      reportedBy: "Sneha Patel",
+      imageUrl: "https://assets.mixkit.co/videos/preview/mixkit-very-dark-street-at-night-with-a-single-street-lamp-43187-large.mp4"
     }
   ];
 
@@ -512,6 +557,9 @@
       if (mediaVal === 'streetlight') resolvedImageUrl = "/images/streetlight_fixed_vadodara.png";
       if (mediaVal === 'water') resolvedImageUrl = "/images/water_fixed_vadodara.png";
       if (mediaVal === 'garbage') resolvedImageUrl = "/images/garbage_fixed_vadodara.png";
+      if (mediaVal === 'pothole_video_fixed') resolvedImageUrl = "https://assets.mixkit.co/videos/preview/mixkit-driving-on-a-smooth-asphalt-road-in-a-forest-41558-large.mp4";
+      if (mediaVal === 'water_video_fixed') resolvedImageUrl = "https://assets.mixkit.co/videos/preview/mixkit-water-flowing-through-a-stone-channel-in-a-garden-48924-large.mp4";
+      if (mediaVal === 'streetlight_video_fixed') resolvedImageUrl = "https://assets.mixkit.co/videos/preview/mixkit-street-lights-at-night-in-a-city-43159-large.mp4";
     }
     
     const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
@@ -958,18 +1006,16 @@
         imageElement = `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
             <div class="relative">
-              <img src="${originalImg}" alt="Before - ${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity" />
-              <span class="absolute top-2 left-2 bg-black/75 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow">BEFORE (Reported)</span>
+              ${renderMediaElement(originalImg, `Before - ${issue.title}`, "", `<span class="absolute top-2 left-2 bg-black/75 text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow z-20">BEFORE (Reported)</span>`)}
             </div>
             <div class="relative">
-              <img src="${resolvedImg}" alt="After - ${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product hover:opacity-95 transition-opacity border-success/30" />
-              <span class="absolute top-2 left-2 bg-success text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow">AFTER (Resolved)</span>
+              ${renderMediaElement(resolvedImg, `After - ${issue.title}`, "border-success/30", `<span class="absolute top-2 left-2 bg-success text-white text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded shadow z-20">AFTER (Resolved)</span>`)}
             </div>
           </div>
         `;
       } else {
         imageElement = issue.imageUrl 
-          ? `<img src="${issue.imageUrl}" alt="${issue.title}" class="w-full h-48 object-cover rounded-md border border-hairline/20 shadow-product mb-5 hover:opacity-95 transition-opacity" />`
+          ? renderMediaElement(issue.imageUrl, issue.title)
           : '';
       }
 
@@ -1202,11 +1248,16 @@
       aiOverlay.classList.add('flex');
     }
 
+    const isVideoFile = (fileInput?.files?.[0]?.type?.startsWith('video/')) || isVideo(mediaSelection);
+    const mediaLoadedText = isVideoFile ? "Video Stream Loaded." : "Media Loaded.";
+    const scanningText = isVideoFile ? "Extracting video frames and analyzing motion vectors..." : "Scanning description for key infrastructure indicators...";
+    const mediaVerifiedText = isVideoFile ? "Video Frames Verified." : "Image Verified.";
+
     const states = [
       { text: "Initializing AI Vision Analyzer...", v: "Activating...", g: "Pending...", s: "Pending..." },
-      { text: "Scanning description for key infrastructure indicators...", v: "Media Loaded.", g: "Locality Locked.", s: "Pending..." },
-      { text: `Verifying coordinates [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]...`, v: "Media Loaded.", g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Scanning Hazards..." },
-      { text: "Analyzing severity hazard index...", v: "Media Verified.", g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Determining SLA Class..." },
+      { text: scanningText, v: mediaLoadedText, g: "Locality Locked.", s: "Pending..." },
+      { text: `Verifying coordinates [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]...`, v: mediaLoadedText, g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Scanning Hazards..." },
+      { text: "Analyzing severity hazard index...", v: mediaVerifiedText, g: `Locked [${latVal.toFixed(4)}, ${lngVal.toFixed(4)}]`, s: "Determining SLA Class..." },
       { text: "Finalizing civic report...", v: "Complete.", g: "Complete.", s: "Complete." }
     ];
 
@@ -1236,6 +1287,9 @@
         if (mediaSelection === 'streetlight') imageUrl = "/images/streetlight_vadodara.png";
         if (mediaSelection === 'water') imageUrl = "/images/water_vadodara.png";
         if (mediaSelection === 'garbage') imageUrl = "/images/garbage_vadodara.png";
+        if (mediaSelection === 'pothole_video') imageUrl = "https://assets.mixkit.co/videos/preview/mixkit-pothole-in-the-road-with-water-43034-large.mp4";
+        if (mediaSelection === 'water_video') imageUrl = "https://assets.mixkit.co/videos/preview/mixkit-water-pouring-from-a-pipe-42289-large.mp4";
+        if (mediaSelection === 'streetlight_video') imageUrl = "https://assets.mixkit.co/videos/preview/mixkit-very-dark-street-at-night-with-a-single-street-lamp-43187-large.mp4";
       }
 
       const newIssue = {

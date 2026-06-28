@@ -12,7 +12,7 @@ import Footer from '../components/Footer.astro';
     <div id="admin-login-gate" class="flex-grow flex items-center justify-center py-24 px-6 relative z-30">
       <div class="w-full max-w-sm flex flex-col gap-8">
         <div class="text-center">
-          <div class="inline-flex items-center justify-center w-10 h-10 bg-ink text-white rounded-full font-bold text-sm mb-3">
+          <div class="inline-flex items-center justify-center w-10 h-10 bg-primary text-on-primary rounded-full font-bold text-sm mb-3">
             VMC
           </div>
           <h2 class="text-display-sm text-ink font-medium tracking-tight">Authority Portal</h2>
@@ -46,7 +46,7 @@ import Footer from '../components/Footer.astro';
 
           <button 
             type="submit" 
-            class="w-full h-11 bg-ink hover:bg-primary-active text-white text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer mt-4"
+            class="w-full h-11 bg-primary hover:bg-primary-active text-on-primary text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer mt-4"
           >
             Sign In to Portal
           </button>
@@ -264,7 +264,7 @@ import Footer from '../components/Footer.astro';
           <span id="modal-issue-id" class="text-[9px] font-bold text-muted uppercase tracking-wider">Case ID</span>
           <h3 id="modal-issue-title" class="text-body-strong font-bold text-ink tracking-tight mt-0.5">Title Details</h3>
         </div>
-        <button id="modal-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-card text-muted hover:text-ink transition-colors cursor-pointer text-lg font-light">
+        <button id="admin-drawer-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-card text-muted hover:text-ink transition-colors cursor-pointer text-lg font-light">
           &times;
         </button>
       </div>
@@ -308,6 +308,7 @@ import Footer from '../components/Footer.astro';
           <span class="text-[9px] font-bold text-muted uppercase tracking-wider">Report Attachment</span>
           <div class="relative w-full h-[180px] rounded border border-hairline overflow-hidden bg-surface-card flex items-center justify-center mt-1">
             <img id="modal-image" class="w-full h-full object-cover" src="" alt="Citizen attachment" />
+            <video id="modal-video" class="w-full h-full object-cover hidden" autoplay loop muted playsinline controls></video>
           </div>
         </div>
 
@@ -390,7 +391,8 @@ import Footer from '../components/Footer.astro';
               />
               <div class="w-full h-24 rounded border border-hairline overflow-hidden mt-1.5 bg-surface-card flex items-center justify-center">
                 <img id="resolve-image-preview" src="" alt="Proof Preview" class="w-full h-full object-cover hidden" />
-                <span id="resolve-image-placeholder" class="text-[9px] text-muted-soft">No proof image loaded</span>
+                <video id="resolve-video-preview" src="" class="w-full h-full object-cover hidden" autoplay loop muted playsinline controls></video>
+                <span id="resolve-image-placeholder" class="text-[9px] text-muted-soft">No proof media loaded</span>
               </div>
             </div>
           </div>
@@ -399,13 +401,13 @@ import Footer from '../components/Footer.astro';
           <div class="flex flex-col gap-2 mt-4 pt-4 border-t border-hairline">
             <button 
               type="submit" 
-              class="w-full h-11 bg-ink hover:bg-primary-active text-white text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer"
+              class="w-full h-11 bg-primary hover:bg-primary-active text-on-primary text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer"
             >
               Update & Dispatch SLA
             </button>
             <button 
               type="button" 
-              id="modal-cancel-btn" 
+              id="admin-drawer-cancel-btn" 
               class="w-full h-11 bg-transparent hover:bg-surface-card text-ink text-button-utility font-semibold rounded-md flex items-center justify-center active-scale transition-colors cursor-pointer"
             >
               Cancel
@@ -417,9 +419,9 @@ import Footer from '../components/Footer.astro';
     </div>
 
     <!-- Notification Toast -->
-    <div id="toast-notification" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-ink text-white border border-white/10 rounded-md py-3 px-6 shadow-md flex items-center gap-3 animate-slide-up-fade">
+    <div id="admin-toast-notification" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-primary text-on-primary border border-white/10 rounded-md py-3 px-6 shadow-md flex items-center gap-3 animate-slide-up-fade">
       <span class="text-sm">🔔</span>
-      <span id="toast-message" class="text-xs font-semibold font-sans">Notification text</span>
+      <span id="admin-toast-message" class="text-xs font-semibold font-sans">Notification text</span>
     </div>
   </main>
 
@@ -427,8 +429,16 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <script>
-  // Auth flags
-  let adminAuthorized = localStorage.getItem('pinpoint_admin_authorized') === 'true';
+    // Helper to check if url/base64 is a video
+    function isVideo(url: string): boolean {
+      if (!url) return false;
+      if (url.startsWith('data:video/')) return true;
+      const cleanUrl = url.split('?')[0].split('#')[0];
+      return /\.(mp4|webm|mov|ogg|m4v|avi|mkv)$/i.test(cleanUrl);
+    }
+
+    // Auth flags
+    let adminAuthorized = localStorage.getItem('pinpoint_admin_authorized') === 'true';
   const loginGate = document.getElementById('admin-login-gate');
   const dashboardContent = document.getElementById('admin-dashboard-content');
   const loginForm = document.getElementById('admin-login-form');
@@ -455,17 +465,18 @@ import Footer from '../components/Footer.astro';
   // Drawer Elements
   const detailDrawer = document.getElementById('admin-detail-drawer');
   const drawerBackdrop = document.getElementById('drawer-backdrop');
-  const modalCloseBtn = document.getElementById('modal-close-btn');
-  const modalCancelBtn = document.getElementById('modal-cancel-btn');
+  const modalCloseBtn = document.getElementById('admin-drawer-close-btn');
+  const modalCancelBtn = document.getElementById('admin-drawer-cancel-btn');
   const actionForm = document.getElementById('modal-action-form');
   const actionStatus = document.getElementById('action-status') as HTMLSelectElement;
   const actionDept = document.getElementById('action-dept') as HTMLSelectElement;
   const resolutionContainer = document.getElementById('resolution-fields-container');
   const resolveNotes = document.getElementById('resolve-notes') as HTMLTextAreaElement;
   const resolveBy = document.getElementById('resolve-by') as HTMLInputElement;
-  const resolveImage = document.getElementById('resolve-image') as HTMLInputElement;
-  const resolveImagePreview = document.getElementById('resolve-image-preview') as HTMLImageElement;
-  const resolveImagePlaceholder = document.getElementById('resolve-image-placeholder');
+    const resolveImage = document.getElementById('resolve-image') as HTMLInputElement;
+    const resolveImagePreview = document.getElementById('resolve-image-preview') as HTMLImageElement;
+    const resolveVideoPreview = document.getElementById('resolve-video-preview') as HTMLVideoElement;
+    const resolveImagePlaceholder = document.getElementById('resolve-image-placeholder');
   const btnAutofill = document.getElementById('btn-autofill-resolution');
 
   // Constants
@@ -503,8 +514,8 @@ import Footer from '../components/Footer.astro';
 
   // Toast Helper
   function showToast(message: string) {
-    const toast = document.getElementById('toast-notification');
-    const toastMsg = document.getElementById('toast-message');
+    const toast = document.getElementById('admin-toast-notification');
+    const toastMsg = document.getElementById('admin-toast-message');
     if (toast && toastMsg) {
       toastMsg.textContent = message;
       toast.classList.remove('hidden');
@@ -926,6 +937,7 @@ import Footer from '../components/Footer.astro';
     const modalGps = document.getElementById('modal-gps');
     const modalDesc = document.getElementById('modal-desc');
     const modalImage = document.getElementById('modal-image') as HTMLImageElement;
+    const modalVideo = document.getElementById('modal-video') as HTMLVideoElement;
 
     if (modalId) modalId.textContent = issue.id.toUpperCase();
     if (modalTitle) modalTitle.textContent = issue.title;
@@ -934,7 +946,19 @@ import Footer from '../components/Footer.astro';
     if (modalLocality) modalLocality.textContent = issue.locality;
     if (modalGps) modalGps.textContent = `${issue.lat.toFixed(4)}, ${issue.lng.toFixed(4)}`;
     if (modalDesc) modalDesc.textContent = issue.description || 'No description provided.';
-    if (modalImage) modalImage.src = issue.imageUrl || '/images/pothole.png';
+    if (isVideo(issue.imageUrl)) {
+      if (modalVideo) {
+        modalVideo.src = issue.imageUrl;
+        modalVideo.classList.remove('hidden');
+      }
+      if (modalImage) modalImage.classList.add('hidden');
+    } else {
+      if (modalImage) {
+        modalImage.src = issue.imageUrl || '/images/pothole.png';
+        modalImage.classList.remove('hidden');
+      }
+      if (modalVideo) modalVideo.classList.add('hidden');
+    }
 
     // Set SLA details
     const slaEl = document.getElementById('modal-sla-badge');
@@ -964,11 +988,23 @@ import Footer from '../components/Footer.astro';
       resolveImage.value = issue.resolvedImageUrl || '';
       
       if (issue.resolvedImageUrl) {
-        resolveImagePreview.src = issue.resolvedImageUrl;
-        resolveImagePreview.classList.remove('hidden');
+        if (isVideo(issue.resolvedImageUrl)) {
+          if (resolveVideoPreview) {
+            resolveVideoPreview.src = issue.resolvedImageUrl;
+            resolveVideoPreview.classList.remove('hidden');
+          }
+          if (resolveImagePreview) resolveImagePreview.classList.add('hidden');
+        } else {
+          if (resolveImagePreview) {
+            resolveImagePreview.src = issue.resolvedImageUrl;
+            resolveImagePreview.classList.remove('hidden');
+          }
+          if (resolveVideoPreview) resolveVideoPreview.classList.add('hidden');
+        }
         resolveImagePlaceholder?.classList.add('hidden');
       } else {
-        resolveImagePreview.classList.add('hidden');
+        if (resolveImagePreview) resolveImagePreview.classList.add('hidden');
+        if (resolveVideoPreview) resolveVideoPreview.classList.add('hidden');
         resolveImagePlaceholder?.classList.remove('hidden');
       }
     } else {
@@ -976,7 +1012,8 @@ import Footer from '../components/Footer.astro';
       resolveNotes.value = '';
       resolveBy.value = '';
       resolveImage.value = '';
-      resolveImagePreview.classList.add('hidden');
+      if (resolveImagePreview) resolveImagePreview.classList.add('hidden');
+      if (resolveVideoPreview) resolveVideoPreview.classList.add('hidden');
       resolveImagePlaceholder?.classList.remove('hidden');
     }
 
@@ -1026,11 +1063,23 @@ import Footer from '../components/Footer.astro';
   resolveImage?.addEventListener('input', () => {
     const val = resolveImage.value.trim();
     if (val) {
-      resolveImagePreview.src = val;
-      resolveImagePreview.classList.remove('hidden');
-      resolveImagePlaceholder?.classList.add('hidden');
+      if (isVideo(val)) {
+        if (resolveVideoPreview) {
+          resolveVideoPreview.src = val;
+          resolveVideoPreview.classList.remove('hidden');
+        }
+        if (resolveImagePreview) resolveImagePreview.classList.add('hidden');
+      } else {
+        if (resolveImagePreview) {
+          resolveImagePreview.src = val;
+          resolveImagePreview.classList.remove('hidden');
+        }
+        if (resolveVideoPreview) resolveVideoPreview.classList.add('hidden');
+      }
+      resolveImagePlaceholder?.shadowRoot || resolveImagePlaceholder?.classList.add('hidden');
     } else {
-      resolveImagePreview.classList.add('hidden');
+      if (resolveImagePreview) resolveImagePreview.classList.add('hidden');
+      if (resolveVideoPreview) resolveVideoPreview.classList.add('hidden');
       resolveImagePlaceholder?.classList.remove('hidden');
     }
   });
@@ -1066,8 +1115,19 @@ import Footer from '../components/Footer.astro';
     resolveBy.value = crew;
     resolveImage.value = img;
     
-    resolveImagePreview.src = img;
-    resolveImagePreview.classList.remove('hidden');
+    if (isVideo(img)) {
+      if (resolveVideoPreview) {
+        resolveVideoPreview.src = img;
+        resolveVideoPreview.classList.remove('hidden');
+      }
+      if (resolveImagePreview) resolveImagePreview.classList.add('hidden');
+    } else {
+      if (resolveImagePreview) {
+        resolveImagePreview.src = img;
+        resolveImagePreview.classList.remove('hidden');
+      }
+      if (resolveVideoPreview) resolveVideoPreview.classList.add('hidden');
+    }
     resolveImagePlaceholder?.classList.add('hidden');
   }
 

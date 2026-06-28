@@ -125,14 +125,14 @@
 
         <!-- Attached Media -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-white font-bold">Attach Photo Evidence</label>
+          <label class="text-sm font-medium text-white font-bold">Attach Photo or Video Evidence</label>
           
           <!-- File Input for Real Upload -->
           <div class="flex flex-col gap-1">
             <input 
               type="file" 
               id="form-file-upload" 
-              accept="image/*"
+              accept="image/*,video/*"
               class="block w-full text-xs text-on-dark-soft
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
@@ -141,7 +141,7 @@
                 hover:file:bg-primary-active
                 cursor-pointer"
             />
-            <span class="text-[11px] text-on-dark-soft">Upload a real photo from your device.</span>
+            <span class="text-[11px] text-on-dark-soft">Upload a real photo or video from your device.</span>
           </div>
 
           <div class="text-[11px] text-on-dark-soft font-bold text-center py-0.5">OR</div>
@@ -156,6 +156,9 @@
               <option value="streetlight">Dark Alleyway Streetlamp (Dusk Render)</option>
               <option value="water">Sidewalk Water Pipe Burst (Water Render)</option>
               <option value="garbage">Central Square Overfilled Trash Bins (Recycle Render)</option>
+              <option value="pothole_video">Suburban Pothole (Video Scan - MP4)</option>
+              <option value="water_video">Water Leakage Flow (Video Scan - MP4)</option>
+              <option value="streetlight_video">Flickering Streetlight (Video Scan - MP4)</option>
             </select>
             <span class="text-[11px] text-on-dark-soft">Use a pre-seeded photorealistic asset.</span>
           </div>
@@ -216,14 +219,14 @@
 
         <!-- Resolution Photo Proof -->
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-white font-bold">Attach Resolution Photo Proof</label>
+          <label class="text-sm font-medium text-white font-bold">Attach Resolution Photo or Video Proof</label>
           
           <!-- File Input for Real Upload -->
           <div class="flex flex-col gap-1">
             <input 
               type="file" 
               id="resolve-form-file-upload" 
-              accept="image/*"
+              accept="image/*,video/*"
               class="block w-full text-xs text-on-dark-soft
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
@@ -232,7 +235,7 @@
                 hover:file:bg-primary-active
                 cursor-pointer"
             />
-            <span class="text-[11px] text-on-dark-soft">Upload a photo of the resolved state from your device.</span>
+            <span class="text-[11px] text-on-dark-soft">Upload a photo or video of the resolved state from your device.</span>
           </div>
 
           <div class="text-[11px] text-on-dark-soft font-bold text-center py-0.5">OR</div>
@@ -247,6 +250,9 @@
               <option value="streetlight">Working LED Light / Bright Street</option>
               <option value="water">Repaired Water Line / Dry Footpath</option>
               <option value="garbage">Cleared Trash Bins / Swept Street corner</option>
+              <option value="pothole_video_fixed">Repaired Road (Video Verification - MP4)</option>
+              <option value="water_video_fixed">Repaired Water Line (Video Verification - MP4)</option>
+              <option value="streetlight_video_fixed">Working LED Light (Video Verification - MP4)</option>
             </select>
             <span class="text-[11px] text-on-dark-soft">Use a pre-seeded resolved asset.</span>
           </div>
