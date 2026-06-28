@@ -375,12 +375,29 @@
       icon: pickerIcon
     }).addTo(reportMap);
 
+    function detectLocality(lat: number, lng: number) {
+      let closestLocality = '';
+      let minDistance = Infinity;
+      for (const [name, center] of Object.entries(localityCenters)) {
+        const dist = Math.pow(lat - center[0], 2) + Math.pow(lng - center[1], 2);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closestLocality = name;
+        }
+      }
+      const select = document.getElementById('form-locality') as HTMLSelectElement;
+      if (select && closestLocality && select.value !== closestLocality) {
+        select.value = closestLocality;
+      }
+    }
+
     function updateCoords(lat: number, lng: number) {
       const formLat = document.getElementById('form-lat') as HTMLInputElement;
       const formLng = document.getElementById('form-lng') as HTMLInputElement;
       if (formLat) formLat.value = lat.toFixed(6);
       if (formLng) formLng.value = lng.toFixed(6);
       reportMarker.setLatLng([lat, lng]);
+      detectLocality(lat, lng);
     }
 
     reportMarker.on('dragend', () => {
@@ -390,6 +407,31 @@
 
     reportMap.on('click', (e: any) => {
       updateCoords(e.latlng.lat, e.latlng.lng);
+    });
+
+    const btnLocateMe = document.getElementById('btn-locate-me');
+    btnLocateMe?.addEventListener('click', () => {
+      if (navigator.geolocation) {
+        btnLocateMe.classList.add('animate-pulse');
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            btnLocateMe.classList.remove('animate-pulse');
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            reportMap.setView([lat, lng], 16);
+            updateCoords(lat, lng);
+            showToast("Location updated from GPS!");
+          },
+          (error) => {
+            btnLocateMe.classList.remove('animate-pulse');
+            console.error("Geolocation error:", error);
+            showToast("Failed to retrieve GPS location.");
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        showToast("Geolocation is not supported by this browser.");
+      }
     });
 
     setTimeout(() => {

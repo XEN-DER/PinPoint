@@ -30,6 +30,19 @@ const { className = "relative w-full h-[360px] md:h-[450px] bg-[#f4f2ee] border 
     <span id="active-neighborhood-label" class="font-bold">All Localities</span>
   </div>
 
+  <!-- Locate Me Button (Main Map) -->
+  <button 
+    type="button" 
+    id="main-map-locate-me" 
+    class="absolute bottom-20 right-3.5 z-20 bg-white/90 hover:bg-white border border-gray-200 text-black p-2 rounded-md shadow-sm active-scale transition-colors flex items-center justify-center cursor-pointer"
+    title="Show My Location"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+    </svg>
+  </button>
+
   <!-- Leaflet Map Container -->
   <div id="pinpoint-leaflet-map" class="w-full h-full z-10"></div>
 </div>
@@ -127,6 +140,46 @@ const { className = "relative w-full h-[360px] md:h-[450px] bg-[#f4f2ee] border 
     });
 
     renderMarkers();
+
+    // Locate Me listener
+    let userLocationMarker: any = null;
+    const mainLocateBtn = document.getElementById('main-map-locate-me');
+    mainLocateBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (navigator.geolocation) {
+        mainLocateBtn.classList.add('animate-pulse');
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            mainLocateBtn.classList.remove('animate-pulse');
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            if (!userLocationMarker) {
+              const userIcon = L.divIcon({
+                html: `
+                  <div class="relative flex items-center justify-center w-6 h-6">
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-40 animate-ping"></span>
+                    <div class="relative w-3.5 h-3.5 rounded-full bg-blue-500 border-2 border-white shadow-md"></div>
+                  </div>
+                `,
+                className: 'user-location-marker',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+              });
+              userLocationMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
+            } else {
+              userLocationMarker.setLatLng([userLat, userLng]);
+            }
+            map.setView([userLat, userLng], 15);
+          },
+          (error) => {
+            mainLocateBtn.classList.remove('animate-pulse');
+            console.error("Geolocation error:", error);
+          },
+          { enableHighAccuracy: true }
+        );
+      }
+    });
   }
 
   function filterLocality(name: string) {
