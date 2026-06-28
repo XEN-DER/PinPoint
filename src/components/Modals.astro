@@ -67,18 +67,36 @@
         </div>
 
         <!-- AI Copilot Scanner Block -->
-        <div id="ai-copilot-widget" class="bg-surface-dark/50 border border-hairline/20 rounded-md p-4 flex flex-col gap-3">
+        <div id="ai-copilot-widget" class="bg-surface-dark/60 border border-hairline/20 rounded-md p-4 flex flex-col gap-3 transition-all duration-300">
           <div class="flex items-center justify-between border-b border-hairline/20 pb-2.5">
             <div class="flex items-center gap-2">
-              <span class="text-lg">✨</span>
+              <span class="text-base animate-pulse shadow-[0_0_10px_rgba(164,212,197,0.5)] bg-brand-mint/20 w-6 h-6 rounded-full flex items-center justify-center text-brand-mint">✨</span>
               <span class="text-sm font-medium text-white font-bold">AI Copilot Scanner</span>
             </div>
-            <span id="ai-copilot-status" class="text-[10px] uppercase font-bold tracking-wider text-on-dark-soft">Awaiting Input...</span>
+            <span id="ai-copilot-status" class="text-[10px] uppercase font-mono font-bold tracking-wider text-on-dark-soft transition-colors duration-200">Awaiting Input...</span>
           </div>
+          
+          <!-- Live Copilot Result Text -->
           <div class="flex items-center gap-3 py-1">
-            <div id="ai-copilot-spinner" class="hidden w-4.5 h-4.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div id="ai-copilot-spinner" class="hidden w-4 h-4 border-2 border-brand-mint border-t-transparent rounded-full animate-spin"></div>
             <div id="ai-copilot-result" class="text-xs text-on-dark-soft leading-relaxed font-normal">
-              Type a description or upload a photo to activate the live copilot suggestions.
+              Type a description or attach media to activate the live copilot suggestions.
+            </div>
+          </div>
+
+          <!-- Dynamic Keyword Tags -->
+          <div id="ai-copilot-tags-container" class="hidden flex flex-col gap-1.5 border-t border-hairline/10 pt-2">
+            <span class="text-[10px] uppercase font-mono font-bold tracking-wider text-on-dark-soft">Recognized Indicators</span>
+            <div id="ai-copilot-tags" class="flex flex-wrap gap-1.5">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Category Confidence Meters -->
+          <div id="ai-copilot-confidence-container" class="hidden flex flex-col gap-2 border-t border-hairline/10 pt-2">
+            <span class="text-[10px] uppercase font-mono font-bold tracking-wider text-on-dark-soft">Classification Confidence</span>
+            <div id="ai-copilot-confidence" class="flex flex-col gap-2">
+              <!-- Injected dynamically -->
             </div>
           </div>
         </div>

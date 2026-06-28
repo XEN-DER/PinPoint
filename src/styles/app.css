@@ -290,3 +290,12 @@ body {
 .animate-pulse-slow {
   animation: subtlePulse 3s infinite ease-in-out;
 }
+
+@keyframes borderFlash {
+  0%, 100% { border-color: rgba(164, 212, 197, 0.2); box-shadow: none; }
+  50% { border-color: rgba(164, 212, 197, 0.8); box-shadow: 0 0 10px rgba(164, 212, 197, 0.4); }
+}
+
+.animate-border-flash {
+  animation: borderFlash 1.2s ease-in-out 2;
+}

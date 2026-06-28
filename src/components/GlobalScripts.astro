@@ -660,56 +660,168 @@
     const copilotStatus = document.getElementById('ai-copilot-status');
     const copilotResult = document.getElementById('ai-copilot-result');
     const copilotSpinner = document.getElementById('ai-copilot-spinner');
+    
+    const tagsContainer = document.getElementById('ai-copilot-tags-container');
+    const tagsWrapper = document.getElementById('ai-copilot-tags');
+    const confidenceContainer = document.getElementById('ai-copilot-confidence-container');
+    const confidenceWrapper = document.getElementById('ai-copilot-confidence');
 
     if (queryText.length < 5) {
       if (copilotStatus) copilotStatus.textContent = 'Awaiting Input...';
-      if (copilotResult) copilotResult.textContent = 'Type a description or upload a photo to activate the live copilot suggestions.';
+      if (copilotResult) copilotResult.textContent = 'Type a description or attach media to activate the live copilot suggestions.';
       if (copilotSpinner) copilotSpinner.classList.add('hidden');
+      tagsContainer?.classList.add('hidden');
+      confidenceContainer?.classList.add('hidden');
       return;
     }
 
-    if (copilotStatus) copilotStatus.textContent = 'Scanning...';
+    if (copilotStatus) {
+      copilotStatus.textContent = 'Analyzing...';
+      copilotStatus.classList.remove('text-on-dark-soft', 'text-brand-mint');
+      copilotStatus.classList.add('text-brand-pink');
+    }
     if (copilotSpinner) copilotSpinner.classList.remove('hidden');
     if (copilotResult) {
-      copilotResult.innerHTML = '<span class="text-primary italic font-medium">AI analyzing details...</span>';
+      copilotResult.innerHTML = '<span class="text-brand-mint italic font-medium animate-pulse-slow">AI scanning statement and media feeds...</span>';
     }
 
     if (aiAnalysisTimeout) clearTimeout(aiAnalysisTimeout);
     
     aiAnalysisTimeout = setTimeout(() => {
-      let category = "Infrastructure";
-      if (queryText.includes("leak") || queryText.includes("water") || queryText.includes("pipe") || queryText.includes("drain")) {
-        category = "Water Leakage";
-      } else if (queryText.includes("light") || queryText.includes("lamp") || queryText.includes("dark") || queryText.includes("bulb")) {
-        category = "Streetlight";
-      } else if (queryText.includes("trash") || queryText.includes("garbage") || queryText.includes("bin") || queryText.includes("waste")) {
-        category = "Waste Management";
-      }
+      // Keyword sets
+      const keywordsMap: Record<string, string[]> = {
+        'Water Leakage': ['leak', 'water', 'pipe', 'drain', 'sewer', 'flooding', 'burst', 'tap', 'flow', 'leakage', 'overflow'],
+        'Streetlight': ['light', 'lamp', 'dark', 'bulb', 'flicker', 'flickering', 'pole', 'blackout', 'night', 'streetlight', 'streetlamp'],
+        'Waste Management': ['trash', 'garbage', 'bin', 'waste', 'dump', 'litter', 'rubbish', 'unhygienic', 'stink', 'smell', 'bins'],
+        'Infrastructure': ['pothole', 'road', 'divider', 'sidewalk', 'pavement', 'concrete', 'crack', 'hole', 'pave', 'asphalt', 'barrier', 'bridge']
+      };
 
+      // Extract recognized keywords
+      const foundTags: string[] = [];
+      const scores: Record<string, number> = {
+        'Water Leakage': 5,
+        'Streetlight': 5,
+        'Waste Management': 5,
+        'Infrastructure': 10
+      };
+
+      Object.keys(keywordsMap).forEach(cat => {
+        keywordsMap[cat].forEach(keyword => {
+          if (queryText.includes(keyword)) {
+            scores[cat] += 35;
+            if (!foundTags.includes(keyword)) {
+              foundTags.push(keyword);
+            }
+          }
+        });
+      });
+
+      // Severity indicators
       let severity = "Medium";
-      if (queryText.includes("danger") || queryText.includes("severe") || queryText.includes("accident") || queryText.includes("flooding") || queryText.includes("injury")) {
+      if (queryText.includes("danger") || queryText.includes("severe") || queryText.includes("accident") || queryText.includes("flooding") || queryText.includes("injury") || queryText.includes("hazard") || queryText.includes("high")) {
         severity = "High";
-      } else if (queryText.includes("small") || queryText.includes("minor") || queryText.includes("cosmetic")) {
+      } else if (queryText.includes("small") || queryText.includes("minor") || queryText.includes("cosmetic") || queryText.includes("low")) {
         severity = "Low";
       }
 
-      const formCategory = document.getElementById('form-category') as HTMLSelectElement;
-      if (formCategory) {
-        formCategory.value = category;
+      // Calculate total score and normalized confidence percentages
+      const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+      const confidences: Record<string, number> = {};
+      
+      let maxCat = 'Infrastructure';
+      let maxScore = -1;
+      
+      Object.keys(scores).forEach(cat => {
+        confidences[cat] = Math.round((scores[cat] / totalScore) * 100);
+        if (scores[cat] > maxScore) {
+          maxScore = scores[cat];
+          maxCat = cat;
+        }
+      });
+
+      // Normalize to sum to 100%
+      let sum = Object.values(confidences).reduce((a, b) => a + b, 0);
+      if (sum !== 100) {
+        confidences[maxCat] += (100 - sum);
       }
 
+      // Automatically update fields
+      const formCategory = document.getElementById('form-category') as HTMLSelectElement;
+      let categoryChanged = false;
+      if (formCategory && formCategory.value !== maxCat) {
+        formCategory.value = maxCat;
+        categoryChanged = true;
+      }
+
+      let severityChanged = false;
       const radio = document.querySelector(`input[name="form-severity"][value="${severity}"]`) as HTMLInputElement;
-      if (radio) {
+      if (radio && !radio.checked) {
         radio.checked = true;
         updateSeverityRadioUI();
+        severityChanged = true;
+      }
+
+      // Trigger border flash animations on auto-assignment
+      if (categoryChanged && formCategory) {
+        formCategory.classList.remove('animate-border-flash');
+        void formCategory.offsetWidth; // Trigger reflow
+        formCategory.classList.add('animate-border-flash');
+      }
+      if (severityChanged) {
+        const severityWrapper = radio.closest('.flex') as HTMLElement;
+        if (severityWrapper) {
+          severityWrapper.classList.remove('animate-border-flash');
+          void severityWrapper.offsetWidth; // Trigger reflow
+          severityWrapper.classList.add('animate-border-flash');
+        }
+      }
+
+      // Render Tags
+      if (tagsWrapper && foundTags.length > 0) {
+        tagsWrapper.innerHTML = foundTags.map(tag => `
+          <span class="px-2.5 py-0.5 rounded bg-brand-mint/10 border border-brand-mint/20 text-[10px] text-brand-mint font-semibold animate-fade-in font-mono shadow-[0_0_8px_rgba(164,212,197,0.05)]">
+            #${tag}
+          </span>
+        `).join('');
+        tagsContainer?.classList.remove('hidden');
+      } else {
+        tagsContainer?.classList.add('hidden');
+      }
+
+      // Render Confidence progress bars
+      if (confidenceWrapper) {
+        const sortedCats = Object.keys(confidences).sort((a, b) => confidences[b] - confidences[a]);
+        
+        confidenceWrapper.innerHTML = sortedCats.map(cat => {
+          const conf = confidences[cat];
+          const isTop = cat === maxCat;
+          const barColor = isTop ? 'bg-brand-mint shadow-[0_0_8px_rgba(164,212,197,0.4)]' : 'bg-on-dark-soft/40';
+          const labelColor = isTop ? 'text-brand-mint font-bold' : 'text-on-dark-soft';
+          const pctColor = isTop ? 'text-brand-mint font-bold font-mono' : 'text-on-dark-soft font-mono';
+          
+          return `
+            <div class="flex items-center gap-3">
+              <span class="text-[11px] w-24 text-left ${labelColor}">${cat}</span>
+              <div class="flex-grow bg-surface-dark h-1.5 rounded-full overflow-hidden border border-hairline/5">
+                <div class="${barColor} h-full rounded-full transition-all duration-700 ease-out" style="width: ${conf}%"></div>
+              </div>
+              <span class="text-[11px] w-8 text-right ${pctColor}">${conf}%</span>
+            </div>
+          `;
+        }).join('');
+        confidenceContainer?.classList.remove('hidden');
       }
 
       if (copilotSpinner) copilotSpinner.classList.add('hidden');
-      if (copilotStatus) copilotStatus.textContent = 'Matched âœ¨';
-      if (copilotResult) {
-        copilotResult.innerHTML = `<strong>AI Match:</strong> <span class="text-primary">${category} (${severity} Severity)</span>. Suggested parameters applied.`;
+      if (copilotStatus) {
+        copilotStatus.textContent = 'Classified ✨';
+        copilotStatus.classList.remove('text-brand-pink');
+        copilotStatus.classList.add('text-brand-mint');
       }
-    }, 1000);
+      if (copilotResult) {
+        copilotResult.innerHTML = `<strong>Auto-Categorized:</strong> <span class="text-brand-mint font-semibold">${maxCat}</span> (${severity} Severity suggested).`;
+      }
+    }, 800);
   }
 
   // Handle severity radio pill clicks
