@@ -3,30 +3,30 @@
 interface Props {
   className?: string;
 }
-const { className = "relative w-full h-[360px] md:h-[450px] bg-canvas border border-hairline rounded-lg overflow-hidden select-none z-10 shadow-sm" } = Astro.props;
+const { className = "relative w-full h-[360px] md:h-[450px] bg-[#f4f2ee] border border-gray-200 rounded-lg overflow-hidden select-none z-10 shadow-sm" } = Astro.props;
 ---
 
 <div class={className}>
   <!-- Map Legend (Top Left) -->
-  <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3.5 py-2.5 rounded-md z-20 flex flex-col gap-1.5 text-xs text-ink shadow-sm pointer-events-none">
-    <div class="font-bold text-[10px] uppercase tracking-wider text-muted mb-0.5">Status Legend</div>
+  <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm border border-gray-200 px-3.5 py-2.5 rounded-md z-20 flex flex-col gap-1.5 text-xs text-black shadow-sm pointer-events-none">
+    <div class="font-bold text-[10px] uppercase tracking-wider text-gray-500 mb-0.5">Status Legend</div>
     <div class="flex items-center gap-2">
-      <span class="w-2.5 h-2.5 rounded-full bg-error border border-canvas"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-error border border-white"></span>
       <span>Open (Escalated)</span>
     </div>
     <div class="flex items-center gap-2">
-      <span class="w-2.5 h-2.5 rounded-full bg-warning border border-canvas"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-warning border border-white"></span>
       <span>In Progress</span>
     </div>
     <div class="flex items-center gap-2">
-      <span class="w-2.5 h-2.5 rounded-full bg-success border border-canvas"></span>
+      <span class="w-2.5 h-2.5 rounded-full bg-success border border-white"></span>
       <span>Resolved</span>
     </div>
   </div>
 
   <!-- Neighborhood Indicator (Top Right) -->
-  <div class="absolute top-4 right-4 bg-canvas/90 backdrop-blur-sm border border-hairline px-3 py-1.5 rounded-md z-20 text-xs text-ink shadow-sm pointer-events-none">
-    <span class="text-muted">Viewing: </span>
+  <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-gray-200 px-3 py-1.5 rounded-md z-20 text-xs text-black shadow-sm pointer-events-none">
+    <span class="text-gray-500">Viewing: </span>
     <span id="active-neighborhood-label" class="font-bold">All Localities</span>
   </div>
 
@@ -69,7 +69,13 @@ const { className = "relative w-full h-[360px] md:h-[450px] bg-canvas border bor
       return;
     }
 
-    if (map) return;
+    const container = document.getElementById('pinpoint-leaflet-map');
+    if (!container) return;
+
+    if (map) {
+      map.remove();
+      map = null;
+    }
 
     // Initialize Leaflet Map
     map = L.map('pinpoint-leaflet-map', {
@@ -297,7 +303,9 @@ const { className = "relative w-full h-[360px] md:h-[450px] bg-canvas border bor
   });
 
   // Initialize Map
-  initMap();
+  document.addEventListener('astro:page-load', () => {
+    initMap();
+  });
 </script>
 
 <style>
@@ -319,22 +327,22 @@ const { className = "relative w-full h-[360px] md:h-[450px] bg-canvas border bor
   }
   /* Fix popup styling to adapt to light/dark mode */
   :global(.leaflet-popup-content-wrapper) {
-    background-color: var(--color-surface-card) !important;
-    color: var(--color-ink) !important;
+    background-color: #f4f2ee !important;
+    color: #1a1a1a !important;
     border-radius: 8px !important;
     font-family: 'Inter', system-ui, sans-serif !important;
     font-size: 11px !important;
     font-weight: 600 !important;
     padding: 0px 4px !important;
-    border: 1px solid var(--color-hairline) !important;
+    border: 1px solid #e0dcd1 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   }
   :global(.leaflet-popup-content) {
     margin: 8px 12px !important;
   }
   :global(.leaflet-popup-tip) {
-    background-color: var(--color-surface-card) !important;
-    border-left: 1px solid var(--color-hairline) !important;
-    border-bottom: 1px solid var(--color-hairline) !important;
+    background-color: #f4f2ee !important;
+    border-left: 1px solid #e0dcd1 !important;
+    border-bottom: 1px solid #e0dcd1 !important;
   }
 </style>

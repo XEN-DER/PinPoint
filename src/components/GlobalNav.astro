@@ -2,47 +2,31 @@
 // Global Nav component matching the {component.top-nav} spec in clay/DESIGN.md
 ---
 
-<nav class="bg-canvas border-b border-hairline text-ink h-16 flex items-center justify-between px-6 select-none relative z-50 text-nav-link">
+<nav class="bg-surface-dark-elevated/80 backdrop-blur-xl border-b border-hairline/10 text-on-dark h-16 flex items-center justify-between px-6 select-none relative z-50 text-nav-link shadow-lg">
   <!-- Left Side: Logo only -->
   <div class="flex items-center gap-8">
     <!-- Pinpoint Logo -->
-    <a href="#" class="flex items-center gap-2.5 hover:opacity-80 active-scale" id="nav-logo">
+    <a href="/" class="flex items-center gap-2.5 hover:opacity-80 active-scale" id="nav-logo">
       <!-- Friendly clay-like circular marker icon -->
       <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
       </svg>
-      <span class="text-lg font-bold tracking-[-0.5px] text-ink font-display">Pinpoint</span>
+      <span class="text-lg font-bold tracking-[-0.5px] text-white font-display">Pinpoint</span>
     </a>
   </div>
 
   <!-- Right Side: User Profile Indicator (Gamification Quick Stats in Clay style) -->
   <div class="flex items-center gap-3 sm:gap-4">
-    <!-- Theme Toggle Button -->
-    <button 
-      class="theme-toggle-btn w-10 h-10 rounded-md border border-hairline flex items-center justify-center cursor-pointer hover:bg-surface-card active-scale transition-colors text-ink focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-      title="Toggle Color Theme"
-      aria-label="Toggle Color Theme"
-    >
-      <!-- Sun icon (visible in dark mode) -->
-      <svg class="theme-toggle-sun-icon w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="5"></circle>
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 18.36l1.42-1.42M18.36 4.22l1.42-1.42"></path>
-      </svg>
-      <!-- Moon icon (visible in light mode) -->
-      <svg class="theme-toggle-moon-icon w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-    </button>
 
     <!-- Points Tracker (Mint Filled Pill) -->
-    <div class="flex items-center gap-1 bg-brand-mint text-primary-active dark:bg-brand-mint/15 dark:text-brand-mint px-3 py-1 rounded-pill text-[12px] font-semibold font-sans tracking-wide">
+    <div class="flex items-center gap-1 bg-brand-mint text-brand-mint bg-brand-mint/15  px-3 py-1 rounded-pill text-[12px] font-semibold font-sans tracking-wide">
       <span id="user-points-display" class="font-bold">350</span> pts
     </div>
     
     <!-- User Badge -->
     <div class="hidden sm:flex items-center gap-1.5" id="user-profile-badge">
       <span class="w-2.5 h-2.5 rounded-full bg-success"></span>
-      <span class="text-body-strong hover:text-primary transition-colors duration-150 cursor-pointer text-sm font-semibold" id="user-level-name">Civic Scout</span>
+      <span class="text-body-strong hover:text-brand-mint transition-colors duration-150 cursor-pointer text-sm font-semibold" id="user-level-name">Civic Scout</span>
     </div>
   </div>
 </nav>

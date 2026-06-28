@@ -1,74 +1,77 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import LeafletMap from '../components/Map.astro';
 ---
 
-<Layout title="Pinpoint — Hyperlocal Civic Action Platform">
-  <main class="flex-grow select-none bg-canvas">
-    <!-- Hero Section -->
-    <section class="max-w-6xl mx-auto px-6 py-20 lg:py-28 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-      <!-- Left text content -->
-      <div class="flex-1 flex flex-col items-start gap-8 z-10 w-full animate-slide-up-fade">
-        <h1 class="text-hero-display text-ink w-full pr-4 relative">
-          Transform Your Neighborhood. <span class="text-muted">Together.</span>
-        </h1>
-        
-        <p class="text-lead text-body-strong max-w-lg leading-relaxed">
-          Pinpoint is an open, community-driven civic resolution platform. Report issues, verify repairs, and watch the impact unfold in real-time.
-        </p>
-      </div>
+<Layout title="Pinpoint — Civic Action Command Center">
+  <main class="flex-grow select-none bg-surface-dark relative overflow-hidden flex flex-col items-center justify-center min-h-[calc(100vh-116px)] border-b border-hairline/10">
+    
+    <!-- Deep Space / Command Center Background -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 flex items-center justify-center opacity-20">
+      <!-- Animated Grid -->
+      <div class="absolute inset-0 bg-[linear-gradient(rgba(164,212,197,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(164,212,197,0.1)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_10%,transparent_100%)]"></div>
       
-      <!-- Right Feature Graphic (Clean geometric composition) -->
-      <div class="flex-1 w-full max-w-lg aspect-square bg-surface-card border border-hairline rounded-2xl p-6 relative flex flex-col justify-between overflow-hidden group shadow-sm animate-slide-up-fade stagger-1">
-        <div class="absolute inset-0 z-0 opacity-80">
-          <LeafletMap className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out pointer-events-auto" />
-        </div>
-        <div class="absolute inset-0 bg-gradient-to-br from-brand-lavender/20 to-surface-card/50 pointer-events-none z-0"></div>
-        <div class="flex justify-between items-start w-full relative z-10">
-          <div class="bg-canvas border border-hairline px-4 py-2 rounded-full text-caption font-bold shadow-sm flex items-center gap-2 group-hover:-translate-y-1 transition-transform">
-            <span class="w-2 h-2 rounded-full bg-brand-pink animate-pulse"></span>
-            32 Active Reports
-          </div>
-        </div>
-        <div class="relative z-10 bg-canvas border border-hairline p-5 rounded-xl shadow-sm transform translate-y-8 group-hover:translate-y-4 transition-transform duration-500 flex flex-col gap-3">
-          <div class="flex justify-between items-center border-b border-divider-soft pb-3">
-            <span class="text-caption font-bold text-ink">Bapod Water Line</span>
-            <span class="text-[10px] font-mono font-bold bg-brand-teal text-white px-2 py-1 rounded">VERIFIED</span>
-          </div>
-          <div class="h-2 w-full bg-hairline rounded-full overflow-hidden">
-            <div class="h-full bg-ink w-3/4"></div>
-          </div>
-          <span class="text-[10px] text-muted font-bold tracking-widest uppercase">75% Resolved</span>
-        </div>
-      </div>
-    </section>
+      <!-- Core Glow -->
+      <div class="w-[600px] h-[600px] bg-brand-mint/10 rounded-full blur-[100px] absolute animate-pulse"></div>
+    </div>
 
-    <!-- Dashboard Grid -->
-    <section class="max-w-6xl mx-auto px-6 py-12 pb-24">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-up-fade stagger-2">
-        <a href="/feed" class="bg-surface-card hover:bg-surface-strong border border-hairline rounded-lg p-6 flex flex-col gap-3 transition-transform active-scale group cursor-pointer block">
-          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">📝</div>
-          <h3 class="text-lead font-bold text-ink">Active Issues</h3>
-          <p class="text-caption text-muted">Browse, verify, and resolve issues reported in your neighborhood.</p>
-        </a>
+    <!-- Hero Content -->
+    <section class="max-w-7xl w-full mx-auto px-6 py-12 flex flex-col items-center text-center relative z-10 animate-toast-slide-up">
+      <span class="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-surface-dark-elevated border border-brand-mint/20 text-brand-mint text-xs font-bold tracking-widest uppercase mb-6 shadow-[0_0_20px_rgba(164,212,197,0.1)]">
+        <span class="w-2 h-2 rounded-full bg-brand-mint animate-pulse shadow-[0_0_10px_rgba(164,212,197,0.8)]"></span>
+        System Online
+      </span>
+      
+      <h1 class="text-[4rem] md:text-[6rem] font-display font-medium tracking-tight text-white mb-6 leading-none">
+        Pinpoint <span class="text-brand-mint">Nexus</span>
+      </h1>
+      
+      <p class="text-on-dark-soft max-w-2xl mx-auto text-xl md:text-2xl font-light mb-16">
+        Hyperlocal civic resolution protocol. Track, predict, and resolve community infrastructure distress in real-time.
+      </p>
+
+      <!-- Navigation Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl animate-toast-slide-up" style="animation-delay: 150ms;">
         
-        <a href="/hotspots" class="bg-surface-card hover:bg-surface-strong border border-hairline rounded-lg p-6 flex flex-col gap-3 transition-transform active-scale group cursor-pointer block">
-          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">🗺️</div>
-          <h3 class="text-lead font-bold text-ink">Hotspots Map</h3>
-          <p class="text-caption text-muted">Visualize problem areas and neighborhood clusters in real-time.</p>
+        <!-- Feed Card -->
+        <a href="/feed" class="group relative bg-surface-dark-elevated/40 backdrop-blur-xl border border-hairline/10 p-8 rounded-3xl shadow-2xl hover:bg-surface-dark-elevated/80 hover:border-brand-mint/40 transition-all duration-300 overflow-hidden flex flex-col items-start text-left">
+          <div class="absolute inset-0 bg-gradient-to-br from-brand-mint/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="w-14 h-14 rounded-full bg-brand-mint/10 border border-brand-mint/20 flex items-center justify-center text-brand-mint mb-6 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(164,212,197,0.3)] transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          </div>
+          <h3 class="text-2xl font-display text-white mb-3 font-medium">Active Issues</h3>
+          <p class="text-on-dark-soft text-sm font-light leading-relaxed">Browse and verify live reports mapped in your locality.</p>
         </a>
 
-        <a href="/impact" class="bg-surface-card hover:bg-surface-strong border border-hairline rounded-lg p-6 flex flex-col gap-3 transition-transform active-scale group cursor-pointer block">
-          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">📈</div>
-          <h3 class="text-lead font-bold text-ink">Impact Analytics</h3>
-          <p class="text-caption text-muted">See the real-time difference we are making in the community.</p>
+        <!-- Hotspots Card -->
+        <a href="/hotspots" class="group relative bg-surface-dark-elevated/40 backdrop-blur-xl border border-hairline/10 p-8 rounded-3xl shadow-2xl hover:bg-surface-dark-elevated/80 hover:border-brand-coral/40 transition-all duration-300 overflow-hidden flex flex-col items-start text-left">
+          <div class="absolute inset-0 bg-gradient-to-br from-brand-coral/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="w-14 h-14 rounded-full bg-brand-coral/10 border border-brand-coral/20 flex items-center justify-center text-brand-coral mb-6 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(255,107,90,0.3)] transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="text-2xl font-display text-white mb-3 font-medium">Hotspots</h3>
+          <p class="text-on-dark-soft text-sm font-light leading-relaxed">AI predictive insights and threat level cluster analysis.</p>
         </a>
 
-        <a href="/leaderboard" class="bg-surface-card hover:bg-surface-strong border border-hairline rounded-lg p-6 flex flex-col gap-3 transition-transform active-scale group cursor-pointer block">
-          <div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition-transform">🏆</div>
-          <h3 class="text-lead font-bold text-ink">Leaderboard</h3>
-          <p class="text-caption text-muted">Earn points and rank up by reporting and verifying issues.</p>
+        <!-- Impact Card -->
+        <a href="/impact" class="group relative bg-surface-dark-elevated/40 backdrop-blur-xl border border-hairline/10 p-8 rounded-3xl shadow-2xl hover:bg-surface-dark-elevated/80 hover:border-brand-pink/40 transition-all duration-300 overflow-hidden flex flex-col items-start text-left">
+          <div class="absolute inset-0 bg-gradient-to-br from-brand-pink/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="w-14 h-14 rounded-full bg-brand-pink/10 border border-brand-pink/20 flex items-center justify-center text-brand-pink mb-6 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(255,107,90,0.3)] transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          </div>
+          <h3 class="text-2xl font-display text-white mb-3 font-medium">Analytics</h3>
+          <p class="text-on-dark-soft text-sm font-light leading-relaxed">Platform-wide resolution metrics and community impact.</p>
         </a>
+
+        <!-- Leaderboard Card -->
+        <a href="/leaderboard" class="group relative bg-surface-dark-elevated/40 backdrop-blur-xl border border-hairline/10 p-8 rounded-3xl shadow-2xl hover:bg-surface-dark-elevated/80 hover:border-brand-ochre/40 transition-all duration-300 overflow-hidden flex flex-col items-start text-left">
+          <div class="absolute inset-0 bg-gradient-to-br from-brand-ochre/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div class="w-14 h-14 rounded-full bg-brand-ochre/10 border border-brand-ochre/20 flex items-center justify-center text-brand-ochre mb-6 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(232,185,74,0.3)] transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+          </div>
+          <h3 class="text-2xl font-display text-white mb-3 font-medium">Top Citizens</h3>
+          <p class="text-on-dark-soft text-sm font-light leading-relaxed">Global gamification rankings and civic engagement scores.</p>
+        </a>
+
       </div>
     </section>
   </main>
