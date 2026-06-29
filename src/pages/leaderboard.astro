@@ -48,7 +48,7 @@ import Layout from '../layouts/Layout.astro';
                   <span class="text-on-dark-soft font-light" id="level-progress-text">350 / 450 pts</span>
                 </div>
                 <div class="h-2.5 w-full bg-surface-dark rounded-full overflow-hidden border border-hairline/10 shadow-inner">
-                  <div class="h-full bg-gradient-to-r from-brand-ochre/50 to-brand-ochre rounded-full relative shadow-[0_0_10px_rgba(232,185,74,0.5)] transition-all duration-300" id="level-progress-bar" style="width: 77%"></div>
+                  <div class="h-full bg-gradient-to-r from-brand-ochre/50 to-brand-ochre rounded-full relative shadow-[0_0_10px_rgba(232,185,74,0.5)] transition-all duration-300 animate-pulse" id="level-progress-bar" style="width: 77%"></div>
                 </div>
               </div>
 
@@ -57,13 +57,13 @@ import Layout from '../layouts/Layout.astro';
                 <h5 class="text-xs font-bold text-on-dark-soft uppercase tracking-widest mb-4">Earned Badges</h5>
                 <div class="flex flex-wrap gap-2.5" id="badges-container">
                   <!-- Badge 1 -->
-                  <div class="flex items-center gap-1.5 bg-surface-dark border border-hairline/10 px-3 py-2 rounded-lg text-white text-xs shadow-sm">
-                    <span class="text-base">🛡️</span>
+                  <div class="flex items-center gap-1.5 bg-surface-dark border border-hairline/10 hover:border-brand-ochre/40 px-3 py-2 rounded-lg text-white text-xs shadow-sm hover:shadow-[0_0_15px_rgba(232,185,74,0.2)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                    <span class="text-base drop-shadow-md">🛡️</span>
                     <span class="font-bold text-white">Pothole Patrol</span>
                   </div>
                   <!-- Badge 2 -->
-                  <div class="flex items-center gap-1.5 bg-surface-dark border border-hairline/10 px-3 py-2 rounded-lg text-white text-xs shadow-sm">
-                    <span class="text-base">⚡</span>
+                  <div class="flex items-center gap-1.5 bg-surface-dark border border-hairline/10 hover:border-brand-mint/40 px-3 py-2 rounded-lg text-white text-xs shadow-sm hover:shadow-[0_0_15px_rgba(164,212,197,0.2)] hover:-translate-y-0.5 transition-all duration-300 cursor-default">
+                    <span class="text-base drop-shadow-md">⚡</span>
                     <span class="font-bold text-white">Light Guardian</span>
                   </div>
                   <!-- Badge 3 (Locked) -->

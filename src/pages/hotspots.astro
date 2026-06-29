@@ -62,48 +62,62 @@ import Layout from '../layouts/Layout.astro';
             Threat Level Analysis
           </h2>
           
-          <div class="space-y-10">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- Threat 1 -->
-            <div class="group">
-              <div class="flex justify-between items-end mb-3">
+            <div class="group bg-[#111111] p-6 rounded-2xl border border-hairline/10 hover:border-brand-pink/40 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(255,107,90,0.15)] transition-all duration-300">
+              <div class="flex justify-between items-start mb-6">
                 <div>
-                  <h3 class="text-white font-medium text-xl mb-1">Ajwa Road</h3>
-                  <span class="text-sm text-on-dark-soft">Water Line Failures</span>
+                  <h3 class="text-white font-medium text-xl mb-1 group-hover:text-brand-pink transition-colors">Ajwa Road</h3>
+                  <span class="text-xs text-on-dark-soft">Water Line Failures</span>
                 </div>
-                <span class="text-brand-pink text-sm font-bold tracking-widest uppercase bg-brand-pink/10 px-3 py-1.5 rounded-full shadow-[0_0_10px_rgba(255,107,90,0.2)] animate-pulse">Critical</span>
+                <span class="text-brand-pink text-[10px] font-bold tracking-widest uppercase bg-brand-pink/10 px-3 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,107,90,0.3)] animate-pulse border border-brand-pink/20">Critical</span>
               </div>
-              <div class="h-3.5 w-full bg-[#1A1A1A] rounded-full overflow-hidden border border-hairline/10 shadow-inner">
-                <div class="h-full bg-gradient-to-r from-brand-pink/40 to-brand-pink rounded-full relative group-hover:shadow-[0_0_20px_rgba(255,107,90,0.6)] transition-all duration-500 ease-out" style="width: 82%">
-                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+              <div class="h-2 w-full bg-surface-dark rounded-full overflow-hidden shadow-inner">
+                <div class="h-full bg-gradient-to-r from-brand-pink/40 to-brand-pink rounded-full relative group-hover:shadow-[0_0_20px_rgba(255,107,90,0.8)] transition-all duration-500 ease-out" style="width: 82%">
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
                 </div>
               </div>
             </div>
 
             <!-- Threat 2 -->
-            <div class="group">
-              <div class="flex justify-between items-end mb-3">
+            <div class="group bg-[#111111] p-6 rounded-2xl border border-hairline/10 hover:border-brand-ochre/40 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(255,176,132,0.1)] transition-all duration-300">
+              <div class="flex justify-between items-start mb-6">
                 <div>
-                  <h3 class="text-white font-medium text-xl mb-1">Bapod</h3>
-                  <span class="text-sm text-on-dark-soft">Pothole Fissures</span>
+                  <h3 class="text-white font-medium text-xl mb-1 group-hover:text-brand-ochre transition-colors">Bapod</h3>
+                  <span class="text-xs text-on-dark-soft">Pothole Fissures</span>
                 </div>
-                <span class="text-brand-ochre text-sm font-bold tracking-widest uppercase">Elevated</span>
+                <span class="text-brand-ochre text-[10px] font-bold tracking-widest uppercase bg-brand-ochre/10 px-3 py-1.5 rounded-full border border-brand-ochre/20">Elevated</span>
               </div>
-              <div class="h-3.5 w-full bg-[#1A1A1A] rounded-full overflow-hidden border border-hairline/10 shadow-inner">
-                <div class="h-full bg-gradient-to-r from-brand-ochre/40 to-brand-ochre rounded-full relative group-hover:shadow-[0_0_20px_rgba(255,176,132,0.4)] transition-all duration-500 ease-out" style="width: 58%"></div>
+              <div class="h-2 w-full bg-surface-dark rounded-full overflow-hidden shadow-inner">
+                <div class="h-full bg-gradient-to-r from-brand-ochre/40 to-brand-ochre rounded-full relative group-hover:shadow-[0_0_15px_rgba(255,176,132,0.6)] transition-all duration-500 ease-out" style="width: 58%"></div>
               </div>
             </div>
 
             <!-- Threat 3 -->
-            <div class="group">
-              <div class="flex justify-between items-end mb-3">
+            <div class="group bg-[#111111] p-6 rounded-2xl border border-hairline/10 hover:border-brand-mint/40 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(164,212,197,0.1)] transition-all duration-300">
+              <div class="flex justify-between items-start mb-6">
                 <div>
-                  <h3 class="text-white font-medium text-xl mb-1">Waghodia Road</h3>
-                  <span class="text-sm text-on-dark-soft">Waste Logistical Bottlenecks</span>
+                  <h3 class="text-white font-medium text-xl mb-1 group-hover:text-brand-mint transition-colors">Waghodia Road</h3>
+                  <span class="text-xs text-on-dark-soft">Waste Logistical Bottlenecks</span>
                 </div>
-                <span class="text-brand-mint text-sm font-bold tracking-widest uppercase">Stable</span>
+                <span class="text-brand-mint text-[10px] font-bold tracking-widest uppercase bg-brand-mint/10 px-3 py-1.5 rounded-full border border-brand-mint/20">Stable</span>
               </div>
-              <div class="h-3.5 w-full bg-[#1A1A1A] rounded-full overflow-hidden border border-hairline/10 shadow-inner">
-                <div class="h-full bg-gradient-to-r from-brand-mint/40 to-brand-mint rounded-full relative group-hover:shadow-[0_0_20px_rgba(164,212,197,0.4)] transition-all duration-500 ease-out" style="width: 25%"></div>
+              <div class="h-2 w-full bg-surface-dark rounded-full overflow-hidden shadow-inner">
+                <div class="h-full bg-gradient-to-r from-brand-mint/40 to-brand-mint rounded-full relative group-hover:shadow-[0_0_15px_rgba(164,212,197,0.6)] transition-all duration-500 ease-out" style="width: 25%"></div>
+              </div>
+            </div>
+            
+            <!-- Threat 4 (New to fill grid) -->
+            <div class="group bg-[#111111] p-6 rounded-2xl border border-hairline/10 hover:border-brand-mint/40 hover:-translate-y-1 shadow-lg hover:shadow-[0_10px_30px_rgba(164,212,197,0.1)] transition-all duration-300">
+              <div class="flex justify-between items-start mb-6">
+                <div>
+                  <h3 class="text-white font-medium text-xl mb-1 group-hover:text-brand-mint transition-colors">Kishanwadi</h3>
+                  <span class="text-xs text-on-dark-soft">Streetlight Outages</span>
+                </div>
+                <span class="text-brand-mint text-[10px] font-bold tracking-widest uppercase bg-brand-mint/10 px-3 py-1.5 rounded-full border border-brand-mint/20">Stable</span>
+              </div>
+              <div class="h-2 w-full bg-surface-dark rounded-full overflow-hidden shadow-inner">
+                <div class="h-full bg-gradient-to-r from-brand-mint/40 to-brand-mint rounded-full relative group-hover:shadow-[0_0_15px_rgba(164,212,197,0.6)] transition-all duration-500 ease-out" style="width: 12%"></div>
               </div>
             </div>
           </div>

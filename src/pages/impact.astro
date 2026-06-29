@@ -7,15 +7,18 @@ import Layout from '../layouts/Layout.astro';
     <h1 class="text-[3.5rem] font-display font-medium text-white leading-none">Impact & Analytics</h1>
     <p class="text-on-dark-soft text-lg mt-4 font-light">See the real-time difference we are making in the community.</p>
   </div>
-    <section id="analytics-section" class="bg-surface-dark border-b border-hairline/10 py-8 px-6 sm:px-12 flex flex-col items-center text-center scroll-mt-[52px]">
-      <div class="max-w-4xl mx-auto flex flex-col items-center">
+    <section id="analytics-section" class="relative bg-surface-dark py-16 px-6 sm:px-12 flex flex-col items-center text-center overflow-hidden scroll-mt-[52px]">
+      <!-- Animated Background Glow -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-pink/5 rounded-full blur-[120px] -z-10 animate-pulse pointer-events-none"></div>
+      
+      <div class="max-w-5xl mx-auto flex flex-col items-center relative z-10">
         <!-- Badge Pill -->
         <span class="text-brand-pink text-xs font-bold tracking-widest uppercase mb-6 bg-brand-pink/10 px-4 py-1.5 rounded-full border border-brand-pink/30 shadow-[0_0_15px_rgba(255,107,90,0.2)]">
-          ðŸŒ± Hyperlocal Action Hub
+          🌱 Hyperlocal Action Hub
         </span>
         
-        <!-- Headline in Plain Black style -->
-        <h1 class="text-[3.5rem] font-display font-medium text-white leading-none font-medium mb-6 select-text tracking-[-2.5px] leading-tight font-display">
+        <!-- Headline in Premium Gradient -->
+        <h1 class="text-[4rem] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 leading-none font-medium mb-6 select-text tracking-[-2.5px] font-display">
           Civic Resolution Analytics
         </h1>
         
@@ -24,39 +27,46 @@ import Layout from '../layouts/Layout.astro';
           Identify, report, and verify community issues. Connect with local municipal authorities in a transparent, warm, and collaborative ecosystem.
         </p>
 
-        <!-- CTA Buttons (Clay rounded-md 12px style) -->
-        <div class="flex flex-wrap justify-center gap-4 mb-16">
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap justify-center gap-4 mb-20">
           <button 
             id="hero-report-btn" 
-            class="bg-brand-mint text-surface-dark font-bold rounded-full px-8 py-3.5 hover:bg-white hover:shadow-[0_0_20px_rgba(164,212,197,0.6)] transition-all duration-300"
+            class="bg-brand-mint text-surface-dark font-bold rounded-full px-8 py-3.5 hover:bg-white hover:shadow-[0_0_20px_rgba(164,212,197,0.6)] transition-all duration-300 hover:-translate-y-1"
           >
             Report an Issue
           </button>
           <a 
             href="#feed-section" 
-            class="text-white border border-hairline/20 rounded-full px-8 py-3.5 hover:border-brand-mint/40 hover:bg-surface-dark-elevated transition-all duration-300"
+            class="text-white border border-hairline/20 rounded-full px-8 py-3.5 hover:border-brand-mint/40 hover:bg-surface-dark-elevated transition-all duration-300 hover:-translate-y-1"
           >
             Explore Map & Feed
           </a>
         </div>
 
-        <!-- Live Impact Stats Ticker (Clay-style horizontal list) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 w-full pt-12 border-t border-hairline/10">
-          <div>
-            <div class="text-[4rem] text-white hover:text-brand-pink transition-colors duration-300 font-semibold font-display tracking-tight" id="ticker-reported">1,280</div>
-            <div class="text-sm tracking-wider uppercase text-on-dark-soft font-semibold mt-2">Issues Reported</div>
+        <!-- Live Impact Stats Ticker (Glass Cards) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
+          <div class="bg-surface-dark-elevated/40 backdrop-blur-md border border-hairline/10 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="text-[3.5rem] text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 group-hover:from-brand-pink group-hover:to-red-400 transition-all duration-500 font-semibold font-display tracking-tight leading-none" id="ticker-reported">1,280</div>
+            <div class="text-[10px] tracking-widest uppercase text-on-dark-soft font-bold mt-4">Issues Reported</div>
           </div>
-          <div>
-            <div class="text-[4rem] text-white hover:text-brand-mint transition-colors duration-300 font-semibold font-display tracking-tight" id="ticker-resolved">1,208</div>
-            <div class="text-sm tracking-wider uppercase text-on-dark-soft font-semibold mt-2">Problems Resolved</div>
+          
+          <div class="bg-surface-dark-elevated/40 backdrop-blur-md border border-hairline/10 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-mint/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="text-[3.5rem] text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 group-hover:from-brand-mint group-hover:to-emerald-400 transition-all duration-500 font-semibold font-display tracking-tight leading-none" id="ticker-resolved">1,208</div>
+            <div class="text-[10px] tracking-widest uppercase text-on-dark-soft font-bold mt-4">Problems Resolved</div>
           </div>
-          <div>
-            <div class="text-[4rem] text-white hover:text-brand-coral transition-colors duration-300 font-semibold font-display tracking-tight" id="ticker-active">72</div>
-            <div class="text-sm tracking-wider uppercase text-on-dark-soft font-semibold mt-2">Active Reports</div>
+          
+          <div class="bg-surface-dark-elevated/40 backdrop-blur-md border border-hairline/10 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-coral/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="text-[3.5rem] text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 group-hover:from-brand-coral group-hover:to-orange-400 transition-all duration-500 font-semibold font-display tracking-tight leading-none" id="ticker-active">72</div>
+            <div class="text-[10px] tracking-widest uppercase text-on-dark-soft font-bold mt-4">Active Reports</div>
           </div>
-          <div>
-            <div class="text-[4rem] text-white hover:text-success transition-colors duration-300 font-semibold font-display tracking-tight" id="ticker-rate">94%</div>
-            <div class="text-sm tracking-wider uppercase text-on-dark-soft font-semibold mt-2">Resolution Rate</div>
+          
+          <div class="bg-surface-dark-elevated/40 backdrop-blur-md border border-hairline/10 p-8 rounded-3xl shadow-xl transition-all duration-300 hover:scale-105 group relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="text-[3.5rem] text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 group-hover:from-success group-hover:to-green-400 transition-all duration-500 font-semibold font-display tracking-tight leading-none" id="ticker-rate">94%</div>
+            <div class="text-[10px] tracking-widest uppercase text-on-dark-soft font-bold mt-4">Resolution Rate</div>
           </div>
         </div>
       </div>
