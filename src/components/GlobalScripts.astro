@@ -82,11 +82,11 @@
     } else {
       if (isDisputed) {
         badgeClass = textLight ? 'bg-red-500/30 text-white animate-pulse' : 'bg-red-50 text-red-700 border-red-300 border animate-pulse';
-        badgeText = `âš ï¸ Disputed Â· SLA BREACHED`;
+        badgeText = `⚠️ Disputed · SLA BREACHED`;
       } else if (elapsedDays > targetDays) {
         const overDays = elapsedDays - targetDays;
         badgeClass = textLight ? 'bg-red-500/30 text-white animate-pulse' : 'bg-red-50 text-red-700 border-red-300 border animate-pulse';
-        badgeText = `âš ï¸ SLA BREACHED by ${overDays} day${overDays > 1 ? 's' : ''}`;
+        badgeText = `⚠️ SLA BREACHED by ${overDays} day${overDays > 1 ? 's' : ''}`;
       } else {
         const remainingDays = targetDays - elapsedDays;
         badgeClass = textLight ? 'bg-canvas/10 text-on-dark' : 'bg-canvas text-ink border-hairline border';
@@ -276,9 +276,9 @@
     localStorage.setItem('pinpoint_user_stats', JSON.stringify({ points: 350, level: "Civic Scout" }));
   }
 
-  // Track upvoted issues by user
-  if (!localStorage.getItem('pinpoint_user_upvotes')) {
-    localStorage.setItem('pinpoint_user_upvotes', JSON.stringify([]));
+  // Track verifications by user
+  if (!localStorage.getItem('pinpoint_user_verifications')) {
+    localStorage.setItem('pinpoint_user_verifications', JSON.stringify([]));
   }
 
   // Main Feed DOM bindings
@@ -679,6 +679,11 @@
       const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
       userStats.points = Math.max(0, userStats.points - 50);
       localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+
+      // Add to verifications as disputed
+      const verifications = JSON.parse(localStorage.getItem('pinpoint_user_verifications') || '[]');
+      verifications.push(issueId + '_fix_disputed');
+      localStorage.setItem('pinpoint_user_verifications', JSON.stringify(verifications));
 
       localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
       showToast("Issue reopened. Municipal authority notified of dispute. -50 Civic points.");
@@ -1100,7 +1105,7 @@
     issuesFeed.innerHTML = '';
 
     const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
-    const upvoted = JSON.parse(localStorage.getItem('pinpoint_user_upvotes') || '[]');
+    const verifications = JSON.parse(localStorage.getItem('pinpoint_user_verifications') || '[]');
 
     const query = searchInput?.value.toLowerCase() || '';
     const cat = categoryFilter?.value || 'All';
@@ -1136,22 +1141,15 @@
         statusBadgeColor = 'bg-brand-pink/10 text-brand-pink border-brand-pink/30 border animate-pulse';
       } else if (issue.status === 'Resolved') {
         statusBadgeColor = 'bg-brand-mint/10 text-brand-mint border-brand-mint/30 border';
+      } else if (issue.status === 'Closed') {
+        statusBadgeColor = 'bg-brand-mint/20 text-brand-mint border-brand-mint/40 border font-bold shadow-[0_0_8px_rgba(164,212,197,0.2)]';
       }
 
       let disputeBtnClass = 'bg-brand-pink/10 hover:bg-brand-pink/20 text-brand-pink border border-brand-pink/30 transition-colors';
 
-      const hasUpvoted = upvoted.includes(issue.id);
-      const verifyText = issue.status === 'Open' ? `Verify (${issue.verifications})` : `Verified (${issue.verifications})`;
-      
-      // Secondary buttons over saturated backgrounds must be high-contrast white containers
-      // Dark glassmorphic buttons
-      let upvoteBtnClass = hasUpvoted 
-        ? 'bg-brand-mint/20 text-brand-mint border border-brand-mint/30 shadow-[0_0_10px_rgba(164,212,197,0.2)]' 
-        : 'bg-surface-dark text-white hover:bg-surface-dark-elevated border border-hairline/20 hover:border-brand-mint/30 transition-colors';
-      let verifyBtnClass = 'bg-surface-dark text-white hover:bg-surface-dark-elevated border border-hairline/20 hover:border-brand-mint/30 transition-colors';
-      let resolveBtnClass = 'bg-brand-mint/10 text-brand-mint hover:bg-brand-mint/20 border border-brand-mint/30 transition-colors';
-
-      const upvoteBtnText = hasUpvoted ? 'Upvoted' : 'Upvote';
+      const hasVerified = verifications.includes(issue.id);
+      const hasVerifiedFix = verifications.includes(issue.id + '_fix_verified');
+      const hasDisputedFix = verifications.includes(issue.id + '_fix_disputed');
 
       let imageElement = '';
       if (issue.status === 'Resolved') {
@@ -1223,63 +1221,87 @@
           <!-- Audit Log Panel (Resolved state verification proof) -->
           ${auditPanel}
 
-          <!-- Badges & Controls Row -->
-          <div class="flex flex-wrap items-center gap-3 border-t border-divider-soft pt-4 mt-4">
-            <!-- Severity Badge -->
-            <span class="text-[11px] font-bold px-3 py-1 rounded-pill ${severityBadgeColor}">
-              ${issue.severity} Severity
-            </span>
+          <!-- Card Footer (Relaxed & Spacious) -->
+          <div class="border-t border-divider-soft pt-4 mt-4 flex flex-col gap-4">
+            <!-- Metadata Row -->
+            <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Severity Badge -->
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${severityBadgeColor}">
+                  ${issue.severity} Severity
+                </span>
+                
+                <!-- Status Badge -->
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md ${statusBadgeColor}">
+                  ${issue.disputed ? '⚠️ Disputed' : (issue.status === 'Closed' ? '✓ Verified' : issue.status)}
+                </span>
 
-            <!-- Status Badge -->
-            <span class="text-[11px] font-bold px-3 py-1 rounded-pill ${statusBadgeColor}">
-              ${issue.disputed ? 'âš ï¸ Disputed' : issue.status}
-            </span>
-
-            <!-- SLA Countdown Badge -->
-            ${getSLATimerHtml(issue, textLight)}
-
-            <span class="text-xs ${textLight ? 'text-on-dark-soft' : 'text-muted'} ml-1 font-medium">By ${issue.reportedBy}</span>
-
-            <!-- Controls (Verify, Upvote, Resolve) -->
-            <div class="flex items-center gap-2 ml-auto">
-              <!-- Upvote -->
-              <button 
-                onclick="handleUpvote('${issue.id}')"
-                class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${upvoteBtnClass}"
-              >
-                ${upvoteBtnText} (${issue.verifications})
-              </button>
-
-              <!-- Verify (Only for Open issues) -->
-              ${issue.status === 'Open' ? `
-                <button 
-                  onclick="handleVerify('${issue.id}')"
-                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${verifyBtnClass}"
-                >
-                  Verify
-                </button>
-              ` : ''}
-
-              <!-- Dispute Fix (Only for Resolved issues that are not already disputed) -->
-              ${issue.status === 'Resolved' && !issue.disputed ? `
-                <button 
-                  onclick="handleDispute('${issue.id}')"
-                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${disputeBtnClass}"
-                >
-                  Dispute Fix
-                </button>
-              ` : ''}
-
-              <!-- Simulated Authority: Mark as Resolved -->
-              ${issue.status !== 'Resolved' ? `
-                <button 
-                  onclick="handleResolve('${issue.id}')"
-                  class="px-4 py-2 rounded-md text-xs font-bold active-scale cursor-pointer transition-colors ${resolveBtnClass}"
-                >
-                  Resolve
-                </button>
-              ` : ''}
+                <!-- SLA Countdown Badge -->
+                ${getSLATimerHtml(issue, textLight)}
+              </div>
+              
+              <!-- Reporter -->
+              <span class="text-xs ${textLight ? 'text-on-dark-soft' : 'text-muted'} font-medium">
+                By ${issue.reportedBy}
+              </span>
             </div>
+
+            <!-- Actions Row (Only visible if there are actions) -->
+            ${(issue.status === 'Open' || (issue.status === 'Resolved' && !issue.disputed) || (issue.status !== 'Resolved' && issue.status !== 'Closed')) ? `
+              <div class="flex items-center justify-end gap-2 pt-2 border-t border-divider-soft/5">
+                <!-- Open Issue Verification -->
+                ${issue.status === 'Open' ? (
+                  hasVerified ? `
+                    <button class="px-4 py-2 rounded-md text-xs font-bold bg-brand-mint/20 text-brand-mint border border-brand-mint/30 shadow-[0_0_10px_rgba(164,212,197,0.1)] pointer-events-none flex items-center gap-1">
+                      <span>✓</span> Verified (${issue.verifications})
+                    </button>
+                  ` : `
+                    <button 
+                      onclick="handleVerify('${issue.id}')"
+                      class="px-4 py-2 rounded-md text-xs font-bold bg-surface-dark hover:bg-surface-dark-elevated text-white border border-hairline/20 hover:border-brand-mint/30 transition-colors active-scale cursor-pointer flex items-center gap-1"
+                    >
+                      Verify (${issue.verifications})
+                    </button>
+                  `
+                ) : ''}
+
+                <!-- Resolved Issue: Verify Fix / Dispute Fix -->
+                ${issue.status === 'Resolved' && !issue.disputed ? (
+                  hasVerifiedFix ? `
+                    <button class="px-4 py-2 rounded-md text-xs font-bold bg-brand-mint/20 text-brand-mint border border-brand-mint/30 pointer-events-none flex items-center gap-1">
+                      <span>✓</span> Fix Verified
+                    </button>
+                  ` : hasDisputedFix ? `
+                    <button class="px-4 py-2 rounded-md text-xs font-bold bg-brand-pink/20 text-brand-pink border border-brand-pink/30 pointer-events-none flex items-center gap-1">
+                      <span>⚠</span> Fix Disputed
+                    </button>
+                  ` : `
+                    <button 
+                      onclick="handleVerifyFix('${issue.id}')"
+                      class="px-4 py-2 rounded-md text-xs font-bold bg-brand-mint/10 hover:bg-brand-mint/20 text-brand-mint border border-brand-mint/30 transition-colors active-scale cursor-pointer flex items-center gap-1"
+                    >
+                      Verify Fix
+                    </button>
+                    <button 
+                      onclick="handleDispute('${issue.id}')"
+                      class="px-4 py-2 rounded-md text-xs font-bold bg-brand-pink/10 hover:bg-brand-pink/20 text-brand-pink border border-brand-pink/30 transition-colors active-scale cursor-pointer flex items-center gap-1"
+                    >
+                      Dispute Fix
+                    </button>
+                  `
+                ) : ''}
+
+                <!-- Simulated Authority: Mark as Resolved (only for non-Resolved and non-Closed issues) -->
+                ${issue.status !== 'Resolved' && issue.status !== 'Closed' ? `
+                  <button 
+                    onclick="handleResolve('${issue.id}')"
+                    class="px-4 py-2 rounded-md text-xs font-bold bg-brand-mint/10 text-brand-mint hover:bg-brand-mint/20 border border-brand-mint/30 transition-colors active-scale cursor-pointer"
+                  >
+                    Resolve
+                  </button>
+                ` : ''}
+              </div>
+            ` : ''}
           </div>
         </div>
       `;
@@ -1297,39 +1319,34 @@
     });
   }
 
-  // Upvote Action Handler
-  (window as any).handleUpvote = function(id: string) {
+  // Verify Action Handler (Open issues)
+  (window as any).handleVerify = function(id: string) {
     const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
-    const upvoted = JSON.parse(localStorage.getItem('pinpoint_user_upvotes') || '[]');
+    const verifications = JSON.parse(localStorage.getItem('pinpoint_user_verifications') || '[]');
     
-    if (upvoted.includes(id)) {
-      const index = upvoted.indexOf(id);
-      upvoted.splice(index, 1);
-      
-      const issue = issues.find((i: any) => i.id === id);
-      if (issue) issue.verifications = Math.max(0, issue.verifications - 1);
-      
-      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
-      localStorage.setItem('pinpoint_user_upvotes', JSON.stringify(upvoted));
-      
-      const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
-      userStats.points = Math.max(0, userStats.points - 15);
-      localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
+    if (verifications.includes(id)) {
+      return;
+    }
 
-      showToast("Upvote removed.");
-    } else {
-      upvoted.push(id);
-      const issue = issues.find((i: any) => i.id === id);
-      if (issue) issue.verifications += 1;
-
-      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
-      localStorage.setItem('pinpoint_user_upvotes', JSON.stringify(upvoted));
+    const issue = issues.find((i: any) => i.id === id);
+    if (issue) {
+      issue.verifications += 1;
+      verifications.push(id);
       
+      localStorage.setItem('pinpoint_user_verifications', JSON.stringify(verifications));
+
+      if (issue.verifications >= 3 && issue.status === 'Open') {
+        issue.status = 'In Progress';
+        showToast("Crowd verification complete. Escalated to 'In Progress'!");
+      } else {
+        showToast("Verification logged. +15 Civic points!");
+      }
+
       const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');
       userStats.points += 15;
       localStorage.setItem('pinpoint_user_stats', JSON.stringify(userStats));
 
-      showToast("Upvoted issue. +15 Civic points!");
+      localStorage.setItem('pinpoint_issues', JSON.stringify(issues));
     }
 
     renderFeed();
@@ -1337,18 +1354,30 @@
     window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
   };
 
-  // Verify Action Handler
-  (window as any).handleVerify = function(id: string) {
+  // Verify Fix Action Handler (Resolved issues)
+  (window as any).handleVerifyFix = function(id: string) {
     const issues = JSON.parse(localStorage.getItem('pinpoint_issues') || '[]');
+    const verifications = JSON.parse(localStorage.getItem('pinpoint_user_verifications') || '[]');
+    
+    if (verifications.includes(id + '_fix_verified')) {
+      return;
+    }
+
     const issue = issues.find((i: any) => i.id === id);
     if (issue) {
-      issue.verifications += 1;
+      if (typeof issue.fixVerifications !== 'number') {
+        issue.fixVerifications = 0;
+      }
+      issue.fixVerifications += 1;
+      verifications.push(id + '_fix_verified');
       
-      if (issue.verifications >= 3 && issue.status === 'Open') {
-        issue.status = 'In Progress';
-        showToast("Crowd verification complete. Escalated to 'In Progress'!");
+      localStorage.setItem('pinpoint_user_verifications', JSON.stringify(verifications));
+
+      if (issue.fixVerifications >= 2 && issue.status === 'Resolved') {
+        issue.status = 'Closed';
+        showToast("Community consensus reached. Case closed & archived!");
       } else {
-        showToast("Verification logged. +15 Civic points!");
+        showToast("Fix verified! +15 Civic points.");
       }
 
       const userStats = JSON.parse(localStorage.getItem('pinpoint_user_stats') || '{"points": 350, "level": "Civic Scout"}');

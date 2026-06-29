@@ -53,5 +53,28 @@ const {
 		<Footer />
 		<Modals />
 		<GlobalScripts />
+		<script>
+			import { io } from 'socket.io-client';
+			
+			const socket = io();
+			let isUpdatingFromServer = false;
+
+			socket.on('init_issues', (data) => {
+				isUpdatingFromServer = true;
+				localStorage.setItem('pinpoint_issues', JSON.stringify(data));
+				window.dispatchEvent(new CustomEvent('pinpoint_issues_updated'));
+				isUpdatingFromServer = false;
+			});
+
+			const originalSetItem = localStorage.setItem;
+			localStorage.setItem = function(key, value) {
+				originalSetItem.apply(this, arguments as any);
+				if (key === 'pinpoint_issues' && !isUpdatingFromServer) {
+					try {
+						socket.emit('sync_issues', JSON.parse(value));
+					} catch(e) {}
+				}
+			};
+		</script>
 	</body>
 </html>
